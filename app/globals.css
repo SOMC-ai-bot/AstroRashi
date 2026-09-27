@@ -1,0 +1,328 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* Typography Tokens from the Mystic WordPress Template */
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Cinzel', serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sacred: 'Cinzel', serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Deep Mystic Midnight Void Foundations */
+  --bg-primary: #06040A;
+  --bg-surface: #0D0819;
+  --bg-surface-elevated: #140A28;
+  --bg-surface-glass: rgba(16, 10, 32, 0.85);
+  --bg-card: rgba(22, 14, 44, 0.65);
+  --bg-card-hover: rgba(30, 18, 58, 0.85);
+
+  /* Primary Theme Palette: Royal Mystical Violet & Orchid */
+  --purple-primary: #7C3AED;
+  --purple-light: #8B5CF6;
+  --purple-bright: #A855F7;
+  --purple-soft: #C084FC;
+  --purple-glow: rgba(124, 58, 237, 0.45);
+  --purple-subtle: rgba(124, 58, 237, 0.15);
+
+  /* Compatibility theme aliases */
+  --theme-orange: #8B5CF6;
+  --theme-orange-hover: #9333EA;
+  --theme-orange-light: #C084FC;
+  --theme-orange-glow: rgba(139, 92, 246, 0.45);
+  --theme-orange-subtle: rgba(139, 92, 246, 0.15);
+
+  --gold-primary: #F59E0B;
+  --gold-light: #FBBF24;
+  --gold-muted: #D97706;
+  --gold-glow: rgba(245, 158, 11, 0.45);
+  --gold-subtle: rgba(245, 158, 11, 0.12);
+
+  --theme-blue: #6366F1;
+  --theme-blue-light: #818CF8;
+  --theme-blue-glow: rgba(99, 102, 241, 0.38);
+
+  --theme-green: #10B981;
+  --theme-green-light: #34D399;
+  --theme-green-glow: rgba(16, 185, 129, 0.38);
+
+  /* Elegant Celestial Monochromes */
+  --theme-white: #FFFFFF;
+  --text-primary: #FFFFFF;
+  --text-secondary: #E4DCF9;
+  --text-muted: #A79BBF;
+  --text-dim: #71648A;
+
+  /* Mystic Wireframe Borders & Highlights */
+  --border-subtle: rgba(168, 85, 247, 0.16);
+  --border-card: rgba(168, 85, 247, 0.24);
+  --border-card-hover: rgba(192, 132, 252, 0.55);
+  --border-focus: rgba(168, 85, 247, 0.75);
+  --border-glow-gold: rgba(245, 158, 11, 0.45);
+  --border-outline-btn: rgba(216, 180, 254, 0.5);
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Radii - Refined crisp aesthetics matching the template */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 140ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 220ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Multi-Layer Cosmic Shadows */
+  --shadow-card: 0 16px 40px -10px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --shadow-card-hover: 0 24px 60px -12px rgba(0, 0, 0, 0.9), 0 0 35px rgba(124, 58, 237, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  --shadow-glow: 0 0 32px var(--purple-glow);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+  font-weight: 700;
+}
+
+/* Mystical WordPress Cosmic Atmosphere */
+.cosmic-bg {
+  background-color: var(--bg-primary);
+  background-image: 
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124, 58, 237, 0.28) 0%, transparent 65%),
+    radial-gradient(circle at 15% 45%, rgba(168, 85, 247, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 85% 65%, rgba(91, 33, 182, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 50% 95%, rgba(139, 92, 246, 0.12) 0%, transparent 60%);
+  background-attachment: fixed;
+}
+
+/* Template Exact Buttons */
+.btn-mystic-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #7C3AED 0%, #8B5CF6 100%);
+  color: #FFFFFF;
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  border-radius: 4px;
+  padding: 10px 24px;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(124, 58, 237, 0.45);
+  transition: all 200ms ease;
+  text-decoration: none;
+}
+
+.btn-mystic-primary:hover {
+  background: linear-gradient(135deg, #8B5CF6 0%, #9333EA 100%);
+  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.65);
+  transform: translateY(-1px);
+}
+
+.btn-mystic-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
+  color: #F3EEFF;
+  border: 1px solid rgba(216, 180, 254, 0.5);
+  border-radius: 4px;
+  padding: 10px 24px;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 200ms ease;
+  text-decoration: none;
+}
+
+.btn-mystic-outline:hover {
+  background: rgba(124, 58, 237, 0.2);
+  border-color: #C084FC;
+  color: #FFFFFF;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.35);
+  transform: translateY(-1px);
+}
+
+/* Glassmorphism Panels */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.glass-panel-elevated {
+  background: var(--bg-surface-glass);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Card Interactive 3D Lift */
+.custom-card {
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal), border-color var(--transition-normal);
+}
+
+.custom-card:hover {
+  border-color: rgba(192, 132, 252, 0.45);
+}
+
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+  border-color: rgba(192, 132, 252, 0.6);
+}
+
+/* Sacred Mandala Rotating Ring Animations */
+@keyframes sacredRotateClockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes sacredRotateCounter {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+@keyframes sacredPulseCore {
+  0% { transform: scale(0.96); opacity: 0.75; filter: drop-shadow(0 0 15px #8B5CF6); }
+  50% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 35px #C084FC); }
+  100% { transform: scale(0.96); opacity: 0.75; filter: drop-shadow(0 0 15px #8B5CF6); }
+}
+
+.sacred-ring-clockwise {
+  animation: sacredRotateClockwise 80s linear infinite;
+  transform-origin: center;
+}
+
+.sacred-ring-counter {
+  animation: sacredRotateCounter 95s linear infinite;
+  transform-origin: center;
+}
+
+.sacred-core-pulse {
+  animation: sacredPulseCore 4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Shimmer Highlight */
+.shimmer-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+  animation: cardShimmer 6s infinite ease-in-out;
+  pointer-events: none;
+}
+
+@keyframes cardShimmer {
+  0% { left: -100%; }
+  35%, 100% { left: 100%; }
+}
+
+@keyframes orbBreathe {
+  0% {
+    transform: scale(0.97);
+    box-shadow: 0 0 25px rgba(124, 58, 237, 0.45), 0 0 50px rgba(168, 85, 247, 0.25);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 45px rgba(124, 58, 237, 0.8), 0 0 75px rgba(192, 132, 252, 0.5);
+  }
+  100% {
+    transform: scale(0.97);
+    box-shadow: 0 0 25px rgba(124, 58, 237, 0.45), 0 0 50px rgba(168, 85, 247, 0.25);
+  }
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Cosmic Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(124, 58, 237, 0.5) 0%, rgba(168, 85, 247, 0.3) 100%);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--purple-light);
+}
+
+::selection {
+  background: var(--purple-primary);
+  color: #FFFFFF;
+}
+
+.will-change-transform {
+  will-change: transform;
+}
