@@ -5,7 +5,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { Sparkles, Bookmark, Share2, ArrowRight, RotateCcw, AlertCircle, Check } from 'lucide-react';
+import { Sparkles, Bookmark, Share2, ArrowRight, RotateCcw, AlertCircle, Check, BookOpen, Compass, CheckCircle2 } from 'lucide-react';
 import { AstrologyResultObject } from '@/types';
 import { saveCalculationItem } from '@/lib/astrology-engine/history-engine';
 
@@ -15,6 +15,9 @@ interface UniversalToolModalProps {
   toolTitle: string;
   toolCategory: string;
   toolDescription: string;
+  toolHowItWorks?: string;
+  toolKeyFeatures?: string[];
+  toolPracticalGuidance?: string;
   inputFormNode: React.ReactNode;
   result: AstrologyResultObject | null;
   isLoading: boolean;
@@ -31,6 +34,9 @@ export const UniversalToolModal: React.FC<UniversalToolModalProps> = ({
   toolTitle,
   toolCategory,
   toolDescription,
+  toolHowItWorks,
+  toolKeyFeatures,
+  toolPracticalGuidance,
   inputFormNode,
   result,
   isLoading,
@@ -134,14 +140,14 @@ export const UniversalToolModal: React.FC<UniversalToolModalProps> = ({
           </div>
         )}
 
-        {/* 5-Step Universal Result Architecture */}
+        {/* Simple Arranged Result Layout */}
         {result && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', animation: 'modalFadeIn 220ms ease' }}>
-            {/* 1. RESULT HEADER */}
-            <Card variant="gradient" style={{ padding: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--gold-primary)', letterSpacing: '0.05em' }}>
-                  CALCULATED RESULT
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', animation: 'modalFadeIn 220ms ease' }}>
+            {/* 1. Main Result Card */}
+            <Card variant="gradient" style={{ padding: '20px', border: '1.5px solid var(--theme-orange-primary)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--gold-primary)', letterSpacing: '0.06em' }}>
+                  ✦ VERIFIED CALCULATION RESULT
                 </span>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button
@@ -150,16 +156,17 @@ export const UniversalToolModal: React.FC<UniversalToolModalProps> = ({
                       background: 'rgba(255, 255, 255, 0.08)',
                       border: 'none',
                       borderRadius: 'var(--radius-sm)',
-                      padding: '4px 8px',
+                      padding: '4px 10px',
                       color: saved ? '#34C759' : 'var(--text-secondary)',
-                      fontSize: '11px',
+                      fontSize: '11.5px',
+                      fontWeight: 600,
                       display: 'flex',
                       alignItems: 'center',
                       gap: '4px',
                       cursor: 'pointer',
                     }}
                   >
-                    {saved ? <Check size={12} /> : <Bookmark size={12} />}
+                    {saved ? <Check size={13} /> : <Bookmark size={13} />}
                     <span>{saved ? 'Saved' : 'Save'}</span>
                   </button>
                   <button
@@ -168,22 +175,23 @@ export const UniversalToolModal: React.FC<UniversalToolModalProps> = ({
                       background: 'rgba(255, 255, 255, 0.08)',
                       border: 'none',
                       borderRadius: 'var(--radius-sm)',
-                      padding: '4px 8px',
+                      padding: '4px 10px',
                       color: copied ? '#34C759' : 'var(--text-secondary)',
-                      fontSize: '11px',
+                      fontSize: '11.5px',
+                      fontWeight: 600,
                       display: 'flex',
                       alignItems: 'center',
                       gap: '4px',
                       cursor: 'pointer',
                     }}
                   >
-                    {copied ? <Check size={12} /> : <Share2 size={12} />}
+                    {copied ? <Check size={13} /> : <Share2 size={13} />}
                     <span>{copied ? 'Copied' : 'Share'}</span>
                   </button>
                 </div>
               </div>
 
-              <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#FFFFFF', marginBottom: '8px', lineHeight: 1.4 }}>
                 {result.interpretation.summary}
               </h3>
 
@@ -198,107 +206,146 @@ export const UniversalToolModal: React.FC<UniversalToolModalProps> = ({
                   }
                   size="sm"
                 >
-                  Quality: {result.interpretation.quality}
+                  Status: {result.interpretation.quality}
                 </Badge>
               )}
             </Card>
 
-            {/* SMART TOOL DESCRIPTION & WHAT YOU GAIN UPON CALCULATION */}
+            {/* 2. Simple 'How This Tool Works' Card */}
             <div
               style={{
-                background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(14, 10, 24, 0.95) 100%)',
-                padding: '18px 20px',
+                background: 'rgba(255, 255, 255, 0.03)',
+                padding: '14px 16px',
                 borderRadius: 'var(--radius-md)',
-                border: '1px solid rgba(168, 85, 247, 0.3)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
               }}
             >
-              <div>
-                <h4 style={{ fontSize: '13px', fontWeight: 800, color: '#FACC15', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Sparkles size={14} />
-                  <span>About {toolTitle}</span>
-                </h4>
-                <p style={{ fontSize: '12.5px', color: '#E4DCF9', lineHeight: 1.55 }}>
-                  {toolDescription} This calculation cross-references your exact astronomical coordinates and birth degrees with classical Vedic Jyotish principles to evaluate planetary dignity, aspects, and temporal strength.
-                </p>
-              </div>
-
-              <div style={{ paddingTop: '8px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
-                <h4 style={{ fontSize: '13px', fontWeight: 800, color: '#38BDF8', marginBottom: '4px' }}>
-                  ✦ What You Gain from This Calculation
-                </h4>
-                <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-                  A clear, grounded understanding of your planetary influences, empowering you to navigate karmic cycles, optimize personal timing, and make informed choices aligned with your cosmic blueprint.
-                </p>
-              </div>
-            </div>
-            <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '16px', borderRadius: 'var(--radius-md)' }}>
-              <h4 style={{ fontSize: '13px', fontWeight: 700, color: 'var(--accent-rose-light)', marginBottom: '6px' }}>
-                ✦ What This Means
+              <h4
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 800,
+                  color: '#38BDF8',
+                  marginBottom: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <BookOpen size={14} />
+                <span>How This Tool Works</span>
               </h4>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                {result.interpretation.whatThisMeans}
+              <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+                {toolHowItWorks ||
+                  result.interpretation.howCalculated ||
+                  `Calculated using your precise astronomical coordinates and Vedic sidereal degrees with Lahiri Ayanamsa.`}
               </p>
             </div>
 
-            {/* 3. HOW IT WAS CALCULATED */}
-            <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '16px', borderRadius: 'var(--radius-md)' }}>
-              <h4 style={{ fontSize: '13px', fontWeight: 700, color: 'var(--gold-primary)', marginBottom: '6px' }}>
-                ⚙ How It Was Calculated
-              </h4>
-              <p style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                {result.interpretation.howCalculated}
-              </p>
-            </div>
-
-            {/* 4. TRADITIONAL INTERPRETATION */}
-            <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '16px', borderRadius: 'var(--radius-md)' }}>
-              <h4 style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
-                📜 Traditional Astrological Interpretation
-              </h4>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                {result.interpretation.traditionalContext}
-              </p>
-            </div>
-
-            {/* 5. CONSULT EXPERT ASTROLOGER ON THIS RESULT */}
+            {/* 3. Simple 'Key Insights You Receive' Card */}
             <div
               style={{
-                padding: '16px',
+                background: 'rgba(255, 255, 255, 0.03)',
+                padding: '14px 16px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+              }}
+            >
+              <h4
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 800,
+                  color: '#FACC15',
+                  marginBottom: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <Sparkles size={14} />
+                <span>Key Insights You Receive</span>
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {(toolKeyFeatures || [
+                  'Sidereal planetary position mapped to classical astrological canons.',
+                  'Direct evaluation of strength, harmony, and cosmic influences.',
+                  'Clear timing awareness to optimize important life decisions.',
+                ]).map((feat, idx) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px', color: '#E2E8F0' }}>
+                    <span style={{ color: 'var(--gold-primary)', fontWeight: 800 }}>•</span>
+                    <span>{feat}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 4. Simple 'Practical Guidance' Card */}
+            <div
+              style={{
+                background: 'rgba(216, 197, 138, 0.08)',
+                padding: '14px 16px',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid rgba(216, 197, 138, 0.25)',
+              }}
+            >
+              <h4
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 800,
+                  color: 'var(--gold-primary)',
+                  marginBottom: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <Compass size={14} />
+                <span>Practical Guidance</span>
+              </h4>
+              <p style={{ fontSize: '12.5px', color: 'var(--text-primary)', lineHeight: 1.55 }}>
+                {toolPracticalGuidance ||
+                  result.interpretation.whatThisMeans ||
+                  'Use this calculation for reflective awareness, harmony, and informed personal decisions.'}
+              </p>
+            </div>
+
+            {/* 5. Consult Specialist Astrologer on This Result */}
+            <div
+              style={{
+                padding: '14px 16px',
                 borderRadius: 'var(--radius-md)',
                 background: 'linear-gradient(135deg, rgba(255, 106, 0, 0.2) 0%, rgba(250, 204, 21, 0.15) 100%)',
                 border: '1px solid rgba(255, 106, 0, 0.35)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '10px',
               }}
             >
               <div>
-                <p style={{ fontSize: '13.5px', fontWeight: 800, color: '#FFFFFF' }}>
-                  Consult Expert Astrologer on This Result
+                <p style={{ fontSize: '13px', fontWeight: 800, color: '#FFFFFF' }}>
+                  Consult Specialist Astrologer
                 </p>
-                <p style={{ fontSize: '11.5px', color: 'var(--text-secondary)' }}>
-                  Opens consultation with this calculation as verified evidence
+                <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                  Discuss this {toolTitle} result directly with our expert
                 </p>
               </div>
               <Button
                 variant="primary"
-                size="md"
+                size="sm"
                 onClick={() => {
                   onClose();
                   onAskAI(`Explain this ${toolTitle} result: "${result.interpretation.summary}". What does it mean for my personal journey?`);
                 }}
                 icon={<Sparkles size={14} />}
               >
-                Consult Astrologer
+                Ask Specialist
               </Button>
             </div>
 
             {/* Related Tools Links */}
             {result.relatedTools && result.relatedTools.length > 0 && (
-              <div style={{ marginTop: '8px' }}>
+              <div style={{ marginTop: '4px' }}>
                 <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)' }}>
                   RELATED TOOLS:
                 </span>
@@ -308,7 +355,7 @@ export const UniversalToolModal: React.FC<UniversalToolModalProps> = ({
                       key={rt.id}
                       onClick={() => onSelectRelatedTool && onSelectRelatedTool(rt.id)}
                       style={{
-                        padding: '6px 10px',
+                        padding: '5px 10px',
                         borderRadius: 'var(--radius-full)',
                         background: 'rgba(255, 255, 255, 0.05)',
                         border: '1px solid var(--border-subtle)',
@@ -328,9 +375,9 @@ export const UniversalToolModal: React.FC<UniversalToolModalProps> = ({
               </div>
             )}
 
-            {/* Contextual Ethical Disclaimer */}
-            <p style={{ fontSize: '10.5px', color: 'var(--text-muted)', lineHeight: 1.4, textAlign: 'center', marginTop: '8px' }}>
-              {result.disclaimer}
+            {/* Simple Contextual Note */}
+            <p style={{ fontSize: '10.5px', color: 'var(--text-muted)', lineHeight: 1.4, textAlign: 'center', marginTop: '4px' }}>
+              {result.disclaimer || 'Astrological interpretations are reflective guides based on classical Jyotish.'}
             </p>
           </div>
         )}

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { LanguageCode } from '@/types';
 import { useSubscription } from '@/lib/state/subscription-context';
+import { LocationPicker } from '@/components/tools/LocationPicker';
 import { ProfilesManagerModal } from './ProfilesManagerModal';
 import { SavedCalculationsModal } from './SavedCalculationsModal';
 import {
@@ -56,6 +57,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const [birthDate, setBirthDate] = useState(user.birthDate);
   const [birthTime, setBirthTime] = useState(user.birthTime);
   const [birthPlace, setBirthPlace] = useState(user.birthPlace);
+  const [latitude, setLatitude] = useState(user.latitude || 28.6139);
+  const [longitude, setLongitude] = useState(user.longitude || 77.209);
+  const [timezone, setTimezone] = useState(user.timezone || 'Asia/Kolkata');
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
@@ -96,6 +100,9 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       birthDate,
       birthTime,
       birthPlace,
+      latitude,
+      longitude,
+      timezone,
     });
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 2400);
@@ -251,7 +258,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   padding: '6px 4px',
                 }}
               >
-                <span>{user.isPremium ? 'Change Subscription Plan' : 'Upgrade Plan (From ₹199/mo)'}</span>
+                <span>{user.isPremium ? 'Change Subscription Plan' : 'Upgrade Plan (From ₹29/mo)'}</span>
               </button>
             </div>
           </div>
@@ -431,14 +438,26 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             />
           </div>
 
-          <Input
-            label="Place of Birth"
-            value={birthPlace}
-            onChange={(e) => setBirthPlace(e.target.value)}
-            icon={<MapPin size={16} />}
-            placeholder="e.g. Varanasi, Uttar Pradesh, India"
-            required
-          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+              Place of Birth (Search City or Auto-Detect GPS)
+            </label>
+            <LocationPicker
+              value={birthPlace}
+              onSelect={(city) => {
+                const formatted = `${city.name}${city.state ? ', ' + city.state : ''}, ${city.country}`;
+                setBirthPlace(formatted);
+                setLatitude(city.latitude);
+                setLongitude(city.longitude);
+                setTimezone(city.timezone);
+              }}
+            />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>
+              <span style={{ color: 'var(--gold-primary)' }}>● Verified Coordinates:</span>
+              <span>{latitude.toFixed(4)}°N, {longitude.toFixed(4)}°E</span>
+              <span>• Timezone: {timezone}</span>
+            </div>
+          </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
             <Button type="submit" variant="primary">

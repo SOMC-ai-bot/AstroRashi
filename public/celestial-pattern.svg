@@ -1,0 +1,92 @@
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" opacity="0.35">
+  <defs>
+    <!-- Radiant Star Symbol -->
+    <g id="sparkle-star">
+      <path d="M 0,-16 Q 0,0 16,0 Q 0,0 0,16 Q 0,0 -16,0 Q 0,0 0,-16 Z" fill="#F5D061" opacity="0.75" />
+      <circle cx="0" cy="0" r="2.5" fill="#FFFDE8" />
+    </g>
+    <!-- Small Star -->
+    <g id="tiny-star">
+      <circle cx="0" cy="0" r="1.5" fill="#FCE7A6" opacity="0.65" />
+    </g>
+  </defs>
+
+  <!-- Constellation Lines: Ursa Major / Great Bear -->
+  <g stroke="#E5B842" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.4" fill="none">
+    <path d="M 80,120 L 140,110 L 200,150 L 250,210 L 320,200 L 340,260 L 240,270 L 200,210" />
+    <path d="M 520,80 L 590,130 L 640,110 L 710,170" />
+    <path d="M 120,540 L 190,510 L 240,560 L 220,640 L 140,660 Z" />
+    <path d="M 580,520 L 640,480 L 700,530 L 720,620 L 620,670 Z" />
+  </g>
+
+  <!-- Constellation Nodes (Stars) -->
+  <circle cx="80" cy="120" r="3" fill="#FFEAA7" opacity="0.8" />
+  <circle cx="140" cy="110" r="2.5" fill="#FFEAA7" opacity="0.8" />
+  <circle cx="200" cy="150" r="3.5" fill="#FFF" opacity="0.9" />
+  <circle cx="250" cy="210" r="3" fill="#FFEAA7" opacity="0.8" />
+  <circle cx="320" cy="200" r="2.5" fill="#FFEAA7" opacity="0.8" />
+  <circle cx="340" cy="260" r="4" fill="#FFEAA7" opacity="0.9" />
+  <circle cx="240" cy="270" r="3" fill="#FFEAA7" opacity="0.8" />
+
+  <circle cx="520" cy="80" r="3" fill="#FFEAA7" opacity="0.8" />
+  <circle cx="590" cy="130" r="3.5" fill="#FFF" opacity="0.9" />
+  <circle cx="640" cy="110" r="2" fill="#FFEAA7" opacity="0.8" />
+  <circle cx="710" cy="170" r="4" fill="#FFEAA7" opacity="0.9" />
+
+  <circle cx="120" cy="540" r="3.5" fill="#FFF" opacity="0.8" />
+  <circle cx="190" cy="510" r="2.5" fill="#FFEAA7" opacity="0.8" />
+  <circle cx="240" cy="560" r="3" fill="#FFEAA7" opacity="0.8" />
+  <circle cx="220" cy="640" r="3" fill="#FFEAA7" opacity="0.8" />
+  <circle cx="140" cy="660" r="4" fill="#FFEAA7" opacity="0.9" />
+
+  <!-- Celestial Zodiac Ring Motif -->
+  <g transform="translate(400, 400)" opacity="0.25">
+    <circle cx="0" cy="0" r="160" fill="none" stroke="#F5D061" stroke-width="1.2" />
+    <circle cx="0" cy="0" r="145" fill="none" stroke="#E5B842" stroke-width="0.8" stroke-dasharray="4,6" />
+    <circle cx="0" cy="0" r="120" fill="none" stroke="#F5D061" stroke-width="0.8" />
+    <circle cx="0" cy="0" r="70" fill="none" stroke="#E5B842" stroke-width="0.6" />
+    
+    <!-- 12 Radiating Rays -->
+    <line x1="0" y1="-160" x2="0" y2="-120" stroke="#F5D061" stroke-width="1" />
+    <line x1="0" y1="120" x2="0" y2="160" stroke="#F5D061" stroke-width="1" />
+    <line x1="-160" y1="0" x2="-120" y2="0" stroke="#F5D061" stroke-width="1" />
+    <line x1="120" y1="0" x2="160" y2="0" stroke="#F5D061" stroke-width="1" />
+    <line x1="-113" y1="-113" x2="-85" y2="-85" stroke="#F5D061" stroke-width="1" />
+    <line x1="85" y1="85" x2="113" y2="113" stroke="#F5D061" stroke-width="1" />
+    <line x1="113" y1="-113" x2="85" y2="-85" stroke="#F5D061" stroke-width="1" />
+    <line x1="-85" y1="85" x2="-113" y2="113" stroke="#F5D061" stroke-width="1" />
+
+    <!-- Radiant Sun-Moon Center Face Silhouette -->
+    <path d="M 0,-40 C 22,-40 40,-22 40,0 C 40,22 22,40 0,40 C -8,40 -16,37 -23,32 C -10,25 -2,12 -2,0 C -2,-12 -10,-25 -23,-32 C -16,-37 -8,-40 0,-40 Z" fill="#F5D061" opacity="0.6" />
+  </g>
+
+  <!-- Dispersed Sparkling Golden Stars -->
+  <use href="#sparkle-star" x="60" y="240" transform="scale(0.8)" />
+  <use href="#sparkle-star" x="720" y="320" transform="scale(1)" />
+  <use href="#sparkle-star" x="480" y="700" transform="scale(0.7)" />
+  <use href="#sparkle-star" x="180" y="750" transform="scale(0.9)" />
+  <use href="#sparkle-star" x="680" y="60" transform="scale(0.8)" />
+  <use href="#sparkle-star" x="380" y="100" transform="scale(1.1)" />
+
+  <!-- Tiny Stars -->
+  <use href="#tiny-star" x="40" y="40" />
+  <use href="#tiny-star" x="150" y="80" />
+  <use href="#tiny-star" x="290" y="50" />
+  <use href="#tiny-star" x="440" y="30" />
+  <use href="#tiny-star" x="520" y="180" />
+  <use href="#tiny-star" x="610" y="250" />
+  <use href="#tiny-star" x="760" y="190" />
+  <use href="#tiny-star" x="780" y="420" />
+  <use href="#tiny-star" x="710" y="560" />
+  <use href="#tiny-star" x="640" y="740" />
+  <use href="#tiny-star" x="520" y="600" />
+  <use href="#tiny-star" x="330" y="720" />
+  <use href="#tiny-star" x="220" y="690" />
+  <use href="#tiny-star" x="90" y="620" />
+  <use href="#tiny-star" x="40" y="480" />
+  <use href="#tiny-star" x="120" y="360" />
+  <use href="#tiny-star" x="250" y="430" />
+  <use href="#tiny-star" x="530" y="370" />
+  <use href="#tiny-star" x="470" y="250" />
+  <use href="#tiny-star" x="310" y="310" />
+</svg>

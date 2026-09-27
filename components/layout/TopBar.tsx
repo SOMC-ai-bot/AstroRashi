@@ -1,13 +1,36 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Bell, Globe, Sparkles, Crown, User } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  Compass,
+  PieChart,
+  Calculator,
+  FileText,
+  BookOpen,
+  Sparkles,
+  Bot,
+  Crown,
+  User,
+  ChevronDown,
+  Bell,
+  Globe,
+  Check,
+  Menu,
+  X,
+  Flame,
+  Moon,
+  Shield,
+  Clock,
+  Heart,
+  Gem,
+} from 'lucide-react';
 import { useAuth } from '@/lib/state/auth-context';
 import { useI18n } from '@/lib/i18n/i18n-context';
 import { LanguageCode } from '@/types';
 import { NavTab } from './BottomNav';
 
 interface TopBarProps {
+  activeTab: NavTab;
   onTabChange: (tab: NavTab) => void;
   onOpenNotifications: () => void;
   onOpenPremium: () => void;
@@ -34,6 +57,7 @@ const LANGUAGE_LABELS: Record<LanguageCode, { label: string; script: string }> =
 };
 
 export const TopBar: React.FC<TopBarProps> = ({
+  activeTab,
   onTabChange,
   onOpenNotifications,
   onOpenPremium,
@@ -42,61 +66,93 @@ export const TopBar: React.FC<TopBarProps> = ({
 }) => {
   const { user } = useAuth();
   const { language, setLanguage } = useI18n();
-  const [showLangMenu, setShowLangMenu] = useState(false);
+
+  const [activeDropdown, setActiveDropdown] = useState<'tools' | 'reports' | 'astrologers' | 'lang' | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const navRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
+
+  const handleSelectTab = (tab: NavTab) => {
+    onTabChange(tab);
+    setActiveDropdown(null);
+    setMobileMenuOpen(false);
+  };
 
   return (
-    <div style={{ position: 'sticky', top: 0, zIndex: 40, width: '100%' }}>
-      {/* Main Header Bar */}
+    <div ref={navRef} style={{ position: 'sticky', top: 0, zIndex: 50, width: '100%' }}>
+      {/* Horizontal Navigation Bar Header */}
       <header
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          height: '66px',
+          height: '72px',
           padding: '0 24px',
-          backgroundColor: 'rgba(10, 6, 20, 0.92)',
-          backdropFilter: 'blur(28px)',
-          WebkitBackdropFilter: 'blur(28px)',
-          borderBottom: '1px solid rgba(168, 85, 247, 0.2)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.7)',
+          backgroundColor: 'rgba(7, 9, 18, 0.94)',
+          backdropFilter: 'blur(30px)',
+          WebkitBackdropFilter: 'blur(30px)',
+          borderBottom: '1px solid rgba(245, 208, 97, 0.22)',
+          boxShadow: '0 8px 36px rgba(0, 0, 0, 0.85)',
+          gap: '16px',
         }}
       >
-        {/* Brand & Sacred Star Logo */}
+        {/* 1. Left: Brand Sacred Sun-Moon Logo */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: '12px',
             cursor: 'pointer',
+            flexShrink: 0,
           }}
-          onClick={() => onTabChange('discover')}
+          onClick={() => handleSelectTab('discover')}
         >
           <div
             style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: '4px',
-              background: 'linear-gradient(135deg, #7C3AED 0%, #8B5CF6 100%)',
+              width: '42px',
+              height: '42px',
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, #F5D061 0%, #D97706 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 0 20px rgba(124, 58, 237, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35)',
-              border: '1px solid rgba(192, 132, 252, 0.5)',
+              boxShadow: '0 0 24px rgba(245, 208, 97, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.5)',
+              border: '1.5px solid #FDE89C',
             }}
           >
-            {/* Sacred Star Pentagram SVG */}
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            {/* Celestial Sun/Moon Emblem */}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#06070E" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2" />
+              <path d="M12 20v2" />
+              <path d="m4.93 4.93 1.41 1.41" />
+              <path d="m17.66 17.66 1.41 1.41" />
+              <path d="M2 12h2" />
+              <path d="M20 12h2" />
+              <path d="m6.34 17.66-1.41 1.41" />
+              <path d="m19.07 4.93-1.41 1.41" />
             </svg>
           </div>
+
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span
               style={{
                 fontFamily: 'var(--font-display), serif',
-                fontSize: '20px',
-                fontWeight: 800,
-                letterSpacing: '0.06em',
-                background: 'linear-gradient(135deg, #FFFFFF 0%, #E9D5FF 60%, #C084FC 100%)',
+                fontSize: '21px',
+                fontWeight: 900,
+                letterSpacing: '0.08em',
+                background: 'linear-gradient(135deg, #FFFFFF 0%, #F5D061 55%, #FBBF24 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 lineHeight: 1.1,
@@ -104,217 +160,638 @@ export const TopBar: React.FC<TopBarProps> = ({
             >
               ASTRONEX
             </span>
-            <span style={{ fontSize: '9.5px', color: '#C084FC', fontWeight: 600, letterSpacing: '0.06em' }}>
-              VEDIC ASTROLOGY & WISDOM
+            <span
+              style={{
+                fontSize: '9.5px',
+                letterSpacing: '0.22em',
+                color: '#F5D061',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                opacity: 0.9,
+              }}
+            >
+              VEDIC INTELLIGENCE
             </span>
           </div>
         </div>
 
-      {/* Right Actions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        {/* Premium Upgrade Pill */}
-        {!user.isPremium ? (
+        {/* 2. Center: Horizontal Tab Bars with Dropdown Menus (Desktop / Tablet) */}
+        <nav
+          className="desktop-horizontal-nav"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            flex: 1,
+            justifyContent: 'center',
+          }}
+        >
+          {/* Discover Tab */}
           <button
-            onClick={onOpenPremium}
+            type="button"
+            onClick={() => handleSelectTab('discover')}
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '7px 16px',
-              background: 'linear-gradient(135deg, rgba(255, 106, 0, 0.22) 0%, rgba(250, 204, 21, 0.25) 100%)',
-              border: '1px solid rgba(250, 204, 21, 0.45)',
-              borderRadius: 'var(--radius-full)',
-              color: '#FACC15',
-              fontSize: '12px',
-              fontWeight: 800,
+              padding: '8px 14px',
+              borderRadius: '8px',
+              border: activeTab === 'discover' ? '1px solid rgba(245, 208, 97, 0.6)' : '1px solid transparent',
+              background: activeTab === 'discover' ? 'rgba(245, 208, 97, 0.14)' : 'transparent',
+              color: activeTab === 'discover' ? '#FFFFFF' : '#CBD5E1',
+              fontSize: '13.5px',
+              fontWeight: 650,
               cursor: 'pointer',
-              transition: 'all 200ms ease',
-              boxShadow: '0 0 16px rgba(250, 204, 21, 0.2)',
+              transition: 'all 160ms ease',
             }}
           >
-            <Crown size={14} color="#FACC15" />
-            <span>GET VIP</span>
+            <Compass size={16} color={activeTab === 'discover' ? '#F5D061' : '#94A3B8'} />
+            <span>Discover</span>
           </button>
-        ) : (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '5px',
-              fontSize: '11px',
-              fontWeight: 800,
-              color: '#FACC15',
-              background: 'rgba(250, 204, 21, 0.16)',
-              padding: '5px 12px',
-              borderRadius: 'var(--radius-full)',
-              border: '1px solid rgba(250, 204, 21, 0.4)',
-              boxShadow: '0 0 14px rgba(250, 204, 21, 0.25)',
-            }}
-          >
-            <Crown size={12} color="#FACC15" />
-            <span>VIP PRO</span>
-          </div>
-        )}
 
-        {/* Multilingual Selector */}
-        <div style={{ position: 'relative' }}>
+          {/* Charts Tab */}
           <button
-            onClick={() => setShowLangMenu(!showLangMenu)}
+            type="button"
+            onClick={() => handleSelectTab('charts')}
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '7px 14px',
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              borderRadius: 'var(--radius-full)',
-              color: 'var(--text-secondary)',
-              fontSize: '12.5px',
-              fontWeight: 600,
+              padding: '8px 14px',
+              borderRadius: '8px',
+              border: activeTab === 'charts' ? '1px solid rgba(245, 208, 97, 0.6)' : '1px solid transparent',
+              background: activeTab === 'charts' ? 'rgba(245, 208, 97, 0.14)' : 'transparent',
+              color: activeTab === 'charts' ? '#FFFFFF' : '#CBD5E1',
+              fontSize: '13.5px',
+              fontWeight: 650,
               cursor: 'pointer',
-              transition: 'border-color 0.18s ease',
+              transition: 'all 160ms ease',
             }}
           >
-            <Globe size={14} color="#38BDF8" />
-            <span>{LANGUAGE_LABELS[language]?.script || 'EN'}</span>
+            <PieChart size={16} color={activeTab === 'charts' ? '#F5D061' : '#94A3B8'} />
+            <span>Birth Charts</span>
           </button>
 
-          {showLangMenu && (
-            <div
+          {/* Dropdown 1: Astrology Tools Hub */}
+          <div style={{ position: 'relative' }}>
+            <button
+              type="button"
+              onClick={() => setActiveDropdown(activeDropdown === 'tools' ? null : 'tools')}
               style={{
-                position: 'absolute',
-                top: '44px',
-                right: 0,
-                width: '190px',
-                backgroundColor: 'rgba(16, 17, 26, 0.96)',
-                backdropFilter: 'blur(24px)',
-                WebkitBackdropFilter: 'blur(24px)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                borderRadius: 'var(--radius-md)',
-                boxShadow: '0 18px 45px rgba(0, 0, 0, 0.85)',
-                padding: '6px',
-                zIndex: 100,
-                animation: 'modalFadeIn 180ms ease',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                border: activeTab === 'tools' || activeDropdown === 'tools' ? '1px solid rgba(245, 208, 97, 0.6)' : '1px solid transparent',
+                background: activeTab === 'tools' || activeDropdown === 'tools' ? 'rgba(245, 208, 97, 0.14)' : 'transparent',
+                color: activeTab === 'tools' || activeDropdown === 'tools' ? '#FFFFFF' : '#CBD5E1',
+                fontSize: '13.5px',
+                fontWeight: 650,
+                cursor: 'pointer',
+                transition: 'all 160ms ease',
               }}
             >
-              {(Object.keys(LANGUAGE_LABELS) as LanguageCode[]).map((code) => (
+              <Calculator size={16} color="#F5D061" />
+              <span>Tools Hub (33+)</span>
+              <ChevronDown size={14} style={{ transform: activeDropdown === 'tools' ? 'rotate(180deg)' : 'none', transition: 'transform 180ms ease' }} />
+            </button>
+
+            {/* Tools Dropdown Menu */}
+            {activeDropdown === 'tools' && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '46px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '360px',
+                  backgroundColor: '#0B0E1B',
+                  border: '1px solid rgba(245, 208, 97, 0.35)',
+                  borderRadius: '12px',
+                  padding: '12px',
+                  boxShadow: '0 20px 60px rgba(0, 0, 0, 0.95), 0 0 20px rgba(245, 208, 97, 0.15)',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, 1fr)',
+                  gap: '6px',
+                  zIndex: 100,
+                  animation: 'dropdownFade 160ms ease',
+                }}
+              >
+                <div style={{ gridColumn: 'span 2', padding: '4px 8px 8px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#F5D061', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                    Popular Calculators
+                  </span>
+                  <span
+                    onClick={() => handleSelectTab('tools')}
+                    style={{ fontSize: '11px', color: '#93C5FD', cursor: 'pointer', fontWeight: 600 }}
+                  >
+                    View All 33+ →
+                  </span>
+                </div>
+
+                {[
+                  { name: 'Moon Sign / Rashi', icon: <Moon size={14} color="#C084FC" /> },
+                  { name: 'Ascendant (Lagna)', icon: <Compass size={14} color="#38BDF8" /> },
+                  { name: 'Mangal Dosha', icon: <Flame size={14} color="#F87171" /> },
+                  { name: 'Sade Sati Tracker', icon: <Clock size={14} color="#FBBF24" /> },
+                  { name: 'Kundli Matching', icon: <Heart size={14} color="#F472B6" /> },
+                  { name: 'Kaal Sarp Yoga', icon: <Shield size={14} color="#FB923C" /> },
+                  { name: 'Gemstone Guide', icon: <Gem size={14} color="#34D399" /> },
+                  { name: 'Numerology Center', icon: <Calculator size={14} color="#FBBF24" /> },
+                ].map((item, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleSelectTab('tools')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '8px 10px',
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid rgba(255, 255, 255, 0.06)',
+                      borderRadius: '8px',
+                      color: '#E2E8F0',
+                      fontSize: '12px',
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: 'background 140ms ease',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(245, 208, 97, 0.12)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)')}
+                  >
+                    {item.icon}
+                    <span>{item.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Dropdown 2: Certified Reports */}
+          <div style={{ position: 'relative' }}>
+            <button
+              type="button"
+              onClick={() => setActiveDropdown(activeDropdown === 'reports' ? null : 'reports')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                border: activeTab === 'reports' || activeDropdown === 'reports' ? '1px solid rgba(245, 208, 97, 0.6)' : '1px solid transparent',
+                background: activeTab === 'reports' || activeDropdown === 'reports' ? 'rgba(245, 208, 97, 0.14)' : 'transparent',
+                color: activeTab === 'reports' || activeDropdown === 'reports' ? '#FFFFFF' : '#CBD5E1',
+                fontSize: '13.5px',
+                fontWeight: 650,
+                cursor: 'pointer',
+                transition: 'all 160ms ease',
+              }}
+            >
+              <FileText size={16} color="#F5D061" />
+              <span>Certified Reports</span>
+              <ChevronDown size={14} style={{ transform: activeDropdown === 'reports' ? 'rotate(180deg)' : 'none', transition: 'transform 180ms ease' }} />
+            </button>
+
+            {/* Reports Dropdown Menu */}
+            {activeDropdown === 'reports' && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '46px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '320px',
+                  backgroundColor: '#0B0E1B',
+                  border: '1px solid rgba(245, 208, 97, 0.35)',
+                  borderRadius: '12px',
+                  padding: '12px',
+                  boxShadow: '0 20px 60px rgba(0, 0, 0, 0.95), 0 0 20px rgba(245, 208, 97, 0.15)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px',
+                  zIndex: 100,
+                }}
+              >
+                <div style={{ padding: '4px 8px 8px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#F5D061', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                    Certified Vedic Reports
+                  </span>
+                  <span
+                    onClick={() => handleSelectTab('reports')}
+                    style={{ fontSize: '11px', color: '#93C5FD', cursor: 'pointer', fontWeight: 600 }}
+                  >
+                    View All 10 →
+                  </span>
+                </div>
+
+                {[
+                  { name: 'Life Insights Blueprint (Free)', badge: 'UNLOCKED', color: '#34D399' },
+                  { name: 'Career & Financial Destiny', badge: 'PRO', color: '#FBBF24' },
+                  { name: 'Marriage & Soulmate Synastry', badge: 'PRO', color: '#FBBF24' },
+                  { name: 'Sade Sati Survival Dossier', badge: 'PRO', color: '#FBBF24' },
+                ].map((item, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleSelectTab('reports')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '8px 12px',
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid rgba(255, 255, 255, 0.06)',
+                      borderRadius: '8px',
+                      color: '#E2E8F0',
+                      fontSize: '12.5px',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                    }}
+                  >
+                    <span>{item.name}</span>
+                    <span style={{ fontSize: '10px', color: item.color, fontWeight: 700 }}>{item.badge}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Learn Astrology Tab */}
+          <button
+            type="button"
+            onClick={() => handleSelectTab('learn')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 14px',
+              borderRadius: '8px',
+              border: activeTab === 'learn' ? '1px solid rgba(245, 208, 97, 0.6)' : '1px solid transparent',
+              background: activeTab === 'learn' ? 'rgba(245, 208, 97, 0.14)' : 'transparent',
+              color: activeTab === 'learn' ? '#FFFFFF' : '#CBD5E1',
+              fontSize: '13.5px',
+              fontWeight: 650,
+              cursor: 'pointer',
+              transition: 'all 160ms ease',
+            }}
+          >
+            <BookOpen size={16} color={activeTab === 'learn' ? '#F5D061' : '#94A3B8'} />
+            <span>Learn Astrology</span>
+          </button>
+
+          {/* Dropdown 3: Expert Astrologers & Chat */}
+          <div style={{ position: 'relative' }}>
+            <button
+              type="button"
+              onClick={() => setActiveDropdown(activeDropdown === 'astrologers' ? null : 'astrologers')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                border: activeTab === 'consultants' || activeTab === 'ai' || activeDropdown === 'astrologers' ? '1px solid rgba(245, 208, 97, 0.6)' : '1px solid transparent',
+                background: activeTab === 'consultants' || activeTab === 'ai' || activeDropdown === 'astrologers' ? 'rgba(245, 208, 97, 0.14)' : 'transparent',
+                color: activeTab === 'consultants' || activeTab === 'ai' || activeDropdown === 'astrologers' ? '#FFFFFF' : '#CBD5E1',
+                fontSize: '13.5px',
+                fontWeight: 650,
+                cursor: 'pointer',
+                transition: 'all 160ms ease',
+              }}
+            >
+              <Sparkles size={16} color="#F5D061" />
+              <span>Astrologers</span>
+              <ChevronDown size={14} style={{ transform: activeDropdown === 'astrologers' ? 'rotate(180deg)' : 'none', transition: 'transform 180ms ease' }} />
+            </button>
+
+            {/* Astrologers Dropdown Menu */}
+            {activeDropdown === 'astrologers' && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '46px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '280px',
+                  backgroundColor: '#0B0E1B',
+                  border: '1px solid rgba(245, 208, 97, 0.35)',
+                  borderRadius: '12px',
+                  padding: '10px',
+                  boxShadow: '0 20px 60px rgba(0, 0, 0, 0.95), 0 0 20px rgba(245, 208, 97, 0.15)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px',
+                  zIndex: 100,
+                }}
+              >
                 <button
-                  key={code}
-                  onClick={() => {
-                    setLanguage(code);
-                    setShowLangMenu(false);
-                  }}
+                  type="button"
+                  onClick={() => handleSelectTab('consultants')}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
-                    width: '100%',
-                    padding: '8px 12px',
-                    borderRadius: 'var(--radius-sm)',
-                    border: 'none',
-                    background: language === code ? 'rgba(255, 106, 0, 0.22)' : 'transparent',
-                    color: language === code ? '#FF8C33' : 'var(--text-primary)',
+                    gap: '10px',
+                    padding: '10px 12px',
+                    background: activeTab === 'consultants' ? 'rgba(245, 208, 97, 0.12)' : 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                    borderRadius: '8px',
+                    color: '#FFFFFF',
                     fontSize: '13px',
-                    fontWeight: language === code ? 700 : 500,
+                    fontWeight: 600,
                     cursor: 'pointer',
                     textAlign: 'left',
                   }}
                 >
-                  <span>{LANGUAGE_LABELS[code].label}</span>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                    {LANGUAGE_LABELS[code].script}
-                  </span>
+                  <Sparkles size={16} color="#F5D061" />
+                  <div>
+                    <div>Expert Astrologers</div>
+                    <div style={{ fontSize: '11px', color: '#94A3B8', fontWeight: 400 }}>Specialist consultations</div>
+                  </div>
                 </button>
-              ))}
-            </div>
-          )}
-        </div>
 
-        {/* Notifications */}
-        <button
-          onClick={onOpenNotifications}
-          style={{
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '38px',
-            height: '38px',
-            borderRadius: 'var(--radius-full)',
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            color: 'var(--text-secondary)',
-            cursor: 'pointer',
-            transition: 'border-color 0.18s ease',
-          }}
-        >
-          <Bell size={16} />
-          {unreadCount > 0 && (
-            <span
-              style={{
-                position: 'absolute',
-                top: '8px',
-                right: '8px',
-                width: '7px',
-                height: '7px',
-                borderRadius: '50%',
-                backgroundColor: 'var(--theme-orange)',
-                boxShadow: '0 0 10px var(--theme-orange)',
-              }}
-            />
-          )}
-        </button>
+                <button
+                  type="button"
+                  onClick={() => handleSelectTab('ai')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '10px 12px',
+                    background: activeTab === 'ai' ? 'rgba(245, 208, 97, 0.12)' : 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                    borderRadius: '8px',
+                    color: '#FFFFFF',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
+                  <Bot size={16} color="#A78BFA" />
+                  <div>
+                    <div>Chat with Expert Astrologers</div>
+                    <div style={{ fontSize: '11px', color: '#94A3B8', fontWeight: 400 }}>Deep reasoning AI counsel</div>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
 
-        {/* Account / Auth Button */}
-        {onOpenAuth && (
+          {/* Subscription Plans Tab */}
           <button
-            onClick={onOpenAuth}
+            type="button"
+            onClick={() => handleSelectTab('subscription')}
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '6px 12px',
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(245, 158, 11, 0.3)',
-              borderRadius: 'var(--radius-full)',
-              color: '#FFFFFF',
-              fontSize: '12px',
+              padding: '8px 14px',
+              borderRadius: '8px',
+              border: activeTab === 'subscription' ? '1.5px solid #F5D061' : '1px solid rgba(245, 208, 97, 0.3)',
+              background: activeTab === 'subscription' ? 'linear-gradient(135deg, rgba(245, 208, 97, 0.25) 0%, rgba(217, 119, 6, 0.25) 100%)' : 'rgba(245, 208, 97, 0.08)',
+              color: '#FDE89C',
+              fontSize: '13.5px',
               fontWeight: 700,
               cursor: 'pointer',
-              transition: 'all 0.2s ease',
+              transition: 'all 160ms ease',
             }}
           >
-            <User size={13} color="#FBBF24" />
-            <span style={{ maxWidth: '85px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {user.name ? user.name.split(' ')[0] : 'Sign In'}
+            <Crown size={15} color="#F5D061" />
+            <span>Plans (₹199/yr)</span>
+          </button>
+        </nav>
+
+        {/* 3. Right: Language, Notifications, Profile & Upgrade CTA */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+          {/* Language Selector Dropdown */}
+          <div style={{ position: 'relative' }}>
+            <button
+              type="button"
+              onClick={() => setActiveDropdown(activeDropdown === 'lang' ? null : 'lang')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                borderRadius: '6px',
+                padding: '6px 10px',
+                color: '#E2E8F0',
+                fontSize: '12px',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              <Globe size={14} color="#F5D061" />
+              <span>{LANGUAGE_LABELS[language]?.script || 'EN'}</span>
+            </button>
+
+            {activeDropdown === 'lang' && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '38px',
+                  right: 0,
+                  width: '180px',
+                  maxHeight: '260px',
+                  overflowY: 'auto',
+                  backgroundColor: '#0B0E1B',
+                  border: '1px solid rgba(245, 208, 97, 0.35)',
+                  borderRadius: '10px',
+                  padding: '6px',
+                  boxShadow: '0 16px 40px rgba(0, 0, 0, 0.9)',
+                  zIndex: 100,
+                }}
+              >
+                {(Object.keys(LANGUAGE_LABELS) as LanguageCode[]).map((code) => (
+                  <button
+                    key={code}
+                    type="button"
+                    onClick={() => {
+                      setLanguage(code);
+                      setActiveDropdown(null);
+                    }}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '6px 10px',
+                      background: language === code ? 'rgba(245, 208, 97, 0.15)' : 'none',
+                      border: 'none',
+                      borderRadius: '6px',
+                      color: language === code ? '#F5D061' : '#E2E8F0',
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                    }}
+                  >
+                    <span>{LANGUAGE_LABELS[code].label}</span>
+                    {language === code && <Check size={12} color="#F5D061" />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Notifications Bell */}
+          <button
+            type="button"
+            onClick={onOpenNotifications}
+            style={{
+              position: 'relative',
+              width: '36px',
+              height: '36px',
+              borderRadius: '8px',
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#CBD5E1',
+              cursor: 'pointer',
+            }}
+          >
+            <Bell size={16} />
+            {unreadCount > 0 && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '6px',
+                  right: '6px',
+                  width: '7px',
+                  height: '7px',
+                  borderRadius: '50%',
+                  backgroundColor: '#F5D061',
+                  boxShadow: '0 0 8px #F5D061',
+                }}
+              />
+            )}
+          </button>
+
+          {/* My Profile Quick Avatar */}
+          <button
+            type="button"
+            onClick={() => handleSelectTab('profile')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '4px 10px 4px 4px',
+              borderRadius: '24px',
+              background: activeTab === 'profile' ? 'rgba(245, 208, 97, 0.2)' : 'rgba(255, 255, 255, 0.06)',
+              border: activeTab === 'profile' ? '1px solid #F5D061' : '1px solid rgba(255, 255, 255, 0.12)',
+              cursor: 'pointer',
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={user.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}
+              alt={user.name}
+              style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }}
+            />
+            <span style={{ fontSize: '12px', fontWeight: 600, color: '#FFFFFF' }}>
+              Profile
             </span>
           </button>
-        )}
 
-        {/* Avatar / Profile */}
-        <button
-          onClick={() => onTabChange('profile')}
+          {/* Mobile Hamburger Toggle */}
+          <button
+            type="button"
+            className="mobile-hamburger-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '8px',
+              background: 'rgba(245, 208, 97, 0.1)',
+              border: '1px solid rgba(245, 208, 97, 0.3)',
+              color: '#F5D061',
+              display: 'none',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile Drawer (Responsive when window is narrow) */}
+      {mobileMenuOpen && (
+        <div
           style={{
-            width: '38px',
-            height: '38px',
-            borderRadius: '50%',
-            overflow: 'hidden',
-            border: '2px solid rgba(245, 158, 11, 0.6)',
-            boxShadow: '0 0 14px rgba(245, 158, 11, 0.3)',
-            padding: 0,
-            cursor: 'pointer',
-            background: 'none',
+            backgroundColor: '#090C18',
+            borderBottom: '1px solid rgba(245, 208, 97, 0.3)',
+            padding: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.9)',
           }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={user.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}
-            alt={user.name}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        </button>
-      </div>
-    </header>
+          {[
+            { tab: 'discover', label: 'Discover & Overview', icon: <Compass size={16} /> },
+            { tab: 'charts', label: 'Birth Charts & Kundli', icon: <PieChart size={16} /> },
+            { tab: 'tools', label: 'Astrology Tools Hub (33+)', icon: <Calculator size={16} /> },
+            { tab: 'reports', label: 'Certified Reports', icon: <FileText size={16} /> },
+            { tab: 'learn', label: 'Learn Astrology', icon: <BookOpen size={16} /> },
+            { tab: 'consultants', label: 'Expert Astrologers', icon: <Sparkles size={16} /> },
+            { tab: 'ai', label: 'Chat with Expert Astrologers', icon: <Bot size={16} /> },
+            { tab: 'subscription', label: 'Subscription & Plans (₹199/yr)', icon: <Crown size={16} /> },
+            { tab: 'profile', label: 'My Profile & Settings', icon: <User size={16} /> },
+          ].map((item) => (
+            <button
+              key={item.tab}
+              type="button"
+              onClick={() => handleSelectTab(item.tab as NavTab)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px 14px',
+                borderRadius: '8px',
+                background: activeTab === item.tab ? 'rgba(245, 208, 97, 0.16)' : 'rgba(255, 255, 255, 0.03)',
+                border: activeTab === item.tab ? '1px solid #F5D061' : '1px solid rgba(255, 255, 255, 0.06)',
+                color: activeTab === item.tab ? '#F5D061' : '#FFFFFF',
+                fontSize: '14px',
+                fontWeight: 600,
+                textAlign: 'left',
+                cursor: 'pointer',
+              }}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      <style jsx>{`
+        @keyframes dropdownFade {
+          from {
+            opacity: 0;
+            transform: translate(-50%, -6px);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, 0);
+          }
+        }
+
+        @media (max-width: 900px) {
+          .desktop-horizontal-nav {
+            display: none !important;
+          }
+          .mobile-hamburger-btn {
+            display: flex !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

@@ -32,11 +32,11 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     id: 'plan_basic',
     tier: 'basic',
     name: 'Basic',
-    subtitle: 'Unlock deeper insights & unlimited consultations',
-    monthlyPrice: 199,
-    yearlyPrice: 1999, // saves ~₹389/year
+    subtitle: 'Unlock deeper insights & unlimited consultations (₹199/yr or ₹29/mo)',
+    monthlyPrice: 29,
+    yearlyPrice: 199, // ₹199/year (Save 43% vs monthly)
     currency: '₹',
-    badge: 'Most Popular',
+    badge: 'Best Value',
     isPopular: true,
     consultantLimit: 4,
     consultationDurationLimitMinutes: null, // Unlimited
@@ -48,7 +48,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
       'Unlimited Expert Astrologer Consultation (No Timer)',
       'Access to All AstroNex Specialist Modes',
       '33+ Calculators (Kundli Match, Sade Sati, Yogas)',
-      '10 In-Depth Certified Reports',
+      '10 In-Depth Certified Reports (5000+ words)',
       'Vedic Sidereal & Western Tropical Systems',
       'Priority Response Queue & Multilingual Engine',
     ],
@@ -70,9 +70,9 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     id: 'plan_premium',
     tier: 'premium',
     name: 'Premium',
-    subtitle: 'The complete cosmic & family experience',
-    monthlyPrice: 799,
-    yearlyPrice: 7990, // saves ~₹1598/year
+    subtitle: 'The complete celestial & family experience (₹399/yr or ₹49/mo)',
+    monthlyPrice: 49,
+    yearlyPrice: 399, // ₹399/year (Save 32% vs monthly)
     currency: '₹',
     badge: 'Ultimate Power',
     consultantLimit: 4,

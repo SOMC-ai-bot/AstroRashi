@@ -429,9 +429,10 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
       </section>
 
       {/* 6. EXACT TEMPLATE: "Know Yourself Through Your Sign" Arched Fan Cards */}
-      <section>
-        <ZodiacWheelCards onSelectSign={() => onTabChange('charts')} />
-      </section>
+        <ZodiacWheelCards
+          onOpenChart={() => onTabChange('charts')}
+          onAskAI={onAskAI}
+        />
 
       {/* 7. EXACT TEMPLATE: Overlapping Mystic Circles (Become A Member & Learning Center) */}
       <section>

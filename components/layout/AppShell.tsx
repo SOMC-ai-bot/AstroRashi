@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { BottomNav, NavTab } from './BottomNav';
 import { TopBar } from './TopBar';
-import { DesktopSidebar } from './DesktopSidebar';
 import { DiscoverScreen } from '@/components/discover/DiscoverScreen';
 import { ChartsScreen } from '@/components/charts/ChartsScreen';
 import { ToolsHub } from '@/components/tools/ToolsHub';
@@ -77,45 +76,26 @@ export const AppShell: React.FC = () => {
         onClose={() => setIsNotificationsOpen(false)}
       />
 
-      <div style={{ display: 'flex', width: '100%', minHeight: '100vh', position: 'relative' }}>
-        {/* Desktop Sidebar (hidden on mobile, visible on >= 1024px) */}
-        <div className="desktop-sidebar-wrapper">
-          <DesktopSidebar
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            onOpenPremium={() => setIsPricingOpen(true)}
-          />
-        </div>
+      <div style={{ display: 'flex', flexDirection: 'column', width: '100%', minHeight: '100vh', position: 'relative' }}>
+        {/* Horizontal Navigation Top Bar Header with Dropdown Menus */}
+        <TopBar
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          onOpenNotifications={() => setIsNotificationsOpen(true)}
+          onOpenPremium={() => setIsPricingOpen(true)}
+          onOpenAuth={() => setIsAuthOpen(true)}
+        />
 
-        {/* Main Application Area */}
-        <div
+        {/* Main Application Content Area */}
+        <main
           style={{
             flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            minHeight: '100vh',
-            maxWidth: '100%',
-            overflowX: 'hidden',
+            width: '100%',
+            maxWidth: '1200px',
+            margin: '0 auto',
+            padding: '24px 20px 0',
           }}
         >
-          {/* Top Bar Header */}
-          <TopBar
-            onTabChange={setActiveTab}
-            onOpenNotifications={() => setIsNotificationsOpen(true)}
-            onOpenPremium={() => setIsPricingOpen(true)}
-            onOpenAuth={() => setIsAuthOpen(true)}
-          />
-
-          {/* Main View Router */}
-          <main
-            style={{
-              flex: 1,
-              width: '100%',
-              maxWidth: '960px',
-              margin: '0 auto',
-              padding: '20px 20px 0',
-            }}
-          >
             {activeTab === 'discover' && (
               <DiscoverScreen
                 onTabChange={setActiveTab}
@@ -156,9 +136,8 @@ export const AppShell: React.FC = () => {
             <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
           </div>
         </div>
-      </div>
 
-      <style jsx global>{`
+      <style>{`
         .desktop-sidebar-wrapper {
           display: none;
         }
@@ -168,7 +147,7 @@ export const AppShell: React.FC = () => {
 
         @media (min-width: 1024px) {
           .desktop-sidebar-wrapper {
-            display: block;
+            display: none;
           }
           .mobile-bottomnav-wrapper {
             display: none;

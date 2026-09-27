@@ -18,6 +18,9 @@ import {
   CheckCircle2,
   X,
   ExternalLink,
+  ArrowLeft,
+  Printer,
+  Award,
 } from 'lucide-react';
 
 export const LearnHub: React.FC = () => {
@@ -27,6 +30,94 @@ export const LearnHub: React.FC = () => {
   const [selectedBranch, setSelectedBranch] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeArticle, setActiveArticle] = useState<LearningArticle | null>(null);
+
+  const handleOpenInNewWindow = (article: LearningArticle) => {
+    const newWindow = window.open('', '_blank');
+    if (!newWindow) return;
+
+    const notesHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${article.title} | AstroNex Cosmic Study Notes</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Outfit', 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.8;
+      color: #E2E8F0;
+      background: #0A0914;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+    h1, h2, h3, h4 { color: #FFFFFF; font-family: 'Cinzel', Georgia, serif; letter-spacing: 0.02em; }
+    h1 { font-size: 32px; border-bottom: 2px solid #F5D061; padding-bottom: 16px; margin-bottom: 24px; line-height: 1.3; }
+    h2 { font-size: 22px; color: #F5D061; margin-top: 40px; margin-bottom: 16px; border-left: 4px solid #FF6A00; padding-left: 12px; }
+    h3 { font-size: 18px; color: #38BDF8; margin-top: 24px; margin-bottom: 12px; }
+    .badge { display: inline-block; background: rgba(245, 208, 97, 0.2); color: #F5D061; border: 1px solid rgba(245, 208, 97, 0.4); padding: 5px 14px; border-radius: 999px; font-size: 12.5px; font-weight: bold; margin-bottom: 16px; }
+    .intro-box { background: rgba(255, 255, 255, 0.04); border-left: 4px solid #F5D061; padding: 20px 24px; border-radius: 8px; margin-bottom: 32px; font-size: 16px; color: #F8FAFC; line-height: 1.7; }
+    .note-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 12px; padding: 26px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+    .principles-box { background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(20, 18, 33, 0.9) 100%); border: 1px solid rgba(168, 85, 247, 0.35); border-radius: 12px; padding: 24px; margin-bottom: 32px; }
+    ul { padding-left: 24px; margin: 14px 0; }
+    li { margin-bottom: 10px; font-size: 15px; }
+    p { margin-bottom: 16px; font-size: 15px; }
+    .faq-box { background: rgba(255, 255, 255, 0.02); border-left: 3px solid #38BDF8; padding: 14px 18px; margin-bottom: 14px; border-radius: 6px; }
+    .outro-box { background: linear-gradient(135deg, rgba(255, 106, 0, 0.2) 0%, rgba(245, 208, 97, 0.12) 100%); border: 1.5px solid rgba(245, 208, 97, 0.35); border-radius: 12px; padding: 26px; margin-top: 40px; }
+    @media print {
+      body { background: #FFFFFF; color: #0F172A; }
+      h1, h2, h3 { color: #0F172A; }
+      .intro-box, .note-card, .principles-box, .outro-box { background: #F8FAFC; border: 1px solid #CBD5E1; color: #1E293B; }
+    }
+  </style>
+</head>
+<body>
+  <div class="badge">${article.branch} • ${article.category} • ${article.readingTime}</div>
+  <h1>${article.title}</h1>
+  <div class="intro-box"><strong>🌟 Executive Introduction:</strong><br/>${article.summary}</div>
+  ${article.keyTakeaways ? `
+  <div class="principles-box">
+    <h3>📌 Key Astrological Principles & Executive Notes</h3>
+    <ul>${article.keyTakeaways.map((k) => `<li><strong>${k}</strong></li>`).join('')}</ul>
+  </div>` : ''}
+  <div>
+    <h2>📖 Deep-Dive Study Notes & Chapter Breakdown</h2>
+    ${article.content
+      .map(
+        (p) => `
+      <div class="note-card">
+        <p>${p.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br/>')}</p>
+      </div>
+    `
+      )
+      .join('')}
+  </div>
+  ${
+    article.faqs && article.faqs.length > 0
+      ? `
+  <div>
+    <h2>❓ Frequently Asked Questions & Classical Clarifications</h2>
+    ${article.faqs
+      .map(
+        (f) => `
+      <div class="faq-box">
+        <strong>Q: ${f.question}</strong>
+        <p style="margin-top: 6px; color: #CBD5E1;">A: ${f.answer}</p>
+      </div>
+    `
+      )
+      .join('')}
+  </div>`
+      : ''
+  }
+  <div class="outro-box">
+    <h3>🎯 Executive Outro & Practical Synthesis</h3>
+    <p>Understanding these cosmic archetypes empowers you to perceive your psychological blueprints with conscious, spiritual agency. For chart-specific verification, consult our AstroNex specialists.</p>
+  </div>
+</body>
+</html>`;
+    newWindow.document.write(notesHtml);
+    newWindow.document.close();
+  };
 
   // Filter articles
   const filteredArticles = LEARNING_ARTICLES.filter((art) => {
@@ -49,141 +140,331 @@ export const LearnHub: React.FC = () => {
     );
   });
 
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', paddingBottom: '90px' }}>
-      {/* Article Reading Modal / Detail View */}
-      {activeArticle && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 9999,
-            backgroundColor: 'rgba(10, 10, 12, 0.85)',
-            backdropFilter: 'blur(16px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '16px',
-          }}
-        >
-          <div
-            style={{
-              position: 'relative',
-              width: '100%',
-              maxWidth: '680px',
-              maxHeight: '85vh',
-              backgroundColor: '#1B1B1E',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              borderRadius: 'var(--radius-xl)',
-              boxShadow: '0 24px 70px rgba(0, 0, 0, 0.7)',
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden',
-            }}
+  // DEDICATED FULL-PAGE STUDY NOTES READER VIEW (NOT IN A POP-UP WINDOW)
+  if (activeArticle) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '90px' }}>
+        {/* Navigation Action Bar */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setActiveArticle(null)}
+            icon={<ArrowLeft size={15} />}
           >
-            {/* Header */}
-            <div
-              style={{
-                padding: '18px 22px',
-                borderBottom: '1px solid var(--border-subtle)',
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'space-between',
-                gap: '12px',
-              }}
+            Back to All Guides
+          </Button>
+
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleOpenInNewWindow(activeArticle)}
+              icon={<ExternalLink size={14} />}
             >
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                  <Badge variant="gold" size="sm">
-                    {activeArticle.branch}
-                  </Badge>
-                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                    {activeArticle.category} • {activeArticle.readingTime}
-                  </span>
-                </div>
-                <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                  {activeArticle.title}
-                </h2>
-              </div>
+              Open in New Webpage
+            </Button>
 
-              <button
-                onClick={() => setActiveArticle(null)}
-                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}
-              >
-                <X size={20} />
-              </button>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.print()}
+              icon={<Printer size={14} />}
+            >
+              Print Notes (PDF)
+            </Button>
 
-            {/* Content Body */}
-            <div style={{ padding: '22px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <p style={{ fontSize: '13.5px', color: 'var(--gold-primary)', fontWeight: 500, lineHeight: '1.5' }}>
-                {activeArticle.summary}
-              </p>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {activeArticle.content.map((p, idx) => (
-                  <p key={idx} style={{ fontSize: '13.5px', color: 'var(--text-secondary)', lineHeight: '1.65' }}>
-                    {p}
-                  </p>
-                ))}
-              </div>
-
-              {/* Key Takeaways */}
-              {activeArticle.keyTakeaways && (
-                <div style={{ backgroundColor: 'rgba(216, 197, 138, 0.06)', border: '1px solid rgba(216, 197, 138, 0.2)', borderRadius: 'var(--radius-md)', padding: '14px' }}>
-                  <h4 style={{ fontSize: '13px', fontWeight: 700, color: 'var(--gold-primary)', marginBottom: '8px' }}>
-                    Key Astrological Principles
-                  </h4>
-                  <ul style={{ paddingLeft: '16px', display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12.5px', color: 'var(--text-secondary)' }}>
-                    {activeArticle.keyTakeaways.map((t, idx) => (
-                      <li key={idx}>{t}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* FAQs */}
-              {activeArticle.faqs && activeArticle.faqs.length > 0 && (
-                <div>
-                  <h4 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
-                    Frequently Asked Questions
-                  </h4>
-                  {activeArticle.faqs.map((faq, idx) => (
-                    <div key={idx} style={{ marginBottom: '10px', padding: '10px 12px', backgroundColor: 'rgba(255, 255, 255, 0.03)', borderRadius: 'var(--radius-md)' }}>
-                      <div style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--text-primary)' }}>
-                        Q: {faq.question}
-                      </div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                        A: {faq.answer}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div style={{ padding: '14px 22px', borderTop: '1px solid var(--border-subtle)', backgroundColor: 'rgba(20, 20, 24, 0.95)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setActiveArticle(null);
-                  startSpecialistSession('classic');
-                }}
-                icon={<Sparkles size={13} color="var(--gold-primary)" />}
-              >
-                Ask Specialist about this topic
-              </Button>
-
-              <Button variant="primary" size="sm" onClick={() => setActiveArticle(null)}>
-                Close
-              </Button>
-            </div>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => startSpecialistSession('classic')}
+              icon={<Sparkles size={14} />}
+            >
+              Ask Astrologer
+            </Button>
           </div>
         </div>
-      )}
 
+        {/* Master Document Header Card */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, rgba(139, 47, 85, 0.3) 0%, rgba(14, 10, 24, 0.96) 100%)',
+            border: '1.5px solid rgba(255, 255, 255, 0.12)',
+            borderRadius: 'var(--radius-xl)',
+            padding: '30px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+            <Badge variant="gold" size="sm">
+              {activeArticle.branch}
+            </Badge>
+            <Badge variant="surface" size="sm">
+              {activeArticle.category}
+            </Badge>
+            <span style={{ fontSize: '12px', color: '#CBD5E1', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <Clock size={13} />
+              <span>{activeArticle.readingTime}</span>
+            </span>
+          </div>
+
+          <h1
+            style={{
+              fontFamily: 'var(--font-display), serif',
+              fontSize: '28px',
+              fontWeight: 800,
+              color: '#FFFFFF',
+              letterSpacing: '0.01em',
+              lineHeight: 1.35,
+              marginBottom: '16px',
+            }}
+          >
+            {activeArticle.title}
+          </h1>
+
+          {/* Intro Box */}
+          <div
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.04)',
+              borderLeft: '4px solid var(--gold-primary)',
+              borderRadius: 'var(--radius-md)',
+              padding: '16px 20px',
+            }}
+          >
+            <h4 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--gold-primary)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Sparkles size={15} />
+              <span>Executive Introduction & Premise</span>
+            </h4>
+            <p style={{ fontSize: '14px', color: '#F1F5F9', lineHeight: 1.65 }}>
+              {activeArticle.summary}
+            </p>
+          </div>
+        </div>
+
+        {/* Key Astrological Principles & Executive Notes */}
+        {activeArticle.keyTakeaways && activeArticle.keyTakeaways.length > 0 && (
+          <div
+            style={{
+              background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(20, 18, 33, 0.9) 100%)',
+              border: '1px solid rgba(168, 85, 247, 0.35)',
+              borderRadius: 'var(--radius-lg)',
+              padding: '24px',
+            }}
+          >
+            <h3
+              style={{
+                fontFamily: 'var(--font-display), serif',
+                fontSize: '17px',
+                fontWeight: 800,
+                color: '#FACC15',
+                marginBottom: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <Award size={18} />
+              <span>Key Astrological Principles & Executive Notes</span>
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px' }}>
+              {activeArticle.keyTakeaways.map((t, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '10px',
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    padding: '12px 14px',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                  }}
+                >
+                  <CheckCircle2 size={16} color="#34D399" style={{ marginTop: '2px', flexShrink: 0 }} />
+                  <span style={{ fontSize: '13px', color: '#E2E8F0', lineHeight: 1.5 }}>{t}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Study Notes & Chapters Body (Structured with proper gaps and headlines) */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <h2
+            style={{
+              fontFamily: 'var(--font-display), serif',
+              fontSize: '20px',
+              fontWeight: 800,
+              color: 'var(--gold-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              marginTop: '8px',
+            }}
+          >
+            <BookOpen size={20} />
+            <span>Deep-Dive Study Notes & Chapter Breakdown</span>
+          </h2>
+
+          {activeArticle.content.map((para, idx) => {
+            const lines = para.split('\n');
+            const headline = lines[0];
+            const bodyLines = lines.slice(1).join('\n');
+
+            return (
+              <Card
+                key={idx}
+                style={{
+                  padding: '24px 28px',
+                  background: 'linear-gradient(180deg, rgba(20, 18, 33, 0.95) 0%, rgba(12, 11, 20, 0.98) 100%)',
+                  border: '1px solid rgba(245, 158, 11, 0.22)',
+                  borderRadius: 'var(--radius-lg)',
+                }}
+              >
+                {headline && (
+                  <h3
+                    style={{
+                      fontFamily: 'var(--font-display), serif',
+                      fontSize: '17px',
+                      fontWeight: 800,
+                      color: '#F5D061',
+                      marginBottom: '14px',
+                      borderLeft: '3px solid var(--theme-orange-primary)',
+                      paddingLeft: '10px',
+                    }}
+                  >
+                    {headline}
+                  </h3>
+                )}
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  {(bodyLines || para)
+                    .split('\n\n')
+                    .map((block, bIdx) => (
+                      <p
+                        key={bIdx}
+                        style={{
+                          fontSize: '14px',
+                          color: '#CBD5E1',
+                          lineHeight: '1.8',
+                          margin: 0,
+                          whiteSpace: 'pre-line',
+                        }}
+                      >
+                        {block}
+                      </p>
+                    ))}
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* Real-World Case Study / Practical Application */}
+        <Card
+          style={{
+            padding: '24px 28px',
+            background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.2) 0%, rgba(15, 23, 42, 0.95) 100%)',
+            border: '1px solid rgba(56, 189, 248, 0.3)',
+          }}
+        >
+          <h3
+            style={{
+              fontFamily: 'var(--font-display), serif',
+              fontSize: '16px',
+              fontWeight: 800,
+              color: '#38BDF8',
+              marginBottom: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <Compass size={18} />
+            <span>Practical Chart Application & Reading Strategy</span>
+          </h3>
+          <p style={{ fontSize: '13.5px', color: '#E2E8F0', lineHeight: 1.7 }}>
+            When analyzing your natal chart or consulting an astrologer, always synthesize this placement alongside your active <strong>Vimshottari Dasha</strong> and current <strong>Saturn / Jupiter transits</strong>. Classical Jyotish emphasizes that no single planetary configuration functions in isolation—it operates within the dynamic holographic web of your entire birth chart.
+          </p>
+        </Card>
+
+        {/* FAQs Section */}
+        {activeArticle.faqs && activeArticle.faqs.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <h3
+              style={{
+                fontFamily: 'var(--font-display), serif',
+                fontSize: '18px',
+                fontWeight: 800,
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              <HelpCircle size={18} color="var(--gold-primary)" />
+              <span>Frequently Asked Questions & Clarifications</span>
+            </h3>
+
+            {activeArticle.faqs.map((faq, idx) => (
+              <div
+                key={idx}
+                style={{
+                  padding: '16px 20px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-md)',
+                }}
+              >
+                <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--gold-primary)', marginBottom: '6px' }}>
+                  Q: {faq.question}
+                </div>
+                <div style={{ fontSize: '13px', color: '#CBD5E1', lineHeight: 1.6 }}>
+                  A: {faq.answer}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Executive Outro & Spiritual Conclusion */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, rgba(255, 106, 0, 0.18) 0%, rgba(245, 208, 97, 0.12) 100%)',
+            border: '1.5px solid rgba(245, 208, 97, 0.35)',
+            borderRadius: 'var(--radius-xl)',
+            padding: '24px 28px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '16px',
+          }}
+        >
+          <div>
+            <h4 style={{ fontSize: '16px', fontWeight: 800, color: '#FFFFFF', marginBottom: '4px' }}>
+              🎯 Executive Outro: Integrating Cosmic Wisdom
+            </h4>
+            <p style={{ fontSize: '13px', color: '#E2E8F0', maxWidth: '620px', lineHeight: 1.55 }}>
+              True astrological wisdom does not breed fatalistic passivity; it awakens conscious agency and calm discernment. Deepen your understanding by consulting an AstroNex specialist on your chart.
+            </p>
+          </div>
+
+          <Button
+            variant="gold"
+            size="md"
+            onClick={() => startSpecialistSession('classic')}
+            icon={<Sparkles size={15} />}
+          >
+            Discuss with Astrologer
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', paddingBottom: '90px' }}>
       {/* Header Banner */}
       <div
         style={{

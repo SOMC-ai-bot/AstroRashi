@@ -136,7 +136,7 @@ export const ConsultantScreen: React.FC = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Crown size={18} color="#FBBF24" />
               <span style={{ fontSize: '13px', color: '#FFFFFF', fontWeight: 700 }}>
-                Unlock all specialist modes with unlimited consultations for just ₹199/mo.
+                Unlock all specialist modes with unlimited consultations for just ₹199/year (₹29/mo).
               </span>
             </div>
             <Button

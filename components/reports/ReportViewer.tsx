@@ -46,8 +46,38 @@ export const ReportViewer: React.FC<ReportViewerProps> = ({ report, onBack }) =>
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }}>
+      {/* Print-specific PDF Styles */}
+      <style>{`
+        @media print {
+          body {
+            background: #FFFFFF !important;
+            color: #0F172A !important;
+          }
+          .no-print {
+            display: none !important;
+          }
+          .pdf-page-break {
+            page-break-before: always !important;
+            margin-top: 30px !important;
+          }
+          .pdf-report-card {
+            background: #FFFFFF !important;
+            border: 1px solid #CBD5E1 !important;
+            color: #0F172A !important;
+            box-shadow: none !important;
+            page-break-inside: avoid !important;
+          }
+          .pdf-gold {
+            color: #854D0E !important;
+          }
+          .pdf-text {
+            color: #1E293B !important;
+          }
+        }
+      `}</style>
+
       {/* Top Action Bar */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+      <div className="no-print" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <Button
           variant="outline"
           size="sm"
@@ -57,14 +87,14 @@ export const ReportViewer: React.FC<ReportViewerProps> = ({ report, onBack }) =>
           Back to Reports Hub
         </Button>
 
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           <Button
             variant="outline"
             size="sm"
             onClick={handlePrint}
             icon={<Printer size={14} />}
           >
-            Print / Save PDF
+            Print / Save PDF (Booklet)
           </Button>
 
           <Button
@@ -73,32 +103,41 @@ export const ReportViewer: React.FC<ReportViewerProps> = ({ report, onBack }) =>
             onClick={handleAskSpecialist}
             icon={<Sparkles size={14} />}
           >
-            Discuss with Specialist Astrologer
+            Discuss with Specialist
           </Button>
         </div>
       </div>
 
       {/* Report Header Cover */}
       <div
+        className="pdf-report-card"
         style={{
-          background: 'linear-gradient(135deg, rgba(139, 47, 85, 0.3) 0%, rgba(20, 20, 24, 0.95) 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
+          background: 'linear-gradient(135deg, rgba(139, 47, 85, 0.35) 0%, rgba(14, 10, 24, 0.98) 100%)',
+          border: '1.5px solid rgba(245, 208, 97, 0.3)',
           borderRadius: 'var(--radius-xl)',
-          padding: '30px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+          padding: '32px',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px', marginBottom: '14px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '16px' }}>
           <div>
-            <Badge variant="gold" size="sm" style={{ marginBottom: '8px' }}>
-              ✦ Certified AstroNex Analysis
-            </Badge>
-            <h1 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--text-primary)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+              <Badge variant="gold" size="sm">
+                ✦ Certified AstroNex Vedic Analysis
+              </Badge>
+              <Badge variant="surface" size="sm">
+                10 Master Chapters • ~5,000 Words Dossier
+              </Badge>
+              <Badge variant="wine" size="sm">
+                Chitra Paksha (Lahiri)
+              </Badge>
+            </div>
+            <h1 style={{ fontFamily: 'var(--font-display), serif', fontSize: '28px', fontWeight: 800, color: '#FFFFFF', lineHeight: 1.3 }}>
               {report.title}
             </h1>
-            <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '4px' }}>
-              Generated for <strong style={{ color: 'var(--text-primary)' }}>{report.profileName}</strong> on{' '}
-              {new Date(report.generatedAt).toLocaleDateString(undefined, { dateStyle: 'long' })} • System: Vedic Sidereal (Chitra Paksha Lahiri)
+            <p style={{ fontSize: '13.5px', color: '#CBD5E1', marginTop: '6px' }}>
+              Prepared for <strong style={{ color: 'var(--gold-primary)' }}>{report.profileName}</strong> • Generated on{' '}
+              {new Date(report.generatedAt).toLocaleDateString(undefined, { dateStyle: 'long' })}
             </p>
           </div>
         </div>
@@ -106,48 +145,76 @@ export const ReportViewer: React.FC<ReportViewerProps> = ({ report, onBack }) =>
         {/* Ethical / Symbolic Disclaimer Banner */}
         <div
           style={{
-            padding: '10px 14px',
+            padding: '12px 16px',
             backgroundColor: 'rgba(255, 255, 255, 0.04)',
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--border-subtle)',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
-            fontSize: '11.5px',
-            color: 'var(--text-muted)',
+            gap: '10px',
+            fontSize: '12px',
+            color: '#E2E8F0',
+            lineHeight: 1.5,
           }}
         >
-          <AlertCircle size={14} color="var(--gold-primary)" />
+          <AlertCircle size={16} color="var(--gold-primary)" style={{ flexShrink: 0 }} />
           <span>
-            Astrological insights represent classical symbolic archetypes and psychological tendencies, not immutable or guaranteed life outcomes. Use for self-reflection and timing awareness.
+            This certified dossier synthesizes classical Parashari & Jaimini principles with modern astronomical ephemerides. It provides empowering timing awareness and does not replace licensed medical, financial, or legal counsel.
           </span>
+        </div>
+      </div>
+
+      {/* Quick Jump Table of Contents (no-print) */}
+      <div className="no-print" style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '16px 20px', borderRadius: 'var(--radius-lg)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+        <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--gold-primary)', letterSpacing: '0.06em', textTransform: 'uppercase', display: 'block', marginBottom: '10px' }}>
+          📑 Quick Chapter Jump (10 Master Chapters):
+        </span>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+          {report.chapters.map((ch, idx) => (
+            <a
+              key={ch.id}
+              href={`#${ch.id}`}
+              style={{
+                padding: '5px 12px',
+                borderRadius: 'var(--radius-full)',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid var(--border-subtle)',
+                color: '#E2E8F0',
+                fontSize: '11.5px',
+                textDecoration: 'none',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              Ch {idx + 1}: {ch.title.split(':')[1]?.trim() || ch.title}
+            </a>
+          ))}
         </div>
       </div>
 
       {/* Strengths & Growth Areas Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
-        <Card style={{ padding: '20px', borderLeft: '4px solid var(--gold-primary)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+        <Card className="pdf-report-card" style={{ padding: '22px', borderLeft: '4px solid var(--gold-primary)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
             <Award size={18} color="var(--gold-primary)" />
-            <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>
-              Identified Chart Strengths
+            <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#FFFFFF' }}>
+              Identified Chart Strengths & Auspicious Yogas
             </h3>
           </div>
-          <ul style={{ paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+          <ul style={{ paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#E2E8F0', lineHeight: 1.5 }}>
             {report.keyStrengths.map((str, idx) => (
               <li key={idx}>{str}</li>
             ))}
           </ul>
         </Card>
 
-        <Card style={{ padding: '20px', borderLeft: '4px solid var(--accent-rose-light)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+        <Card className="pdf-report-card" style={{ padding: '22px', borderLeft: '4px solid var(--accent-rose-light)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
             <Flame size={18} color="var(--accent-rose-light)" />
-            <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)' }}>
-              Conscious Growth Areas
+            <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#FFFFFF' }}>
+              Conscious Growth Areas & Stewardship
             </h3>
           </div>
-          <ul style={{ paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+          <ul style={{ paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px', color: '#E2E8F0', lineHeight: 1.5 }}>
             {report.keyGrowthAreas.map((area, idx) => (
               <li key={idx}>{area}</li>
             ))}
@@ -155,71 +222,122 @@ export const ReportViewer: React.FC<ReportViewerProps> = ({ report, onBack }) =>
         </Card>
       </div>
 
-      {/* Structured Chapters */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      {/* Structured Chapters (10 In-Depth Chapters) */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         {report.chapters.map((chapter, idx) => (
-          <Card key={chapter.id} style={{ padding: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-              <Badge variant="outline" size="sm">
+          <Card
+            key={chapter.id}
+            id={chapter.id}
+            className="pdf-report-card pdf-page-break"
+            style={{
+              padding: '28px',
+              background: 'linear-gradient(180deg, rgba(20, 18, 33, 0.95) 0%, rgba(12, 11, 20, 0.98) 100%)',
+              border: '1px solid rgba(245, 158, 11, 0.22)',
+              borderRadius: 'var(--radius-lg)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <Badge variant="gold" size="sm">
                 Chapter {idx + 1}
               </Badge>
-              <span style={{ fontSize: '12px', color: 'var(--gold-primary)', fontWeight: 600 }}>
-                {chapter.subtitle}
-              </span>
+              {chapter.subtitle && (
+                <span style={{ fontSize: '12.5px', color: 'var(--gold-primary)', fontWeight: 600 }}>
+                  {chapter.subtitle}
+                </span>
+              )}
             </div>
 
-            <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '10px' }}>
+            <h2 style={{ fontFamily: 'var(--font-display), serif', fontSize: '22px', fontWeight: 800, color: '#FFFFFF', marginBottom: '12px' }}>
               {chapter.title}
             </h2>
 
-            <p style={{ fontSize: '13.5px', color: 'var(--gold-primary)', fontWeight: 500, marginBottom: '14px', lineHeight: '1.5' }}>
-              &ldquo;{chapter.summary}&rdquo;
-            </p>
-
             <div
               style={{
-                fontSize: '13.5px',
-                color: 'var(--text-secondary)',
-                lineHeight: '1.7',
-                whiteSpace: 'pre-line',
+                backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                borderLeft: '3px solid var(--theme-orange-primary)',
+                padding: '12px 16px',
+                borderRadius: 'var(--radius-sm)',
                 marginBottom: '18px',
+                fontSize: '13.5px',
+                color: '#F8FAFC',
+                fontStyle: 'italic',
+                lineHeight: 1.55,
               }}
             >
-              {chapter.content}
+              &ldquo;{chapter.summary}&rdquo;
+            </div>
+
+            {/* Paragraphs */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px' }}>
+              {(chapter.contentParagraphs || (chapter.content ? [chapter.content] : [])).map((para, pIdx) => (
+                <p key={pIdx} style={{ fontSize: '14px', color: '#CBD5E1', lineHeight: '1.8', margin: 0 }}>
+                  {para}
+                </p>
+              ))}
             </div>
 
             {/* Calculated Evidence Matrix */}
-            {chapter.evidence && chapter.evidence.length > 0 && (
+            {((chapter.evidencePoints && chapter.evidencePoints.length > 0) || (chapter.evidence && chapter.evidence.length > 0)) && (
               <div
                 style={{
-                  backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                  backgroundColor: 'rgba(0, 0, 0, 0.4)',
                   border: '1px solid var(--border-subtle)',
                   borderRadius: 'var(--radius-md)',
-                  padding: '14px',
+                  padding: '16px',
+                  marginBottom: '16px',
                 }}
               >
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
-                  Calculated Chart Factors (Evidence)
+                <span style={{ fontSize: '11px', color: 'var(--gold-primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', display: 'block', marginBottom: '10px' }}>
+                  ✦ Astrological Evidence & Astronomical Points
                 </span>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
-                  {chapter.evidence.map((ev: any, evIdx: number) => (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '10px' }}>
+                  {(chapter.evidencePoints || chapter.evidence || []).map((ev: any, evIdx: number) => (
                     <div
                       key={evIdx}
                       style={{
-                        padding: '8px 10px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                        padding: '10px 12px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                        border: '1px solid rgba(255, 255, 255, 0.06)',
                         borderRadius: 'var(--radius-sm)',
-                        fontSize: '12px',
+                        fontSize: '12.5px',
                       }}
                     >
-                      <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{ev.factor}</div>
-                      <div style={{ color: 'var(--gold-primary)', fontSize: '11.5px' }}>{ev.placement}</div>
+                      <div style={{ fontWeight: 700, color: '#FFFFFF' }}>{ev.finding || ev.factor}</div>
+                      {ev.placement && <div style={{ color: 'var(--gold-primary)', fontSize: '11.5px', marginTop: '2px' }}>{ev.placement}</div>}
                       <div style={{ color: 'var(--text-muted)', fontSize: '11px', marginTop: '2px' }}>
-                        Influence: {ev.influence}
+                        Source: {ev.source || 'calculated_chart'}
                       </div>
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Traditional Insights */}
+            {chapter.traditionalInsights && chapter.traditionalInsights.length > 0 && (
+              <div style={{ backgroundColor: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.25)', borderRadius: 'var(--radius-md)', padding: '14px 16px', marginBottom: '14px' }}>
+                <h4 style={{ fontSize: '12.5px', fontWeight: 800, color: '#FACC15', marginBottom: '8px' }}>
+                  📜 Classical Shastric Axioms
+                </h4>
+                <ul style={{ paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12.5px', color: '#E2E8F0', margin: 0 }}>
+                  {chapter.traditionalInsights.map((ti, tiIdx) => (
+                    <li key={tiIdx}>{ti}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Practical Guidance */}
+            {chapter.practicalRemedies && chapter.practicalRemedies.length > 0 && (
+              <div style={{ backgroundColor: 'rgba(216, 197, 138, 0.08)', border: '1px solid rgba(216, 197, 138, 0.25)', borderRadius: 'var(--radius-md)', padding: '14px 16px' }}>
+                <h4 style={{ fontSize: '12.5px', fontWeight: 800, color: 'var(--gold-primary)', marginBottom: '8px' }}>
+                  ⚡ Chapter Practical Guidance
+                </h4>
+                <ul style={{ paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12.5px', color: '#F1F5F9', margin: 0 }}>
+                  {chapter.practicalRemedies.map((pr, prIdx) => (
+                    <li key={prIdx}>{pr}</li>
+                  ))}
+                </ul>
               </div>
             )}
           </Card>
@@ -228,27 +346,28 @@ export const ReportViewer: React.FC<ReportViewerProps> = ({ report, onBack }) =>
 
       {/* Traditional Remedies & Disciplines */}
       {report.traditionalRemedies && report.traditionalRemedies.length > 0 && (
-        <Card style={{ padding: '22px', border: '1px solid rgba(216, 197, 138, 0.3)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-            <Sparkles size={18} color="var(--gold-primary)" />
-            <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--gold-primary)' }}>
-              Traditional Harmonizing Remedies & Disciplines
+        <Card className="pdf-report-card pdf-page-break" style={{ padding: '26px', border: '1.5px solid rgba(216, 197, 138, 0.35)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+            <Sparkles size={20} color="var(--gold-primary)" />
+            <h3 style={{ fontFamily: 'var(--font-display), serif', fontSize: '18px', fontWeight: 800, color: 'var(--gold-primary)' }}>
+              Master Traditional Harmonizing Remedies & Disciplines
             </h3>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '10px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px' }}>
             {report.traditionalRemedies.map((rem, rIdx) => (
               <div
                 key={rIdx}
                 style={{
-                  padding: '12px',
+                  padding: '14px',
                   backgroundColor: 'rgba(255, 255, 255, 0.03)',
                   borderRadius: 'var(--radius-md)',
                   border: '1px solid var(--border-subtle)',
-                  fontSize: '12.5px',
-                  color: 'var(--text-secondary)',
+                  fontSize: '13px',
+                  color: '#E2E8F0',
                   display: 'flex',
                   alignItems: 'flex-start',
-                  gap: '8px',
+                  gap: '10px',
+                  lineHeight: 1.5,
                 }}
               >
                 <CheckCircle2 size={16} color="var(--gold-primary)" style={{ flexShrink: 0, marginTop: '2px' }} />

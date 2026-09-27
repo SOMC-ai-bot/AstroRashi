@@ -1,90 +1,62 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  /* Typography Tokens from the Mystic WordPress Template */
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Typography Tokens: Multi-Tiered Hierarchical Fonts */
+  --font-sans: 'Outfit', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: 'Cinzel', serif;
+  --font-editorial: 'Playfair Display', serif;
   --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-sacred: 'Cinzel', serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* Deep Mystic Midnight Void Foundations */
-  --bg-primary: #06040A;
-  --bg-surface: #0D0819;
-  --bg-surface-elevated: #140A28;
-  --bg-surface-glass: rgba(16, 10, 32, 0.85);
-  --bg-card: rgba(22, 14, 44, 0.65);
-  --bg-card-hover: rgba(30, 18, 58, 0.85);
+  /* Deep Mystic Midnight Celestial Void */
+  --bg-primary: #06070E;
+  --bg-surface: #0B0E1B;
+  --bg-surface-elevated: #111528;
+  --bg-surface-glass: rgba(11, 14, 27, 0.88);
+  --bg-card: rgba(14, 18, 36, 0.72);
+  --bg-card-hover: rgba(22, 28, 54, 0.88);
 
-  /* Primary Theme Palette: Royal Mystical Violet & Orchid */
-  --purple-primary: #7C3AED;
-  --purple-light: #8B5CF6;
-  --purple-bright: #A855F7;
-  --purple-soft: #C084FC;
-  --purple-glow: rgba(124, 58, 237, 0.45);
-  --purple-subtle: rgba(124, 58, 237, 0.15);
+  /* Golden Celestial & Solar Radiance */
+  --gold-primary: #F5D061;
+  --gold-light: #FDE89C;
+  --gold-vibrant: #FBBF24;
+  --gold-amber: #D97706;
+  --gold-glow: rgba(245, 208, 97, 0.45);
+  --gold-subtle: rgba(245, 208, 97, 0.12);
 
-  /* Compatibility theme aliases */
-  --theme-orange: #8B5CF6;
-  --theme-orange-hover: #9333EA;
-  --theme-orange-light: #C084FC;
-  --theme-orange-glow: rgba(139, 92, 246, 0.45);
-  --theme-orange-subtle: rgba(139, 92, 246, 0.15);
+  /* Primary Cosmic Theme: Mystic Royal Violet & Starlight */
+  --purple-primary: #8B5CF6;
+  --purple-light: #A78BFA;
+  --purple-bright: #C084FC;
+  --purple-glow: rgba(139, 92, 246, 0.45);
 
-  --gold-primary: #F59E0B;
-  --gold-light: #FBBF24;
-  --gold-muted: #D97706;
-  --gold-glow: rgba(245, 158, 11, 0.45);
-  --gold-subtle: rgba(245, 158, 11, 0.12);
+  --theme-orange: #FF7A00;
+  --theme-orange-light: #FF9E40;
 
-  --theme-blue: #6366F1;
-  --theme-blue-light: #818CF8;
-  --theme-blue-glow: rgba(99, 102, 241, 0.38);
-
-  --theme-green: #10B981;
-  --theme-green-light: #34D399;
-  --theme-green-glow: rgba(16, 185, 129, 0.38);
-
-  /* Elegant Celestial Monochromes */
-  --theme-white: #FFFFFF;
+  /* High-Contrast Crisp Text Palette */
   --text-primary: #FFFFFF;
-  --text-secondary: #E4DCF9;
-  --text-muted: #A79BBF;
-  --text-dim: #71648A;
+  --text-secondary: #F1F5F9;
+  --text-muted: #CBD5E1;
+  --text-dim: #94A3B8;
 
-  /* Mystic Wireframe Borders & Highlights */
-  --border-subtle: rgba(168, 85, 247, 0.16);
-  --border-card: rgba(168, 85, 247, 0.24);
-  --border-card-hover: rgba(192, 132, 252, 0.55);
-  --border-focus: rgba(168, 85, 247, 0.75);
-  --border-glow-gold: rgba(245, 158, 11, 0.45);
-  --border-outline-btn: rgba(216, 180, 254, 0.5);
+  /* Radiant Celestial Borders */
+  --border-subtle: rgba(245, 208, 97, 0.2);
+  --border-card: rgba(245, 208, 97, 0.28);
+  --border-card-hover: rgba(253, 232, 156, 0.65);
+  --border-focus: rgba(245, 208, 97, 0.85);
+  --border-glow-gold: 0 0 16px rgba(245, 208, 97, 0.35);
 
-  /* Spacing */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
-
-  /* Radii - Refined crisp aesthetics matching the template */
+  /* Radii */
   --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
   --radius-full: 9999px;
 
-  /* Transitions */
-  --transition-fast: 140ms cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-normal: 220ms cubic-bezier(0.16, 1, 0.3, 1);
-
   /* Multi-Layer Cosmic Shadows */
-  --shadow-card: 0 16px 40px -10px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  --shadow-card-hover: 0 24px 60px -12px rgba(0, 0, 0, 0.9), 0 0 35px rgba(124, 58, 237, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  --shadow-glow: 0 0 32px var(--purple-glow);
+  --shadow-card: 0 16px 40px -10px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(245, 208, 97, 0.15);
+  --shadow-card-hover: 0 24px 60px -12px rgba(0, 0, 0, 0.9), 0 0 35px rgba(245, 208, 97, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 * {
@@ -102,24 +74,28 @@ body {
   color: var(--text-primary);
   font-family: var(--font-sans);
   overflow-x: hidden;
-  line-height: 1.55;
-  letter-spacing: -0.01em;
+  line-height: 1.6;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   font-weight: 700;
+  color: #FFFFFF;
 }
 
-/* Mystical WordPress Cosmic Atmosphere */
+/* Celestial Starlight & Constellation Background Wallpaper */
 .cosmic-bg {
-  background-color: var(--bg-primary);
+  background-color: #06070E;
   background-image: 
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124, 58, 237, 0.28) 0%, transparent 65%),
-    radial-gradient(circle at 15% 45%, rgba(168, 85, 247, 0.14) 0%, transparent 45%),
-    radial-gradient(circle at 85% 65%, rgba(91, 33, 182, 0.2) 0%, transparent 50%),
-    radial-gradient(circle at 50% 95%, rgba(139, 92, 246, 0.12) 0%, transparent 60%);
+    url('/celestial-pattern.svg'),
+    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(139, 92, 246, 0.22) 0%, transparent 70%),
+    radial-gradient(circle at 10% 30%, rgba(245, 208, 97, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 90% 70%, rgba(124, 58, 237, 0.16) 0%, transparent 50%),
+    radial-gradient(circle at 50% 90%, rgba(251, 191, 36, 0.08) 0%, transparent 55%),
+    linear-gradient(180deg, #06070E 0%, #090C18 50%, #06070E 100%);
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  background-size: 800px 800px, cover, cover, cover, cover, cover;
   background-attachment: fixed;
 }
 

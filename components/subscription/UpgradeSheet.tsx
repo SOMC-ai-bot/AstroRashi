@@ -47,7 +47,7 @@ export const UpgradeSheet: React.FC<UpgradeSheetProps> = ({
             Unlock {requiredFeature || 'Premium Feature'}
           </h3>
           <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginTop: '6px', lineHeight: 1.5 }}>
-            Access all AstroNex Expert Astrologer specialists without session time limits, full natal chart transits, and family profiles starting at just <strong>₹199/month</strong>.
+            Access all AstroNex Expert Astrologer specialists without session time limits, full natal chart transits, and family profiles starting at just <strong>₹199/year (₹29/month)</strong>.
           </p>
         </div>
 
@@ -61,7 +61,7 @@ export const UpgradeSheet: React.FC<UpgradeSheetProps> = ({
             }}
             style={{ width: '100%' }}
           >
-            <span>View Plans (From ₹199/mo)</span>
+            <span>View Plans (From ₹199/yr)</span>
             <ArrowRight size={16} />
           </Button>
 
