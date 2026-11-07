@@ -98,7 +98,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
   const firstName = displayName.split(' ')[0] || 'Seeker';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '80px', color: '#E2E8F0' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '80px', color: '#E2E8F0', width: '100%', maxWidth: '100%', overflowX: 'hidden' }}>
       {/* Top Welcome Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
         <div>
@@ -118,6 +118,8 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
           gridTemplateColumns: 'minmax(0, 1.65fr) minmax(320px, 1fr)',
           gap: '24px',
           alignItems: 'start',
+          width: '100%',
+          maxWidth: '100%',
         }}
         className="dashboard-main-grid"
       >

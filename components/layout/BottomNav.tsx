@@ -52,38 +52,40 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange }) 
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-around',
-        height: '68px',
-        backgroundColor: '#050608',
-        backdropFilter: 'blur(28px)',
-        WebkitBackdropFilter: 'blur(28px)',
-        borderTop: '1px solid rgba(249, 115, 22, 0.22)',
-        boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.85)',
+        height: '66px',
+        backgroundColor: 'rgba(7, 9, 14, 0.96)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+        boxShadow: '0 -6px 24px rgba(0, 0, 0, 0.75)',
         padding: '0 8px',
+        maxWidth: '100vw',
       }}
       className="safe-bottom"
     >
-      {/* 1. Home (or Dashboard if logged in) */}
+      {/* 1. Home / Dashboard */}
       <button
         onClick={() => onTabChange(isAuthenticated ? 'dashboard' : 'home')}
         style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '3px',
+          gap: '4px',
           background: 'none',
           border: 'none',
           cursor: 'pointer',
-          color: isHomeOrDashboardActive ? '#11A8EB' : '#A6A9AF',
-          transition: 'all 180ms ease',
-          padding: '6px 6px',
+          flex: 1,
+          color: isHomeOrDashboardActive ? '#11A8EB' : '#8E95A3',
+          transition: 'all 160ms ease',
+          padding: '6px 2px',
         }}
       >
         {isAuthenticated ? (
-          <LayoutDashboard size={20} strokeWidth={isHomeOrDashboardActive ? 2.5 : 1.8} />
+          <LayoutDashboard size={22} strokeWidth={isHomeOrDashboardActive ? 2.4 : 1.7} />
         ) : (
-          <Home size={20} strokeWidth={isHomeOrDashboardActive ? 2.5 : 1.8} />
+          <Home size={22} strokeWidth={isHomeOrDashboardActive ? 2.4 : 1.7} />
         )}
-        <span style={{ fontSize: '10px', fontWeight: isHomeOrDashboardActive ? 750 : 500 }}>
+        <span style={{ fontSize: '11px', fontWeight: isHomeOrDashboardActive ? 700 : 500, letterSpacing: '0.01em' }}>
           {isAuthenticated ? 'Dashboard' : 'Home'}
         </span>
       </button>
@@ -95,154 +97,111 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange }) 
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '3px',
+          gap: '4px',
           background: 'none',
           border: 'none',
           cursor: 'pointer',
-          color: activeTab === 'charts' ? '#11A8EB' : '#A6A9AF',
-          transition: 'all 180ms ease',
-          padding: '6px 6px',
+          flex: 1,
+          color: activeTab === 'charts' ? '#11A8EB' : '#8E95A3',
+          transition: 'all 160ms ease',
+          padding: '6px 2px',
         }}
       >
-        <PieChart size={20} strokeWidth={activeTab === 'charts' ? 2.5 : 1.8} />
-        <span style={{ fontSize: '10px', fontWeight: activeTab === 'charts' ? 750 : 500 }}>
+        <PieChart size={22} strokeWidth={activeTab === 'charts' ? 2.4 : 1.7} />
+        <span style={{ fontSize: '11px', fontWeight: activeTab === 'charts' ? 700 : 500, letterSpacing: '0.01em' }}>
           Kundli
         </span>
       </button>
 
-      {/* 3. Kundli Match */}
-      <button
-        onClick={() => onTabChange('matching')}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '3px',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          color: activeTab === 'matching' ? '#11A8EB' : '#A6A9AF',
-          transition: 'all 180ms ease',
-          padding: '6px 6px',
-        }}
-      >
-        <Heart size={20} strokeWidth={activeTab === 'matching' ? 2.5 : 1.8} />
-        <span style={{ fontSize: '10px', fontWeight: activeTab === 'matching' ? 750 : 500 }}>
-          Matching
-        </span>
-      </button>
-
-      {/* 4. Center Glowing Orb for AI Astrologer */}
+      {/* 3. Center Glowing AI Astrologer */}
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          marginTop: '-22px',
+          marginTop: '-24px',
+          flex: 1.1,
+          cursor: 'pointer',
         }}
+        onClick={() => onTabChange('ai')}
       >
-        <GlowingOrb
-          size={50}
-          state={activeTab === 'ai' ? 'thinking' : 'idle'}
-          onClick={() => onTabChange('ai')}
-        />
+        <div
+          style={{
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '3px',
+            borderRadius: '50%',
+            background: activeTab === 'ai'
+              ? 'linear-gradient(135deg, #11A8EB 0%, #7C3AED 100%)'
+              : 'rgba(255, 255, 255, 0.08)',
+            boxShadow: activeTab === 'ai'
+              ? '0 6px 20px rgba(17, 168, 235, 0.45)'
+              : '0 4px 14px rgba(0, 0, 0, 0.5)',
+          }}
+        >
+          <GlowingOrb
+            size={48}
+            state={activeTab === 'ai' ? 'thinking' : 'idle'}
+          />
+        </div>
         <span
           style={{
-            fontSize: '9.5px',
+            fontSize: '11px',
             marginTop: '3px',
             fontWeight: activeTab === 'ai' ? 800 : 600,
             color: activeTab === 'ai' ? '#11A8EB' : '#A6A9AF',
+            letterSpacing: '0.01em',
           }}
         >
-          Astrologers
+          AI Chat
         </span>
       </div>
 
-      {/* 5. Panchang */}
+      {/* 4. Panchang / Tools */}
       <button
         onClick={() => onTabChange('panchang')}
         style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '3px',
+          gap: '4px',
           background: 'none',
           border: 'none',
           cursor: 'pointer',
-          color: activeTab === 'panchang' ? '#11A8EB' : '#A6A9AF',
-          transition: 'all 180ms ease',
-          padding: '6px 6px',
+          flex: 1,
+          color: activeTab === 'panchang' ? '#11A8EB' : '#8E95A3',
+          transition: 'all 160ms ease',
+          padding: '6px 2px',
         }}
       >
-        <Calendar size={20} strokeWidth={activeTab === 'panchang' ? 2.5 : 1.8} />
-        <span style={{ fontSize: '10px', fontWeight: activeTab === 'panchang' ? 750 : 500 }}>
+        <Calendar size={22} strokeWidth={activeTab === 'panchang' ? 2.4 : 1.7} />
+        <span style={{ fontSize: '11px', fontWeight: activeTab === 'panchang' ? 700 : 500, letterSpacing: '0.01em' }}>
           Panchang
         </span>
       </button>
 
-      {/* 5b. Astrology Suite (33+ Calculators Hub) */}
-      <button
-        onClick={() => onTabChange('tools')}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '3px',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          color: activeTab === 'tools' ? '#11A8EB' : '#A6A9AF',
-          transition: 'all 180ms ease',
-          padding: '6px 6px',
-        }}
-      >
-        <Calculator size={20} strokeWidth={activeTab === 'tools' ? 2.5 : 1.8} />
-        <span style={{ fontSize: '10px', fontWeight: activeTab === 'tools' ? 750 : 500 }}>
-          Tools
-        </span>
-      </button>
-
-      {/* 6. Expert Astrologers */}
+      {/* 5. Expert Astrologers */}
       <button
         onClick={() => onTabChange('consultants')}
         style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '3px',
+          gap: '4px',
           background: 'none',
           border: 'none',
           cursor: 'pointer',
-          color: activeTab === 'consultants' ? '#FBBF24' : '#A6A9AF',
-          transition: 'all 180ms ease',
-          padding: '6px 6px',
+          flex: 1,
+          color: activeTab === 'consultants' ? '#FBBF24' : '#8E95A3',
+          transition: 'all 160ms ease',
+          padding: '6px 2px',
         }}
       >
-        <Sparkles size={20} strokeWidth={activeTab === 'consultants' ? 2.5 : 1.8} />
-        <span style={{ fontSize: '10px', fontWeight: activeTab === 'consultants' ? 750 : 500 }}>
+        <Sparkles size={22} strokeWidth={activeTab === 'consultants' ? 2.4 : 1.7} />
+        <span style={{ fontSize: '11px', fontWeight: activeTab === 'consultants' ? 700 : 500, letterSpacing: '0.01em' }}>
           Experts
-        </span>
-      </button>
-
-      {/* 7. My Plans */}
-      <button
-        onClick={() => onTabChange('subscription')}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '3px',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          color: activeTab === 'subscription' ? '#FBBF24' : '#A6A9AF',
-          transition: 'all 180ms ease',
-          padding: '6px 6px',
-        }}
-      >
-        <Crown size={20} strokeWidth={activeTab === 'subscription' ? 2.5 : 1.8} />
-        <span style={{ fontSize: '10px', fontWeight: activeTab === 'subscription' ? 750 : 500 }}>
-          {isAuthenticated ? 'My Plans' : 'Subscriptions'}
         </span>
       </button>
     </nav>

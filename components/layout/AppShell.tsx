@@ -119,6 +119,7 @@ export const AppShell: React.FC = () => {
 
         {/* Main Application Area - Full Width */}
         <main
+          className="app-main-content"
           style={{
             flex: 1,
             width: '100%',
@@ -126,6 +127,7 @@ export const AppShell: React.FC = () => {
             margin: '0 auto',
             padding: '24px 20px 40px',
             boxSizing: 'border-box',
+            overflowX: 'hidden',
           }}
         >
           {/* 1. Home / Discover Screen (Visible to all, default for non-logged in) */}
@@ -224,6 +226,9 @@ export const AppShell: React.FC = () => {
         @media (max-width: 1023px) {
           .mobile-bottomnav-wrapper {
             display: block;
+          }
+          .app-main-content {
+            padding: 16px 12px 85px !important;
           }
         }
       `}</style>

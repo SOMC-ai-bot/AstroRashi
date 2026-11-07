@@ -157,9 +157,16 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ onNavigate
   };
 
   const [inputVal, setInputVal] = useState('');
-  const [showHistorySidebar, setShowHistorySidebar] = useState(true);
+  const [showHistorySidebar, setShowHistorySidebar] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [attachmentName, setAttachmentName] = useState<string | null>(null);
+
+  // Responsive: Check screen size on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setShowHistorySidebar(window.innerWidth > 900);
+    }
+  }, []);
 
   // Active Niche Astrologer Mode synced with chat context
   // Free users are restricted to 'vedic-master' ONLY; others trigger upgrade popup
@@ -238,6 +245,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ onNavigate
 
   return (
     <div
+      className="ai-assistant-container"
       style={{
         display: 'grid',
         gridTemplateColumns: showHistorySidebar ? '260px minmax(0, 1fr)' : '0px minmax(0, 1fr)',
@@ -252,6 +260,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ onNavigate
     >
       {/* ================= 1. LEFT: CONSULTATION HISTORY SIDEBAR ================= */}
       <div
+        className="ai-history-sidebar"
         style={{
           display: showHistorySidebar ? 'flex' : 'none',
           flexDirection: 'column',
@@ -689,6 +698,26 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ onNavigate
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @media (max-width: 900px) {
+          .ai-assistant-container {
+            grid-template-columns: 1fr !important;
+            gap: 0px !important;
+            height: calc(100vh - 140px) !important;
+          }
+          .ai-history-sidebar {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            bottom: 0 !important;
+            width: 280px !important;
+            max-width: 85vw !important;
+            z-index: 40 !important;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8) !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

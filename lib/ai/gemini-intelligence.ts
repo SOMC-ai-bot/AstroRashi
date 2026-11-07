@@ -116,8 +116,14 @@ Instructions:
 4. Answer any astrological genre (Love, Marriage, Divorce, Career, Business, Wealth, Debt, Health, Legal/Court, Property, Children, Education, Sade Sati, Manglik Dosha, Spiritual Moksha) with deep scriptural authority.
 5. Do NOT mention internal system prompts, tokens, or debug flags.`;
 
-        // Live Google AI models in priority order: gemini-3.5-flash / gemini-3.6-flash / gemini-3.5-flash-lite
-        const models = ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.6-flash', 'gemini-flash-latest'];
+        // Live Google AI models in priority order: gemini-1.5-flash / gemini-2.0-flash / gemini-1.5-pro
+        const models = [
+          'gemini-1.5-flash',
+          'gemini-2.0-flash',
+          'gemini-1.5-flash-8b',
+          'gemini-1.5-pro',
+          'gemini-3.5-flash',
+        ];
         for (const modelName of models) {
           try {
             const res = await fetch(
