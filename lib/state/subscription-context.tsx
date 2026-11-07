@@ -35,6 +35,7 @@ interface SubscriptionContextType {
     method: PaymentMethodType
   ) => Promise<boolean>;
   cancelSubscription: () => void;
+  switchToFreePlan: () => void;
   restorePurchases: () => Promise<boolean>;
   canAccess: (key: EntitlementKey) => boolean;
   canAccessPersona: (consultantId: string) => boolean;
@@ -87,15 +88,40 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     cycle: BillingCycle,
     method: PaymentMethodType
   ): Promise<boolean> => {
-    const plan = getPlanByTier(tier);
-    const session = await paymentProvider.createCheckoutSession({
-      userId: user.id,
-      tier,
-      billingCycle: cycle,
-      method,
-    });
+    if (tier === 'free') {
+      switchToFreePlan();
+      return true;
+    }
 
-    const verification = await paymentProvider.verifyPayment(session.transactionId);
+    const plan = getPlanByTier(tier);
+    const amount = cycle === 'yearly' ? plan.yearlyPrice : plan.monthlyPrice;
+    if (amount === 0) {
+      switchToFreePlan();
+      return true;
+    }
+
+    // Trigger Razorpay Payment Gateway Modal
+    let paymentId = 'pay_direct_' + Date.now();
+    try {
+      const razorpayResponse = await paymentProvider.openRazorpayCheckout({
+        amountInRupees: amount,
+        name: `AstroNex ${plan.name} Tier`,
+        description: `Access to ${plan.name} cosmic insights & consultations (${cycle})`,
+        userEmail: user?.email || undefined,
+        userPhone: user?.phone || undefined,
+        notes: {
+          tier,
+          cycle,
+          userId: user.id,
+        },
+      });
+      paymentId = razorpayResponse.razorpay_payment_id || paymentId;
+    } catch (checkoutErr: any) {
+      console.warn('[Razorpay Checkout]', checkoutErr?.message || checkoutErr);
+      return false;
+    }
+
+    const verification = await paymentProvider.verifyPayment(paymentId);
     if (verification.success) {
       const now = new Date();
       const renewalDays = cycle === 'yearly' ? 365 : 30;
@@ -156,6 +182,16 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     }
   };
 
+  const switchToFreePlan = () => {
+    setUserSubscription(null);
+    try {
+      localStorage.removeItem(STORAGE_SUB_KEY);
+    } catch (e) {
+      console.error(e);
+    }
+    updatePlan('free');
+  };
+
   const restorePurchases = async (): Promise<boolean> => {
     // Re-verifies active state from server storage
     if (userSubscription && userSubscription.status === 'active') {
@@ -187,6 +223,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
         closeUpgradeModal,
         subscribeToPlan,
         cancelSubscription,
+        switchToFreePlan,
         restorePurchases,
         canAccess,
         canAccessPersona,

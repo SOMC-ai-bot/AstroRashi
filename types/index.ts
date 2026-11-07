@@ -59,6 +59,7 @@ export type BillingCycle = 'monthly' | 'yearly';
 export interface UserProfile extends BirthProfile {
   id: string;
   email: string;
+  phone?: string;
   avatarUrl?: string;
   isPremium: boolean; // true if basic or premium
   planTier: PlanTier;

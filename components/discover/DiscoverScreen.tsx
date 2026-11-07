@@ -13,6 +13,7 @@ import { MoonPhasesRibbon } from '@/components/mystic/MoonPhasesRibbon';
 import { ZodiacWheelCards } from '@/components/mystic/ZodiacWheelCards';
 import { MysticCircles } from '@/components/mystic/MysticCircles';
 import { TestimonialsSection } from '@/components/mystic/TestimonialsSection';
+import { CompanyFooter } from '@/components/layout/CompanyFooter';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -38,14 +39,16 @@ interface DiscoverScreenProps {
   onTabChange: (tab: NavTab) => void;
   onAskAI: (query: string) => void;
   onOpenPremium: () => void;
+  onOpenAuth?: () => void;
 }
 
 export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
   onTabChange,
   onAskAI,
   onOpenPremium,
+  onOpenAuth,
 }) => {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { natalChart, activeProfile } = useAstrology();
   const { specialists, startSpecialistSession } = useConsultant();
   const { t } = useI18n();
@@ -126,7 +129,7 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
             {mounted ? timeInfo.formattedDate : 'Sunday, Sep 27'}
           </Badge>
           <span style={{ fontSize: '12.5px', color: '#E4DCF9', fontWeight: 600 }}>
-            {mounted ? timeInfo.greeting : 'Good afternoon'}, {activeProfile.name} • {mounted ? timeInfo.timeString : '1:15 PM'} ({mounted ? timeInfo.periodLabel : 'Afternoon'})
+            {mounted ? timeInfo.greeting : 'Good afternoon'}, {(activeProfile.name || 'Cosmic Soul').trim().split(/\s+/)[0]} • {mounted ? timeInfo.timeString : '1:15 PM'} ({mounted ? timeInfo.periodLabel : 'Afternoon'})
           </span>
         </div>
 
@@ -143,11 +146,34 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
         </p>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
+          {onOpenAuth && !isAuthenticated && (
+            <button
+              onClick={onOpenAuth}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 22px',
+                borderRadius: '24px',
+                background: 'linear-gradient(135deg, #F97316 0%, #EA580C 100%)',
+                color: '#FFFFFF',
+                fontSize: '13.5px',
+                fontWeight: 750,
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 4px 18px rgba(249, 115, 22, 0.45)',
+              }}
+            >
+              <Sparkles size={16} />
+              <span>Sign In / Register</span>
+            </button>
+          )}
+
           <button
-            onClick={() => onTabChange('consultants')}
+            onClick={() => onTabChange('ai')}
             className="btn-mystic-outline"
           >
-            Schedule a Reading
+            Consult Astrologers
           </button>
           <button
             onClick={() => onTabChange('charts')}
@@ -332,7 +358,8 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
             </div>
           </Card>
 
-          {/* Portal 2: Reports */}
+          {/* Portal 2: Reports - only visible to signed in users */}
+          {isAuthenticated && (
           <Card
             variant="glass"
             interactive
@@ -367,19 +394,21 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
                 </Badge>
               </div>
               <h4 style={{ fontSize: '17px', fontWeight: 800, color: '#FFFFFF', marginBottom: '4px' }}>
-                Deep Reports
+                Life Reports
               </h4>
               <p style={{ fontSize: '12px', color: '#A79BBF', lineHeight: 1.4 }}>
                 Life Blueprint, Career, Marriage & Vimshottari Timeline
               </p>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#C084FC', fontSize: '12px', fontWeight: 700, marginTop: '12px' }}>
-              <span>Access Dossiers</span>
+              <span>Access Life Reports</span>
               <ArrowUpRight size={14} />
             </div>
           </Card>
+          )}
 
-          {/* Portal 4: Academy */}
+
+          {/* Portal 4: Vedic Panchang */}
           <Card
             variant="glass"
             interactive
@@ -391,7 +420,7 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
               minHeight: '170px',
               borderRadius: '8px',
             }}
-            onClick={() => onTabChange('learn')}
+            onClick={() => onTabChange('panchang')}
           >
             <div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
@@ -400,28 +429,28 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
                     width: '44px',
                     height: '44px',
                     borderRadius: '4px',
-                    backgroundColor: 'rgba(124, 58, 237, 0.25)',
+                    backgroundColor: 'rgba(249, 115, 22, 0.2)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: '1px solid rgba(168, 85, 247, 0.45)',
+                    border: '1px solid rgba(249, 115, 22, 0.45)',
                   }}
                 >
-                  <BookOpen size={20} color="#C084FC" />
+                  <Calendar size={20} color="#F97316" />
                 </div>
                 <Badge size="sm" variant="orange">
-                  Academy
+                  Panchang
                 </Badge>
               </div>
               <h4 style={{ fontSize: '17px', fontWeight: 800, color: '#FFFFFF', marginBottom: '4px' }}>
-                Learn Astrology
+                Vedic Panchang
               </h4>
               <p style={{ fontSize: '12px', color: '#A79BBF', lineHeight: 1.4 }}>
-                Vedic, Western & KP guides with 50+ term glossary
+                Daily Tithi, Nakshatra, Rahu Kaal, Abhijit & Festival calendar
               </p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#C084FC', fontSize: '12px', fontWeight: 700, marginTop: '12px' }}>
-              <span>Enter Academy</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#F97316', fontSize: '12px', fontWeight: 700, marginTop: '12px' }}>
+              <span>Open Panchang</span>
               <ArrowUpRight size={14} />
             </div>
           </Card>
@@ -434,154 +463,25 @@ export const DiscoverScreen: React.FC<DiscoverScreenProps> = ({
           onAskAI={onAskAI}
         />
 
-      {/* 7. EXACT TEMPLATE: Overlapping Mystic Circles (Become A Member & Learning Center) */}
+      {/* 7. EXACT TEMPLATE: Overlapping Mystic Circles (Become A Member & Kundli Matrix) */}
       <section>
         <MysticCircles
-          onOpenMembership={onOpenPremium}
-          onOpenLearning={() => onTabChange('learn')}
+          onOpenMembership={() => onTabChange('subscription')}
+          onOpenLearning={() => onTabChange('matching')}
         />
-      </section>
-
-      {/* Expert Astrologers & Specialists */}
-      <section>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '18px',
-          }}
-        >
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <h3 style={{ fontSize: '24px', fontWeight: 800, color: '#FFFFFF', fontFamily: 'var(--font-display)' }}>
-                ✦ Expert Astrologers
-              </h3>
-              <Badge variant="orange" size="sm">
-                Certified Faculty
-              </Badge>
-            </div>
-          </div>
-
-          <button
-            onClick={() => onTabChange('consultants')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              background: 'none',
-              border: 'none',
-              color: '#C084FC',
-              fontSize: '13.5px',
-              cursor: 'pointer',
-              fontWeight: 700,
-            }}
-          >
-            <span>View All</span>
-            <ChevronRight size={16} />
-          </button>
-        </div>
-
-        {/* Specialist Cards - Only 1 unlocked for free users, others locked with Pro */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
-            gap: '16px',
-          }}
-        >
-          {specialists.map((spec) => {
-            const isAccessible = spec.isFreeTier || user.isPremium;
-
-            return (
-              <Card
-                key={spec.id}
-                variant="glass"
-                interactive
-                style={{
-                  padding: '24px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  borderRadius: '8px',
-                  minHeight: '170px',
-                  border: isAccessible
-                    ? '1px solid rgba(168, 85, 247, 0.25)'
-                    : '1px dashed rgba(250, 204, 21, 0.35)',
-                }}
-              >
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
-                    <div
-                      style={{
-                        width: '46px',
-                        height: '46px',
-                        borderRadius: '4px',
-                        background: 'rgba(124, 58, 237, 0.25)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 0 16px rgba(124, 58, 237, 0.4)',
-                        border: '1px solid rgba(168, 85, 247, 0.45)',
-                      }}
-                    >
-                      {getSpecialistIcon(spec.id)}
-                    </div>
-
-                    <Badge variant={spec.isFreeTier ? 'yellow' : isAccessible ? 'orange' : 'outline'} size="sm" dot={spec.isFreeTier}>
-                      {spec.isFreeTier ? 'Standard Access' : isAccessible ? 'Pro Unlocked' : 'Pro Only'}
-                    </Badge>
-                  </div>
-
-                  <h4
-                    style={{
-                      fontSize: '17px',
-                      fontWeight: 800,
-                      color: '#FFFFFF',
-                      lineHeight: '1.3',
-                      fontFamily: 'var(--font-display)',
-                    }}
-                  >
-                    {spec.name}
-                  </h4>
-                </div>
-
-                {/* Action Button */}
-                <div style={{ paddingTop: '18px' }}>
-                  <button
-                    onClick={() => {
-                      if (isAccessible) {
-                        startSpecialistSession(spec.id);
-                      } else {
-                        onOpenPremium();
-                      }
-                    }}
-                    className={isAccessible ? 'btn-mystic-primary' : 'btn-mystic-outline'}
-                    style={{ width: '100%', fontSize: '12px', padding: '8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
-                  >
-                    {isAccessible ? (
-                      <>
-                        <span>Consult Specialist</span>
-                        <ChevronRight size={14} />
-                      </>
-                    ) : (
-                      <>
-                        <Lock size={12} color="#FACC15" />
-                        <span>Unlock with Pro</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
       </section>
 
       {/* Testimonials ("What My Clients Say") */}
       <section>
         <TestimonialsSection />
       </section>
+
+      {/* Website Footer — always visible on Home page */}
+      <CompanyFooter
+        onTabChange={onTabChange}
+        onOpenPremium={onOpenPremium}
+        onOpenAuth={onOpenAuth}
+      />
     </div>
   );
 };

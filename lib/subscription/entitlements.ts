@@ -3,7 +3,7 @@ import { getPlanByTier, SUBSCRIPTION_PLANS } from './plans';
 import { canAccessSpecialist as checkSpecialistAccess, getSpecialistById } from '../specialists/config';
 
 export function getUserPlan(user: UserProfile): SubscriptionPlan {
-  const tier = user.planTier || (user.isPremium ? 'basic' : 'free');
+  const tier = user.planTier === 'premium' || user.isPremium ? 'premium' : 'free';
   return getPlanByTier(tier);
 }
 

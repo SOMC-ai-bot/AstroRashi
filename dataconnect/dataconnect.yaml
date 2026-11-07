@@ -1,0 +1,11 @@
+specVersion: "v1alpha"
+serviceId: "astronex-service"
+location: "us-central1"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "astronex"
+      cloudSql:
+        instanceId: "astronex-postgres"
+connectorDirs: ["./connector"]

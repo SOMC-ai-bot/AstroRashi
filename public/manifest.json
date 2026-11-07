@@ -1,0 +1,19 @@
+{
+  "name": "AstroNex — Specialist AI Astrologer",
+  "short_name": "AstroNex",
+  "description": "Certified Vedic Astrological Dossiers, North Indian Kundli Charts, and Celestial Insights",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0A0C",
+  "theme_color": "#171719",
+  "orientation": "portrait-primary",
+  "categories": ["lifestyle", "utilities"],
+  "icons": [
+    {
+      "src": "/celestial-pattern.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

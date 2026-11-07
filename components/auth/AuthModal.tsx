@@ -1,376 +1,393 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Modal } from '@/components/ui/Modal';
-import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
-import { LocationPicker } from '@/components/tools/LocationPicker';
-import { CityLocation } from '@/lib/astrology-engine/location-service';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/state/auth-context';
-import { AstrologySystem } from '@/types';
-import { Sparkles, Calendar, Clock, MapPin, User, Mail, Lock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Mail, Loader2, AlertCircle, CheckCircle2, X, ArrowLeft } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialMode?: 'signin' | 'register';
+  initialMode?: string;
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({
-  isOpen,
-  onClose,
-  initialMode = 'register',
-}) => {
-  const { user, login, register, socialLogin } = useAuth();
-  const [mode, setMode] = useState<'signin' | 'register'>(initialMode);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+// ── Animated star field ──────────────────────────────────────────────
+const STARS = Array.from({ length: 70 }, (_, i) => ({
+  id: i,
+  x: Math.random() * 100,
+  y: Math.random() * 100,
+  size: Math.random() * 2.2 + 0.4,
+  delay: Math.random() * 5,
+  dur: Math.random() * 3 + 1.8,
+}));
 
-  // Form State
-  const [name, setName] = useState(user.name || '');
-  const [email, setEmail] = useState(user.email || '');
-  const [password, setPassword] = useState('');
-  const [birthDate, setBirthDate] = useState(user.birthDate || '1996-09-12');
-  const [birthTime, setBirthTime] = useState(user.birthTime || '14:30');
-  const [selectedLocation, setSelectedLocation] = useState<CityLocation>({
-    name: 'Varanasi',
-    state: 'Uttar Pradesh',
-    country: 'India',
-    latitude: 25.3176,
-    longitude: 82.9739,
-    timezone: 'Asia/Kolkata',
-    isGoogleVerified: true,
-  });
-  const [system, setSystem] = useState<AstrologySystem>('vedic');
+const StarField: React.FC = () => (
+  <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+    {STARS.map((s) => (
+      <div
+        key={s.id}
+        style={{
+          position: 'absolute',
+          left: `${s.x}%`,
+          top: `${s.y}%`,
+          width: `${s.size}px`,
+          height: `${s.size}px`,
+          borderRadius: '50%',
+          background: '#fff',
+          opacity: 0,
+          animation: `ar-twinkle ${s.dur}s ${s.delay}s infinite ease-in-out alternate`,
+        }}
+      />
+    ))}
+    <div style={{ position:'absolute', top:'22%', left:'-8%', width:'110px', height:'2px', background:'linear-gradient(90deg,transparent,#fff 60%,transparent)', transform:'rotate(-30deg)', animation:'ar-shoot 4s 0.8s infinite linear', opacity: 0.8 }} />
+    <div style={{ position:'absolute', top:'55%', left:'-8%', width:'70px', height:'1.5px', background:'linear-gradient(90deg,transparent,#c4b5fd 60%,transparent)', transform:'rotate(-28deg)', animation:'ar-shoot 5.5s 2.6s infinite linear', opacity: 0.65 }} />
+  </div>
+);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMsg(null);
+// ── Component ────────────────────────────────────────────────────────
+export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
+  const { socialLogin, sendEmailSignInLink } = useAuth();
 
-    if (mode === 'signin') {
-      const res = login(email, password);
-      if (res.success) {
-        onClose();
-      } else {
-        setErrorMsg(res.error || 'Invalid credentials');
-      }
+  const [email, setEmail]           = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg]     = useState<string | null>(null);
+  const [step, setStep]             = useState<'form' | 'link-sent'>('form');
+  const [visible, setVisible]       = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setEmail('');
+      setErrorMsg(null);
+      setIsSubmitting(false);
+      setStep('form');
+      setTimeout(() => setVisible(true), 20);
     } else {
-      const res = register({
-        name,
-        email,
-        password: password || 'default_pass',
-        birthDate,
-        birthTime,
-        birthPlace: `${selectedLocation.name}, ${selectedLocation.state ? `${selectedLocation.state}, ` : ''}${selectedLocation.country}`,
-        latitude: selectedLocation.latitude,
-        longitude: selectedLocation.longitude,
-        astrologySystem: system,
-      });
+      setVisible(false);
+    }
+  }, [isOpen]);
 
+  if (!isOpen) return null;
+
+  // Send Firebase Email Magic Link
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const clean = email.trim().toLowerCase();
+    if (!clean || !clean.includes('@')) {
+      setErrorMsg('Please enter a valid email address.');
+      return;
+    }
+    setErrorMsg(null);
+    setIsSubmitting(true);
+    try {
+      const res = await sendEmailSignInLink(clean);
       if (res.success) {
-        onClose();
+        setStep('link-sent');
       } else {
-        setErrorMsg(res.error || 'Failed to create account');
+        setErrorMsg(res.error || 'Could not send sign-in link. Please try again.');
       }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Sign-in failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
+  const handleGoogle = async () => {
+    setErrorMsg(null);
+    setIsSubmitting(true);
+    try {
+      const res = await socialLogin('google', {});
+      if (res.success) {
+        onClose();
+      } else {
+        setErrorMsg(res.error || 'Google sign-in was cancelled or failed.');
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Google sign-in error.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleFacebook = () => {
+    setErrorMsg(null);
+    setErrorMsg('Facebook login coming soon! Please use Google or email sign-in for now.');
+  };
+
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={mode === 'register' ? 'Set Up Your Cosmic Profile' : 'Welcome to AstroNex'}
-      maxWidth="500px"
-    >
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-        {/* Toggle Mode */}
-        <div
-          style={{
-            display: 'flex',
-            background: 'rgba(255, 255, 255, 0.05)',
-            padding: '4px',
-            borderRadius: 'var(--radius-full)',
-            border: '1px solid var(--border-subtle)',
-          }}
-        >
-          <button
-            type="button"
-            onClick={() => {
-              setMode('register');
-              setErrorMsg(null);
-            }}
-            style={{
-              flex: 1,
-              padding: '8px',
-              border: 'none',
-              borderRadius: 'var(--radius-full)',
-              background: mode === 'register' ? 'linear-gradient(135deg, #FF6A00 0%, #FF8533 100%)' : 'transparent',
-              color: '#FFFFFF',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            Create Account
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setMode('signin');
-              setErrorMsg(null);
-            }}
-            style={{
-              flex: 1,
-              padding: '8px',
-              border: 'none',
-              borderRadius: 'var(--radius-full)',
-              background: mode === 'signin' ? 'linear-gradient(135deg, #FF6A00 0%, #FF8533 100%)' : 'transparent',
-              color: '#FFFFFF',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'all 0.15s ease',
-            }}
-          >
-            Sign In
-          </button>
-        </div>
+    <>
+      <style>{`
+        @keyframes ar-twinkle {
+          from { opacity: 0; transform: scale(0.7); }
+          to   { opacity: 1; transform: scale(1.3); }
+        }
+        @keyframes ar-shoot {
+          0%   { transform: translateX(0) rotate(-30deg); opacity: 0; }
+          8%   { opacity: 0.9; }
+          92%  { opacity: 0.5; }
+          100% { transform: translateX(115vw) rotate(-30deg); opacity: 0; }
+        }
+        @keyframes ar-float1 {
+          0%,100% { transform: translateY(0px) rotate(0deg); }
+          50%      { transform: translateY(-16px) rotate(2.5deg); }
+        }
+        @keyframes ar-float2 {
+          0%,100% { transform: translateY(0px) rotate(0deg); }
+          50%      { transform: translateY(-11px) rotate(-2deg); }
+        }
+        @keyframes ar-glow {
+          0%,100% { box-shadow: 0 0 18px rgba(249,115,22,.35); }
+          50%      { box-shadow: 0 0 38px rgba(249,115,22,.65); }
+        }
+        @keyframes ar-fadein {
+          from { opacity: 0; transform: scale(.95) translateY(20px); }
+          to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes ar-left {
+          from { opacity: 0; transform: translateX(-28px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes ar-right {
+          from { opacity: 0; transform: translateX(28px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        .ar-email-input {
+          width: 100%;
+          padding: 13px 16px 13px 44px;
+          background: rgba(255,255,255,0.07);
+          border: 1.5px solid rgba(167,139,250,0.35);
+          border-radius: 12px;
+          color: #fff;
+          font-size: 14px;
+          outline: none;
+          transition: border-color .2s, box-shadow .2s;
+          box-sizing: border-box;
+        }
+        .ar-email-input:focus {
+          border-color: #a78bfa;
+          box-shadow: 0 0 0 3px rgba(167,139,250,.15);
+        }
+        .ar-email-input::placeholder { color: rgba(255,255,255,.35); }
+        .ar-signup-btn {
+          width: 100%;
+          padding: 13px;
+          border-radius: 12px;
+          border: none;
+          background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%);
+          color: #fff;
+          font-size: 15px;
+          font-weight: 700;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          transition: filter .2s, transform .15s;
+          box-shadow: 0 5px 20px rgba(124,58,237,.45);
+          letter-spacing: .02em;
+        }
+        .ar-signup-btn:hover:not(:disabled) { filter: brightness(1.15); transform: translateY(-1px); }
+        .ar-signup-btn:disabled { opacity: .55; cursor: not-allowed; }
+        .ar-social-btn {
+          flex: 1;
+          padding: 11px 8px;
+          border-radius: 12px;
+          background: rgba(255,255,255,0.06);
+          border: 1.5px solid rgba(255,255,255,0.14);
+          color: #fff;
+          font-size: 13px;
+          font-weight: 700;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          transition: background .2s, border-color .2s, transform .15s;
+        }
+        .ar-social-btn:hover:not(:disabled) {
+          background: rgba(167,139,250,.12);
+          border-color: rgba(167,139,250,.5);
+          transform: translateY(-1px);
+        }
+        .ar-social-btn:disabled { opacity: .55; cursor: not-allowed; }
+        .ar-close-btn {
+          background: rgba(255,255,255,.08);
+          border: 1px solid rgba(255,255,255,.12) !important;
+          border-radius: 50%;
+          width: 34px; height: 34px;
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer; color: #94A3B8;
+          transition: background .2s, color .2s;
+        }
+        .ar-close-btn:hover { background: rgba(255,255,255,.18); color: #fff; }
+      `}</style>
 
-        {errorMsg && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '10px 14px',
-              borderRadius: 'var(--radius-sm)',
-              background: 'rgba(239, 68, 68, 0.15)',
-              border: '1px solid rgba(239, 68, 68, 0.35)',
-              color: '#F87171',
-              fontSize: '12.5px',
-            }}
-          >
-            <AlertCircle size={15} />
-            <span>{errorMsg}</span>
+      {/* Backdrop */}
+      <div onClick={onClose} style={{ position:'fixed', inset:0, zIndex:9998, background:'rgba(0,0,0,.78)', backdropFilter:'blur(7px)' }} />
+
+      {/* Modal wrapper */}
+      <div style={{ position:'fixed', inset:0, zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', padding:'16px', pointerEvents:'none' }}>
+        <div style={{
+          display:'flex', width:'100%', maxWidth:'780px', minHeight:'480px', maxHeight:'95vh',
+          borderRadius:'24px', overflow:'hidden',
+          boxShadow:'0 32px 80px rgba(0,0,0,.75), 0 0 0 1px rgba(167,139,250,.22)',
+          pointerEvents:'all',
+          opacity: visible ? 1 : 0,
+          animation: visible ? 'ar-fadein .42s cubic-bezier(.34,1.56,.64,1) forwards' : 'none',
+        }}>
+
+          {/* ══ LEFT — Cosmic Panel ══ */}
+          <div style={{
+            flex:'0 0 46%', minWidth:'240px', position:'relative',
+            background:'linear-gradient(155deg,#1c0540 0%,#0f0b28 28%,#2d2862 55%,#1a0a40 80%,#100720 100%)',
+            display:'flex', flexDirection:'column', justifyContent:'flex-end',
+            padding:'38px 34px', overflow:'hidden',
+            animation: visible ? 'ar-left .5s .1s ease both' : 'none',
+          }}>
+            <StarField />
+
+            {/* Large blue planet */}
+            <div style={{ position:'absolute', top:'-55px', right:'-60px', width:'230px', height:'230px', borderRadius:'50%', background:'radial-gradient(circle at 32% 32%,#67E8F9 0%,#1D4ED8 42%,#0D2EA0 70%,#04012A 100%)', boxShadow:'0 0 70px rgba(103,232,249,.3),inset -22px -22px 55px rgba(0,0,0,.55)', animation:'ar-float1 7.5s ease-in-out infinite' }}>
+              <div style={{ position:'absolute', inset:'-14px', borderRadius:'50%', border:'2px solid rgba(103,232,249,.12)' }} />
+              <div style={{ position:'absolute', inset:'-26px', borderRadius:'50%', border:'1px solid rgba(103,232,249,.06)' }} />
+              <div style={{ position:'absolute', top:'32%', left:'12%', right:'12%', height:'15%', background:'rgba(255,255,255,.06)', borderRadius:'50%', filter:'blur(5px)' }} />
+            </div>
+
+            {/* Purple planet with ring */}
+            <div style={{ position:'absolute', top:'36%', left:'-35px', width:'140px', height:'140px', borderRadius:'50%', background:'radial-gradient(circle at 38% 28%,#D8B4FE 0%,#7E22CE 48%,#4C0080 78%,#1A0030 100%)', boxShadow:'0 0 48px rgba(192,132,252,.38),inset -12px -16px 32px rgba(0,0,0,.55)', animation:'ar-float2 6s ease-in-out infinite' }}>
+              <div style={{ position:'absolute', top:'50%', left:'-28%', width:'156%', height:'16px', marginTop:'-8px', borderRadius:'50%', border:'3px solid rgba(216,180,254,.45)', transform:'rotateX(68deg)', boxShadow:'0 0 12px rgba(216,180,254,.25)' }} />
+            </div>
+
+            {/* Orange glow dot */}
+            <div style={{ position:'absolute', bottom:'36%', right:'14%', width:'42px', height:'42px', borderRadius:'50%', background:'radial-gradient(circle,#FB923C 0%,#EA580C 100%)', animation:'ar-glow 2.8s ease-in-out infinite' }} />
+
+            {/* Tagline */}
+            <div style={{ position:'relative', zIndex:2 }}>
+              <p style={{ margin:'0 0 10px', fontSize:'12px', color:'rgba(167,139,250,.85)', fontWeight:700, letterSpacing:'.12em', textTransform:'uppercase' }}>✦ Begin Your Cosmic Journey</p>
+              <h2 style={{ margin:0, fontSize:'26px', fontWeight:900, color:'#fff', lineHeight:1.2, textShadow:'0 2px 18px rgba(167,139,250,.4)' }}>
+                SIGN IN TO YOUR<br /><span style={{ color:'#A78BFA' }}>ADVENTURE!</span>
+              </h2>
+              <p style={{ margin:'10px 0 0', fontSize:'12.5px', color:'rgba(255,255,255,.45)', lineHeight:1.55 }}>
+                Unlock your Vedic birth chart,<br />Kundli matching &amp; cosmic insights.
+              </p>
+            </div>
           </div>
-        )}
 
-        {mode === 'register' && (
-          <Input
-            label="Your Full Name"
-            placeholder="e.g. Arya Sharma"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            icon={<User size={16} />}
-            required
-          />
-        )}
+          {/* ══ RIGHT — Form ══ */}
+          <div style={{
+            flex:1, background:'linear-gradient(180deg,#130c2e 0%,#0c0b1e 100%)',
+            display:'flex', flexDirection:'column', justifyContent:'center',
+            padding:'44px 40px', position:'relative',
+            animation: visible ? 'ar-right .5s .15s ease both' : 'none',
+          }}>
+            <button className="ar-close-btn" onClick={onClose} style={{ position:'absolute', top:'16px', right:'16px' }}>
+              <X size={15} />
+            </button>
 
-        <Input
-          label="Email Address"
-          type="email"
-          placeholder="name@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          icon={<Mail size={16} />}
-          required
-        />
+            {step === 'form' ? (
+              <>
+                <h1 style={{ margin:'0 0 6px', fontSize:'34px', fontWeight:900, color:'#fff', letterSpacing:'.03em' }}>SIGN IN</h1>
+                <p style={{ margin:'0 0 26px', fontSize:'13px', color:'rgba(255,255,255,.45)' }}>Sign in with email address</p>
 
-        <Input
-          label="Password"
-          type="password"
-          placeholder="••••••••"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          icon={<Lock size={16} />}
-          required
-        />
+                {/* Error message */}
+                {errorMsg && (
+                  <div style={{ display:'flex', alignItems:'flex-start', gap:'8px', padding:'10px 14px', background:'rgba(239,68,68,.12)', border:'1px solid rgba(239,68,68,.28)', borderRadius:'10px', color:'#FCA5A5', fontSize:'12.5px', marginBottom:'14px' }}>
+                    <AlertCircle size={15} style={{ flexShrink:0, marginTop:'1px' }} />
+                    <span>{errorMsg}</span>
+                  </div>
+                )}
 
-        {mode === 'register' && (
-          <>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <Input
-                label="Date of Birth"
-                type="date"
-                value={birthDate}
-                onChange={(e) => setBirthDate(e.target.value)}
-                icon={<Calendar size={16} />}
-                required
-              />
-              <Input
-                label="Exact Time of Birth"
-                type="time"
-                value={birthTime}
-                onChange={(e) => setBirthTime(e.target.value)}
-                icon={<Clock size={16} />}
-                required
-              />
-            </div>
+                {/* Email form */}
+                <form onSubmit={handleSignUp} style={{ display:'flex', flexDirection:'column', gap:'14px' }}>
+                  <div style={{ position:'relative' }}>
+                    <div style={{ position:'absolute', left:'14px', top:'50%', transform:'translateY(-50%)', color:'#A78BFA', display:'flex', alignItems:'center', pointerEvents:'none' }}>
+                      <Mail size={16} />
+                    </div>
+                    <input
+                      className="ar-email-input"
+                      type="email"
+                      placeholder="Yourname@gmail.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      autoComplete="email"
+                      required
+                    />
+                  </div>
+                  <button type="submit" disabled={isSubmitting} className="ar-signup-btn">
+                    {isSubmitting
+                      ? <><Loader2 size={17} className="animate-spin" /><span>Sending sign-in link...</span></>
+                      : <span>Sign up</span>}
+                  </button>
+                </form>
 
-            <div>
-              <LocationPicker
-                label="Birthplace (Google Registered Location)"
-                selectedCity={selectedLocation}
-                onSelect={(city) => setSelectedLocation(city)}
-              />
-            </div>
+                {/* Divider */}
+                <div style={{ position:'relative', textAlign:'center', margin:'20px 0' }}>
+                  <div style={{ position:'absolute', top:'50%', left:0, right:0, height:'1px', background:'rgba(255,255,255,.09)' }} />
+                  <span style={{ position:'relative', background:'linear-gradient(180deg,#130c2e,#0c0b1e)', padding:'0 14px', fontSize:'11.5px', color:'rgba(255,255,255,.35)', letterSpacing:'.08em' }}>Or continue with</span>
+                </div>
 
-            <div>
-              <label
-                style={{
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  color: 'var(--text-secondary)',
-                  display: 'block',
-                  marginBottom: '6px',
-                }}
-              >
-                Preferred Astrology Tradition
-              </label>
-              <div style={{ display: 'flex', gap: '10px' }}>
+                {/* Social buttons */}
+                <div style={{ display:'flex', gap:'10px', marginBottom:'20px' }}>
+                  <button className="ar-social-btn" type="button" onClick={handleGoogle} disabled={isSubmitting}>
+                    <svg width="17" height="17" viewBox="0 0 24 24">
+                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                    </svg>
+                    <span>Google</span>
+                  </button>
+                  <button className="ar-social-btn" type="button" onClick={handleFacebook} disabled={isSubmitting}>
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="#1877F2">
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                    <span>Facebook</span>
+                  </button>
+                </div>
+
+                <p style={{ margin:0, fontSize:'11.5px', color:'rgba(255,255,255,.28)', lineHeight:1.55 }}>
+                  By registering you with our{' '}
+                  <span style={{ color:'#A78BFA', cursor:'pointer', textDecoration:'underline' }}>Terms and Conditions</span>
+                </p>
+              </>
+            ) : (
+              /* ── Email link sent confirmation screen ── */
+              <div style={{ display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', gap:'20px' }}>
+                <div style={{ width:'72px', height:'72px', borderRadius:'50%', background:'linear-gradient(135deg,#7C3AED,#5B21B6)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 8px 32px rgba(124,58,237,.5)' }}>
+                  <CheckCircle2 size={36} color="#fff" />
+                </div>
+                <div>
+                  <h2 style={{ margin:'0 0 8px', fontSize:'22px', fontWeight:800, color:'#fff' }}>Check Your Email!</h2>
+                  <p style={{ margin:0, fontSize:'13.5px', color:'rgba(255,255,255,.55)', lineHeight:1.65 }}>
+                    We&apos;ve sent a secure sign-in link to:<br />
+                    <strong style={{ color:'#A78BFA', fontSize:'15px' }}>{email}</strong>
+                  </p>
+                </div>
+                <div style={{ padding:'16px 20px', background:'rgba(167,139,250,.08)', border:'1px solid rgba(167,139,250,.2)', borderRadius:'14px', textAlign:'left', width:'100%' }}>
+                  <p style={{ margin:0, fontSize:'13px', color:'rgba(255,255,255,.6)', lineHeight:1.7 }}>
+                    📧 Open the email from <strong style={{ color:'#fff' }}>AstroRashi</strong><br />
+                    🔗 Click the <strong style={{ color:'#A78BFA' }}>Sign In</strong> button/link<br />
+                    ✨ You&apos;ll be signed in automatically<br />
+                    ⏱️ Link expires in <strong style={{ color:'#FACC15' }}>15 minutes</strong>
+                  </p>
+                </div>
+                <p style={{ margin:0, fontSize:'12px', color:'rgba(255,255,255,.35)' }}>
+                  Didn&apos;t receive it? Check your spam folder or{' '}
+                  <button
+                    onClick={() => { setStep('form'); setErrorMsg(null); }}
+                    style={{ background:'none', border:'none', color:'#A78BFA', fontSize:'12px', cursor:'pointer', textDecoration:'underline', padding:0 }}>
+                    try again
+                  </button>
+                </p>
                 <button
-                  type="button"
-                  onClick={() => setSystem('vedic')}
-                  style={{
-                    flex: 1,
-                    padding: '10px',
-                    borderRadius: 'var(--radius-md)',
-                    border:
-                      system === 'vedic'
-                        ? '1.5px solid var(--gold-primary)'
-                        : '1px solid var(--border-subtle)',
-                    background:
-                      system === 'vedic'
-                        ? 'rgba(250, 204, 21, 0.16)'
-                        : 'rgba(255, 255, 255, 0.04)',
-                    color: system === 'vedic' ? '#FACC15' : 'var(--text-secondary)',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  Vedic (Sidereal Lahiri)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSystem('western')}
-                  style={{
-                    flex: 1,
-                    padding: '10px',
-                    borderRadius: 'var(--radius-md)',
-                    border:
-                      system === 'western'
-                        ? '1.5px solid #38BDF8'
-                        : '1px solid var(--border-subtle)',
-                    background:
-                      system === 'western'
-                        ? 'rgba(37, 99, 235, 0.16)'
-                        : 'rgba(255, 255, 255, 0.04)',
-                    color: system === 'western' ? '#38BDF8' : 'var(--text-secondary)',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  Western (Tropical)
+                  onClick={() => { setStep('form'); setErrorMsg(null); }}
+                  style={{ display:'flex', alignItems:'center', gap:'6px', background:'none', border:'1px solid rgba(255,255,255,.12)', borderRadius:'10px', color:'rgba(255,255,255,.5)', fontSize:'12px', padding:'8px 16px', cursor:'pointer' }}>
+                  <ArrowLeft size={13} /><span>Use a different email</span>
                 </button>
               </div>
-            </div>
-          </>
-        )}
-
-        <Button type="submit" variant="primary" size="lg" style={{ marginTop: '8px' }}>
-          <Sparkles size={16} />
-          <span>{mode === 'register' ? 'Create Cosmic Profile' : 'Access AstroNex'}</span>
-        </Button>
-
-        {/* Social Authentication */}
-        <div style={{ position: 'relative', textAlign: 'center', margin: '8px 0 2px' }}>
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: 0,
-              right: 0,
-              height: '1px',
-              backgroundColor: 'var(--border-subtle)',
-            }}
-          />
-          <span
-            style={{
-              position: 'relative',
-              background: '#0E0E14',
-              padding: '0 12px',
-              fontSize: '11px',
-              color: 'var(--text-muted)',
-            }}
-          >
-            or continue with
-          </span>
+            )}
+          </div>
         </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-          <Button
-            type="button"
-            variant="glass"
-            onClick={() => {
-              socialLogin('google', {
-                name: name.trim() || 'Google Cosmic User',
-                birthDate,
-                birthTime,
-                birthPlace: `${selectedLocation.name}, ${selectedLocation.country}`,
-                latitude: selectedLocation.latitude,
-                longitude: selectedLocation.longitude,
-                astrologySystem: system,
-              });
-              onClose();
-            }}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24">
-              <path
-                fill="#4285F4"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              />
-              <path
-                fill="#34A853"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              />
-              <path
-                fill="#FBBC05"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-              />
-              <path
-                fill="#EA4335"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-              />
-            </svg>
-            <span>Google</span>
-          </Button>
-          <Button
-            type="button"
-            variant="glass"
-            onClick={() => {
-              socialLogin('apple', {
-                name: name.trim() || 'Apple Cosmic User',
-                birthDate,
-                birthTime,
-                birthPlace: `${selectedLocation.name}, ${selectedLocation.country}`,
-                latitude: selectedLocation.latitude,
-                longitude: selectedLocation.longitude,
-                astrologySystem: system,
-              });
-              onClose();
-            }}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="#FFFFFF">
-              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 1.01-2.87-.96.04-2.13.65-2.79 1.43-.59.68-1.11 1.76-1 2.81 1.08.08 2.18-.59 2.78-1.37z" />
-            </svg>
-            <span>Apple</span>
-          </Button>
-        </div>
-      </form>
-    </Modal>
+      </div>
+    </>
   );
 };

@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Crown, BookOpen, Sparkles, ArrowRight } from 'lucide-react';
+import { Crown, BookOpen, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '@/lib/state/auth-context';
 
 interface MysticCirclesProps {
   onOpenMembership?: () => void;
@@ -12,6 +13,19 @@ export const MysticCircles: React.FC<MysticCirclesProps> = ({
   onOpenMembership,
   onOpenLearning,
 }) => {
+  const { user } = useAuth();
+  const isPaidMember = user.isPremium || user.planTier === 'basic' || user.planTier === 'premium';
+
+  const handleMemberClick = () => {
+    if (isPaidMember) {
+      // For basic or premium users, do not prompt upgrade; navigate to subscription/store to view active benefits
+      onOpenMembership && onOpenMembership();
+    } else {
+      // For free users, open the store subscription page
+      onOpenMembership && onOpenMembership();
+    }
+  };
+
   return (
     <div
       style={{
@@ -78,7 +92,11 @@ export const MysticCircles: React.FC<MysticCirclesProps> = ({
             border: '1px solid rgba(192, 132, 252, 0.4)',
           }}
         >
-          <Crown size={20} color="#FBBF24" />
+          {isPaidMember ? (
+            <CheckCircle2 size={20} color="#10B981" />
+          ) : (
+            <Crown size={20} color="#FBBF24" />
+          )}
         </div>
 
         <h4
@@ -91,7 +109,7 @@ export const MysticCircles: React.FC<MysticCirclesProps> = ({
             letterSpacing: '0.02em',
           }}
         >
-          Become A Member
+          {isPaidMember ? `${user.planTier.toUpperCase()} VIP Active` : 'Become A Member'}
         </h4>
         <p
           style={{
@@ -102,19 +120,21 @@ export const MysticCircles: React.FC<MysticCirclesProps> = ({
             maxWidth: '190px',
           }}
         >
-          Unlock certified birth chart dossiers, unlimited transit forecasts, and sacred muhurat alerts.
+          {isPaidMember
+            ? 'All 33+ Vedic calculation tools, certified PDF dossiers and unlimited consults are active on your account.'
+            : 'Unlock certified birth chart dossiers, unlimited transit forecasts, and sacred muhurat alerts.'}
         </p>
 
         <button
-          onClick={onOpenMembership}
+          onClick={handleMemberClick}
           className="btn-mystic-outline"
           style={{ padding: '6px 16px', fontSize: '11.5px' }}
         >
-          Learn More
+          {isPaidMember ? 'View Benefits' : 'Join Membership'}
         </button>
       </div>
 
-      {/* Circle 2: Learning Center */}
+      {/* Circle 2: Kundli Matching */}
       <div
         style={{
           position: 'relative',
@@ -128,9 +148,9 @@ export const MysticCircles: React.FC<MysticCirclesProps> = ({
           justifyContent: 'center',
           textAlign: 'center',
           padding: '24px',
-          background: 'radial-gradient(circle at 45% 35%, rgba(42, 22, 80, 0.95) 0%, rgba(15, 9, 30, 0.98) 75%)',
-          border: '1.5px solid rgba(192, 132, 252, 0.55)',
-          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.85), 0 0 35px rgba(168, 85, 247, 0.3)',
+          background: 'radial-gradient(circle at 45% 35%, rgba(60, 20, 20, 0.95) 0%, rgba(20, 10, 15, 0.98) 75%)',
+          border: '1.5px solid rgba(249, 115, 22, 0.55)',
+          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.85), 0 0 35px rgba(249, 115, 22, 0.3)',
           transition: 'transform 240ms ease, box-shadow 240ms ease',
         }}
         className="card-hover"
@@ -140,15 +160,15 @@ export const MysticCircles: React.FC<MysticCirclesProps> = ({
             width: '42px',
             height: '42px',
             borderRadius: '50%',
-            background: 'rgba(124, 58, 237, 0.3)',
+            background: 'rgba(249, 115, 22, 0.25)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             marginBottom: '10px',
-            border: '1px solid rgba(216, 180, 254, 0.5)',
+            border: '1px solid rgba(251, 146, 60, 0.5)',
           }}
         >
-          <BookOpen size={20} color="#C084FC" />
+          <Sparkles size={20} color="#F97316" />
         </div>
 
         <h4
@@ -161,18 +181,18 @@ export const MysticCircles: React.FC<MysticCirclesProps> = ({
             letterSpacing: '0.02em',
           }}
         >
-          Learning Center
+          Kundli Matching
         </h4>
         <p
           style={{
             fontSize: '11.5px',
-            color: '#A79BBF',
+            color: '#FED7AA',
             lineHeight: 1.4,
             marginBottom: '14px',
             maxWidth: '190px',
           }}
         >
-          Master the secrets of 27 Nakshatras, Mahadasha cycles, and planetary aspects with authentic lessons.
+          Calculate authentic 36 Ashtakoot Guna Milan compatibility, Nadi Dosha, and Manglik balance.
         </p>
 
         <button
@@ -180,7 +200,7 @@ export const MysticCircles: React.FC<MysticCirclesProps> = ({
           className="btn-mystic-primary"
           style={{ padding: '6px 16px', fontSize: '11.5px' }}
         >
-          Check It Out
+          Match Charts
         </button>
       </div>
     </div>

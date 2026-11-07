@@ -33,6 +33,7 @@ import {
 interface ProfileScreenProps {
   onOpenPremium: () => void;
   onOpenManageSubscription?: () => void;
+  onOpenAuth?: () => void;
 }
 
 const COSMIC_AVATARS = [
@@ -47,19 +48,37 @@ const COSMIC_AVATARS = [
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   onOpenPremium,
   onOpenManageSubscription,
+  onOpenAuth,
 }) => {
   const { user, updateUserBirthDetails, updateUserProfile, resetDemoData } = useAuth();
   const { currentPlan } = useSubscription();
-  const { activeProfile } = useAstrology();
+  const { activeProfile, saveProfile } = useAstrology();
   const { language, setLanguage, t } = useI18n();
 
   const [name, setName] = useState(user.name);
+  const [email, setEmail] = useState(user.email || '');
+  const [phone, setPhone] = useState(user.phone || '');
+  const [gender, setGender] = useState(user.gender || 'Male');
   const [birthDate, setBirthDate] = useState(user.birthDate);
   const [birthTime, setBirthTime] = useState(user.birthTime);
   const [birthPlace, setBirthPlace] = useState(user.birthPlace);
   const [latitude, setLatitude] = useState(user.latitude || 28.6139);
   const [longitude, setLongitude] = useState(user.longitude || 77.209);
   const [timezone, setTimezone] = useState(user.timezone || 'Asia/Kolkata');
+
+  // Keep local inputs synchronized if user profile updates externally
+  React.useEffect(() => {
+    if (user.name) setName(user.name);
+    if (user.email) setEmail(user.email);
+    if (user.phone) setPhone(user.phone);
+    if (user.gender) setGender(user.gender);
+    if (user.birthDate) setBirthDate(user.birthDate);
+    if (user.birthTime) setBirthTime(user.birthTime);
+    if (user.birthPlace) setBirthPlace(user.birthPlace);
+    if (user.latitude !== undefined) setLatitude(user.latitude);
+    if (user.longitude !== undefined) setLongitude(user.longitude);
+    if (user.timezone) setTimezone(user.timezone);
+  }, [user.name, user.email, user.phone, user.gender, user.birthDate, user.birthTime, user.birthPlace, user.latitude, user.longitude, user.timezone]);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
@@ -95,15 +114,45 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    updateUserBirthDetails({
-      name,
+    const cleanName = name.trim() || user.name || 'User';
+    const cleanEmail = email.trim();
+    const cleanPhone = phone.trim();
+    const updatedData = {
+      name: cleanName,
+      email: cleanEmail,
+      phone: cleanPhone,
+      gender,
       birthDate,
       birthTime,
       birthPlace,
       latitude,
       longitude,
       timezone,
-    });
+    };
+    try {
+      if (typeof window !== 'undefined') {
+        const cached = localStorage.getItem('astronex_cached_active_user');
+        const prev = cached ? JSON.parse(cached) : {};
+        localStorage.setItem('astronex_cached_active_user', JSON.stringify({ ...prev, ...user, ...updatedData }));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    // Update profile with all fields in a single consolidated atomic update
+    updateUserProfile(updatedData);
+    if (activeProfile) {
+      saveProfile({
+        ...activeProfile,
+        name: cleanName,
+        birthDate,
+        birthTime,
+        birthPlace,
+        latitude,
+        longitude,
+        timezone,
+        gender,
+      });
+    }
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 2400);
   };
@@ -118,6 +167,12 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     { code: 'mr', label: 'मराठी (Marathi)' },
     { code: 'gu', label: 'ગુજરાતી (Gujarati)' },
     { code: 'kn', label: 'ಕನ್ನಡ (Kannada)' },
+    { code: 'ml', label: 'മലയാളം (Malayalam)' },
+    { code: 'pa', label: 'ਪੰਜਾਬੀ (Punjabi)' },
+    { code: 'or', label: 'ଓଡ଼ିଆ (Odia)' },
+    { code: 'as', label: 'অসমীয়া (Assamese)' },
+    { code: 'ur', label: 'اردو (Urdu)' },
+    { code: 'ar', label: 'العربية (Arabic)' },
   ];
 
   return (
@@ -143,7 +198,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       />
 
       {/* 1. Profile Header & Photo Customization */}
-      <Card variant="gradient" style={{ padding: '24px' }}>
+      <Card variant="gradient" style={{ padding: '28px', borderRadius: '24px', border: '1.5px solid rgba(249, 115, 22, 0.35)', background: 'linear-gradient(135deg, rgba(249, 115, 22, 0.12) 0%, rgba(17, 19, 26, 0.98) 100%)', boxShadow: '0 16px 40px rgba(0,0,0,0.5)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
           {/* Avatar with Camera Overlay */}
           <div style={{ position: 'relative', width: '84px', height: '84px', flexShrink: 0 }}>
@@ -258,7 +313,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   padding: '6px 4px',
                 }}
               >
-                <span>{user.isPremium ? 'Change Subscription Plan' : 'Upgrade Plan (From ₹29/mo)'}</span>
+                <span>{user.isPremium ? 'Change Subscription Plan' : 'Upgrade to Premium (₹89/mo)'}</span>
               </button>
             </div>
           </div>
@@ -310,89 +365,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
         )}
       </Card>
 
-      {/* 2. Multi-Profile & Calculation History Quick Access Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
-        <Card
-          style={{
-            padding: '18px',
-            cursor: 'pointer',
-            border: '1px solid var(--border-subtle)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-          onClick={() => setIsProfilesModalOpen(true)}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div
-              style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: 'rgba(194, 78, 120, 0.15)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Users size={20} color="var(--accent-rose-light)" />
-            </div>
-            <div>
-              <h4 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                My Profiles & Charts
-              </h4>
-              <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                Active: <strong style={{ color: 'var(--gold-primary)' }}>{activeProfile.name}</strong> ({activeProfile.relationship})
-              </p>
-            </div>
-          </div>
-          <Button variant="outline" size="sm">
-            Manage
-          </Button>
-        </Card>
-
-        <Card
-          style={{
-            padding: '18px',
-            cursor: 'pointer',
-            border: '1px solid var(--border-subtle)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-          onClick={() => setIsHistoryModalOpen(true)}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div
-              style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: 'rgba(216, 197, 138, 0.15)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <History size={20} color="var(--gold-primary)" />
-            </div>
-            <div>
-              <h4 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                Calculation History
-              </h4>
-              <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                Saved tool calculations & audit trails
-              </p>
-            </div>
-          </div>
-          <Button variant="outline" size="sm">
-            View
-          </Button>
-        </Card>
-      </div>
-
       {/* 3. Edit Birth Details Form */}
-      <Card variant="elevated" style={{ padding: '24px' }}>
+      <Card variant="elevated" style={{ padding: '28px', borderRadius: '24px', border: '1.5px solid rgba(255, 255, 255, 0.08)', background: '#12141A', boxShadow: '0 16px 40px rgba(0,0,0,0.5)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
           <div>
             <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)' }}>
@@ -411,15 +385,34 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           )}
         </div>
 
-        <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <Input
-            label="Full Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
+        <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+          {/* Row 1: Name, Email & Phone */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
+            <Input
+              label="Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. Arya Sharma"
+              required
+            />
+            <Input
+              label="Email Address"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="e.g. arya@example.com"
+            />
+            <Input
+              label="Phone Number"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="e.g. +91 98765 43210"
+            />
+          </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
+          {/* Row 2: Date of Birth, Time of Birth, and Gender */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px' }}>
             <Input
               label="Date of Birth"
               type="date"
@@ -436,8 +429,33 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               icon={<Clock size={16} />}
               required
             />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                Gender
+              </label>
+              <select
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '11px 14px',
+                  backgroundColor: '#1E1F26',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  borderRadius: '10px',
+                  color: '#FFFFFF',
+                  fontSize: '14px',
+                  outline: 'none',
+                }}
+              >
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other / Non-binary</option>
+                <option value="Prefer not to say">Prefer not to say</option>
+              </select>
+            </div>
           </div>
 
+          {/* Row 3: Place of Birth with Map/Search Picker */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
               Place of Birth (Search City or Auto-Detect GPS)
@@ -460,8 +478,8 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
-            <Button type="submit" variant="primary">
-              Save Birth Details
+            <Button type="submit" variant="orange" style={{ padding: '12px 28px', fontWeight: 800 }}>
+              Save Personal & Birth Details
             </Button>
           </div>
         </form>

@@ -29,6 +29,8 @@ interface ChatContextType {
   rateMessage: (msgId: string, feedback: 'like' | 'dislike') => void;
   toggleSaveMessage: (msgId: string) => void;
   askAboutPlacement: (prompt: string, navigateToChat?: () => void) => void;
+  selectedAstrologerMode: string;
+  setSelectedAstrologerMode: (modeId: string) => void;
 }
 
 const ChatContext = createContext<ChatContextType | null>(null);
@@ -41,6 +43,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [activeId, setActiveId] = useState<string>('');
   const [isStreaming, setIsStreaming] = useState<boolean>(false);
   const [useAstrologyContext, setUseAstrologyContext] = useState<boolean>(true);
+  const [selectedAstrologerMode, setSelectedAstrologerMode] = useState<string>('vedic-master');
 
   const abortControllerRef = useRef<boolean>(false);
 
@@ -305,6 +308,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         rateMessage,
         toggleSaveMessage,
         askAboutPlacement,
+        selectedAstrologerMode,
+        setSelectedAstrologerMode,
       }}
     >
       {children}

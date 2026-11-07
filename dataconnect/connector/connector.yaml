@@ -1,0 +1,6 @@
+connectorId: "astronex-connector"
+generate:
+  javascriptSdk:
+    outputDir: "../../lib/dataconnect-sdk"
+    package: "@astronex/dataconnect"
+

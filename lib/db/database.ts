@@ -3,6 +3,7 @@ import { UserProfile, BirthProfile, PlanTier, AstrologySystem, HouseSystem, Zodi
 export interface DBUserAccount {
   id: string;
   email: string;
+  phone?: string;
   passwordHash: string;
   name: string;
   birthDate: string;
@@ -11,6 +12,7 @@ export interface DBUserAccount {
   latitude?: number;
   longitude?: number;
   timezone?: string;
+  gender?: string;
   astrologySystem: AstrologySystem;
   houseSystem: HouseSystem;
   zodiacSystem: ZodiacSystem;
@@ -225,7 +227,7 @@ export class AstroNexDatabase {
   }
 
   public getActiveSession(): DBUserAccount | null {
-    if (typeof window === 'undefined') return DEFAULT_DEMO_USER;
+    if (typeof window === 'undefined') return null;
     try {
       const data = localStorage.getItem(STORAGE_SESSION_KEY);
       if (data) {
@@ -234,7 +236,7 @@ export class AstroNexDatabase {
     } catch (e) {
       console.error(e);
     }
-    return DEFAULT_DEMO_USER;
+    return null;
   }
 
   public setActiveSession(user: DBUserAccount): void {
@@ -257,16 +259,30 @@ export class AstroNexDatabase {
 
   public updateUser(userId: string, updates: Partial<DBUserAccount>): DBUserAccount | null {
     const users = this.getUsers();
-    const idx = users.findIndex((u) => u.id === userId);
-    if (idx === -1) return null;
+    const active = this.getActiveSession();
+    let idx = users.findIndex((u) => (userId && u.id === userId) || (active?.id && u.id === active.id) || (updates.email && u.email?.toLowerCase() === updates.email.toLowerCase()));
 
-    users[idx] = { ...users[idx], ...updates };
+    if (idx === -1) {
+      // If user not found in array (e.g. initial session mismatch), create/upsert entry
+      const base: DBUserAccount = active || {
+        ...DEFAULT_DEMO_USER,
+        id: userId || 'usr_' + Date.now(),
+      };
+      const created: DBUserAccount = {
+        ...base,
+        id: userId || base.id,
+        ...updates,
+      };
+      users.push(created);
+      idx = users.length - 1;
+    } else {
+      users[idx] = { ...users[idx], ...updates };
+    }
+
     try {
       localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
-      const current = this.getActiveSession();
-      if (current && current.id === userId) {
-        this.setActiveSession(users[idx]);
-      }
+      // Always persist to active session
+      this.setActiveSession(users[idx]);
     } catch (e) {
       console.error(e);
     }

@@ -80,10 +80,10 @@ Would you like to explore constructive grounding routines or philosophical guida
     let buffer = '';
     for (let i = 0; i < words.length; i++) {
       buffer += (i === 0 ? '' : ' ') + words[i];
-      if (i % 3 === 0 || i === words.length - 1) {
+      if (i % 4 === 0 || i === words.length - 1) {
         onChunk(buffer);
         buffer = '';
-        await new Promise((r) => setTimeout(r, 10));
+        await new Promise((r) => setTimeout(r, 6));
       }
     }
     return response;

@@ -17,11 +17,43 @@ import {
   Award,
   Flame,
   ArrowLeft,
+  Download,
 } from 'lucide-react';
+import { downloadReportAsPDF } from '@/lib/utils/report-export';
 
 interface ReportViewerProps {
   report: AstrologyReport;
   onBack: () => void;
+}
+
+function cleanAstrologyContent(text: string): React.ReactNode {
+  if (!text) return '';
+  // Strip standalone ***, --- or ___
+  const cleaned = text
+    .replace(/^\s*[\*\-_]{3,}\s*$/gm, '')
+    .trim();
+  if (!cleaned) return null;
+
+  const parts: React.ReactNode[] = [];
+  const regex = /(\*\*\*([^*]+)\*\*\*|\*\*([^*]+)\*\*|\*([^*]+)\*)/g;
+  let lastIdx = 0;
+  let m;
+  while ((m = regex.exec(cleaned)) !== null) {
+    if (m.index > lastIdx) {
+      parts.push(cleaned.substring(lastIdx, m.index).replace(/\*\*\*/g, '').replace(/\*\*/g, '').replace(/\*/g, ''));
+    }
+    const innerText = m[2] || m[3] || m[4];
+    parts.push(
+      <strong key={m.index} style={{ color: '#FACC15', fontWeight: 700 }}>
+        {innerText.replace(/\*/g, '')}
+      </strong>
+    );
+    lastIdx = regex.lastIndex;
+  }
+  if (lastIdx < cleaned.length) {
+    parts.push(cleaned.substring(lastIdx).replace(/\*\*\*/g, '').replace(/\*\*/g, '').replace(/\*/g, ''));
+  }
+  return parts.length > 0 ? parts : cleaned.replace(/\*/g, '');
 }
 
 export const ReportViewer: React.FC<ReportViewerProps> = ({ report, onBack }) => {
@@ -46,32 +78,175 @@ export const ReportViewer: React.FC<ReportViewerProps> = ({ report, onBack }) =>
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '80px' }}>
-      {/* Print-specific PDF Styles */}
+      {/* Print-specific PDF Styles with Ultra-Sharp Contrast */}
       <style>{`
         @media print {
-          body {
+          @page {
+            size: A4 portrait;
+            margin: 14mm 14mm 16mm 14mm;
+          }
+          *, *::before, *::after {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            text-rendering: optimizeLegibility !important;
+            -webkit-font-smoothing: antialiased !important;
+            -moz-osx-font-smoothing: grayscale !important;
+          }
+          html, body {
             background: #FFFFFF !important;
-            color: #0F172A !important;
+            background-color: #FFFFFF !important;
+            color: #000000 !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+            font-size: 11pt !important;
+            line-height: 1.6 !important;
           }
           .no-print {
             display: none !important;
           }
           .pdf-page-break {
             page-break-before: always !important;
-            margin-top: 30px !important;
+            break-before: page !important;
+            margin-top: 24pt !important;
           }
           .pdf-report-card {
             background: #FFFFFF !important;
-            border: 1px solid #CBD5E1 !important;
-            color: #0F172A !important;
+            background-color: #FFFFFF !important;
+            border: 1.5pt solid #334155 !important;
+            color: #000000 !important;
             box-shadow: none !important;
             page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            padding: 16pt !important;
+            margin-bottom: 16pt !important;
+            border-radius: 6pt !important;
           }
-          .pdf-gold {
-            color: #854D0E !important;
+          /* Headings: Deep contrast, pure black / rich amber-maroon */
+          .pdf-report-card h1,
+          .pdf-report-card h1 * {
+            color: #000000 !important;
+            font-size: 20pt !important;
+            font-weight: 900 !important;
+            line-height: 1.25 !important;
+            margin-bottom: 6pt !important;
+            text-shadow: none !important;
           }
-          .pdf-text {
-            color: #1E293B !important;
+          .pdf-report-card h2,
+          .pdf-report-card h2 * {
+            color: #78350F !important;
+            font-size: 15pt !important;
+            font-weight: 850 !important;
+            line-height: 1.3 !important;
+            margin-top: 10pt !important;
+            margin-bottom: 6pt !important;
+            border-left: 4.5pt solid #D97706 !important;
+            padding-left: 8pt !important;
+            text-shadow: none !important;
+          }
+          .pdf-report-card h3,
+          .pdf-report-card h3 * {
+            color: #92400E !important;
+            font-size: 13pt !important;
+            font-weight: 800 !important;
+            line-height: 1.3 !important;
+            margin-bottom: 6pt !important;
+            text-shadow: none !important;
+          }
+          .pdf-report-card h4,
+          .pdf-report-card h4 * {
+            color: #78350F !important;
+            font-size: 11.5pt !important;
+            font-weight: 800 !important;
+            margin-bottom: 6pt !important;
+            text-shadow: none !important;
+          }
+          /* Body paragraphs: Crisp, pitch black, perfectly readable */
+          .pdf-report-card p,
+          .pdf-report-card p * {
+            color: #000000 !important;
+            font-size: 11pt !important;
+            font-weight: 550 !important;
+            line-height: 1.65 !important;
+            margin-bottom: 8pt !important;
+            text-align: left !important;
+            letter-spacing: 0.01em !important;
+          }
+          .pdf-report-card strong,
+          .pdf-report-card b {
+            color: #000000 !important;
+            font-weight: 900 !important;
+          }
+          .pdf-report-card span {
+            color: #000000 !important;
+            font-weight: 500 !important;
+          }
+          .pdf-report-card ul,
+          .pdf-report-card ol {
+            color: #000000 !important;
+            padding-left: 18pt !important;
+            margin-bottom: 10pt !important;
+          }
+          .pdf-report-card li,
+          .pdf-report-card li * {
+            color: #000000 !important;
+            font-size: 11pt !important;
+            font-weight: 550 !important;
+            line-height: 1.6 !important;
+            margin-bottom: 4pt !important;
+          }
+          /* Chapter summary quote box */
+          .pdf-report-card div[style*="italic"],
+          .pdf-report-card div[style*="fontStyle: 'italic'"] {
+            background-color: #FFFDF5 !important;
+            border: 1.5pt solid #F59E0B !important;
+            border-left: 5pt solid #D97706 !important;
+            color: #000000 !important;
+            font-weight: 600 !important;
+            font-size: 11.5pt !important;
+            line-height: 1.6 !important;
+            padding: 10pt 14pt !important;
+            margin-bottom: 12pt !important;
+            border-radius: 4pt !important;
+          }
+          /* Astrological evidence matrix cards */
+          .pdf-report-card div[style*="gridTemplateColumns"] > div,
+          .pdf-report-card div[style*="grid-template-columns"] > div {
+            background-color: #F8FAFC !important;
+            border: 1.5pt solid #475569 !important;
+            border-radius: 4pt !important;
+            padding: 8pt 10pt !important;
+          }
+          .pdf-report-card div[style*="gridTemplateColumns"] > div div,
+          .pdf-report-card div[style*="grid-template-columns"] > div div {
+            color: #000000 !important;
+            font-weight: 650 !important;
+          }
+          /* Badges */
+          .pdf-report-card span[class*="badge"],
+          .pdf-report-card div[class*="badge"] {
+            background-color: #FEF3C7 !important;
+            color: #78350F !important;
+            border: 1.5pt solid #D97706 !important;
+            font-weight: 800 !important;
+            font-size: 8.5pt !important;
+          }
+          /* Tables if present */
+          table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            border: 1.5pt solid #334155 !important;
+          }
+          th {
+            background-color: #FEF3C7 !important;
+            color: #78350F !important;
+            font-weight: 850 !important;
+            border: 1.5pt solid #334155 !important;
+            padding: 6pt 8pt !important;
+          }
+          td {
+            color: #000000 !important;
+            font-weight: 550 !important;
+            border: 1.5pt solid #334155 !important;
+            padding: 6pt 8pt !important;
           }
         }
       `}</style>
@@ -91,11 +266,13 @@ export const ReportViewer: React.FC<ReportViewerProps> = ({ report, onBack }) =>
           <Button
             variant="outline"
             size="sm"
-            onClick={handlePrint}
-            icon={<Printer size={14} />}
+            onClick={() => downloadReportAsPDF(report)}
+            icon={<Download size={14} />}
           >
-            Print / Save PDF (Booklet)
+            Download Clean A4 PDF
           </Button>
+
+          
 
           <Button
             variant="primary"
@@ -264,16 +441,20 @@ export const ReportViewer: React.FC<ReportViewerProps> = ({ report, onBack }) =>
                 lineHeight: 1.55,
               }}
             >
-              &ldquo;{chapter.summary}&rdquo;
+              &ldquo;{cleanAstrologyContent(chapter.summary)}&rdquo;
             </div>
 
             {/* Paragraphs */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px' }}>
-              {(chapter.contentParagraphs || (chapter.content ? [chapter.content] : [])).map((para, pIdx) => (
-                <p key={pIdx} style={{ fontSize: '14px', color: '#CBD5E1', lineHeight: '1.8', margin: 0 }}>
-                  {para}
-                </p>
-              ))}
+              {(chapter.contentParagraphs || (chapter.content ? [chapter.content] : [])).map((para, pIdx) => {
+                const node = cleanAstrologyContent(para);
+                if (!node) return null;
+                return (
+                  <p key={pIdx} style={{ fontSize: '14px', color: '#CBD5E1', lineHeight: '1.8', margin: 0 }}>
+                    {node}
+                  </p>
+                );
+              })}
             </div>
 
             {/* Calculated Evidence Matrix */}
@@ -321,7 +502,7 @@ export const ReportViewer: React.FC<ReportViewerProps> = ({ report, onBack }) =>
                 </h4>
                 <ul style={{ paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12.5px', color: '#E2E8F0', margin: 0 }}>
                   {chapter.traditionalInsights.map((ti, tiIdx) => (
-                    <li key={tiIdx}>{ti}</li>
+                    <li key={tiIdx}>{cleanAstrologyContent(ti)}</li>
                   ))}
                 </ul>
               </div>
@@ -335,7 +516,7 @@ export const ReportViewer: React.FC<ReportViewerProps> = ({ report, onBack }) =>
                 </h4>
                 <ul style={{ paddingLeft: '18px', display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12.5px', color: '#F1F5F9', margin: 0 }}>
                   {chapter.practicalRemedies.map((pr, prIdx) => (
-                    <li key={prIdx}>{pr}</li>
+                    <li key={prIdx}>{cleanAstrologyContent(pr)}</li>
                   ))}
                 </ul>
               </div>
@@ -371,7 +552,7 @@ export const ReportViewer: React.FC<ReportViewerProps> = ({ report, onBack }) =>
                 }}
               >
                 <CheckCircle2 size={16} color="var(--gold-primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
-                <span>{rem}</span>
+                <span>{cleanAstrologyContent(rem)}</span>
               </div>
             ))}
           </div>
@@ -380,6 +561,7 @@ export const ReportViewer: React.FC<ReportViewerProps> = ({ report, onBack }) =>
 
       {/* Bottom CTA to Specialist Astrologer */}
       <Card
+        className="no-print"
         style={{
           padding: '20px',
           background: 'linear-gradient(135deg, rgba(255, 106, 0, 0.16) 0%, rgba(14, 14, 20, 0.95) 100%)',

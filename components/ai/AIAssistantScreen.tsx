@@ -4,11 +4,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useChat } from '@/lib/state/chat-context';
 import { useI18n } from '@/lib/i18n/i18n-context';
 import { useAstrology } from '@/lib/state/astrology-context';
+import { useAuth } from '@/lib/state/auth-context';
+import { useSubscription } from '@/lib/state/subscription-context';
 import { ChatMessage } from './ChatMessage';
 import { AstrologyContextBadge } from './AstrologyContextBadge';
-import { QuickPromptChips } from './QuickPromptChips';
-import { ChatHistoryDrawer } from './ChatHistoryDrawer';
-import { GlowingOrb } from './GlowingOrb';
 import {
   Send,
   Square,
@@ -18,13 +17,93 @@ import {
   History,
   Plus,
   Sparkles,
-  Brain,
-  Globe,
-  MapPin,
+  Heart,
+  Briefcase,
+  Shield,
+  UserCheck,
+  ChevronRight,
+  ChevronLeft,
+  Trash2,
+  FileText,
+  Upload,
+  CheckCircle,
+  X,
+  Clock,
+  Lock,
 } from 'lucide-react';
 
-export const AIAssistantScreen: React.FC = () => {
+interface AstrologerNicheMode {
+  id: string;
+  name: string;
+  title: string;
+  icon: React.ReactNode;
+  bg: string;
+  accent: string;
+  faqSuggestions: string[];
+}
+
+const ASTROLOGER_MODES: AstrologerNicheMode[] = [
+  {
+    id: 'vedic-master',
+    name: 'Vedic Master Astrologer',
+    title: 'Comprehensive Janam Kundli, Life Purpose & Planetary Yogas',
+    icon: <Sparkles size={16} color="#11A8EB" />,
+    bg: 'rgba(249, 115, 22, 0.1)',
+    accent: '#11A8EB',
+    faqSuggestions: [
+      'What are the strongest Dhana & Raj Yogas in my Janam Kundli?',
+      'How does my current Mahadasha impact my upcoming 2-year timeline?',
+      'What is my soul purpose based on my Atmakaraka and Lagna lord?',
+    ],
+  },
+  {
+    id: 'love-relationship',
+    name: 'Love & Marriage Astrologer',
+    title: 'Kundli Milan, 7th House Dynamics, Soulmate Timing & Doshas',
+    icon: <Heart size={16} color="#EC4899" />,
+    bg: 'rgba(236, 72, 153, 0.1)',
+    accent: '#EC4899',
+    faqSuggestions: [
+      'When is my favorable marriage timing according to Venus & Jupiter transits?',
+      'How do Mangal Dosha or 7th house aspects affect my relationship compatibility?',
+      'What qualities will my future spouse have based on the Navamsha (D9) chart?',
+    ],
+  },
+  {
+    id: 'career-wealth',
+    name: 'Career & Wealth Astrologer',
+    title: '10th House Karma, Business Venture Muhurats & Financial Growth',
+    icon: <Briefcase size={16} color="#FBBF24" />,
+    bg: 'rgba(251, 191, 36, 0.1)',
+    accent: '#FBBF24',
+    faqSuggestions: [
+      'Should I pursue employment or independent business according to my 10th house?',
+      'When is the optimal period for job change or financial investments?',
+      'Which planetary periods trigger highest wealth accumulation in my chart?',
+    ],
+  },
+  {
+    id: 'dosha-remedy',
+    name: 'Dosha & Remedial Astrologer',
+    title: 'Sade Sati, Kaal Sarp Neutralization, Gemstones & Sacred Mantras',
+    icon: <Shield size={16} color="#3B82F6" />,
+    bg: 'rgba(59, 130, 246, 0.1)',
+    accent: '#3B82F6',
+    faqSuggestions: [
+      'What specific remedies alleviate my current Saturn / Sade Sati phase?',
+      'Which certified gemstone and sacred Beej mantra will fortify my Lagna lord?',
+      'How can I harmonize Rahu-Ketu nodal karmic influences in my chart?',
+    ],
+  },
+];
+
+interface AIAssistantScreenProps {
+  onNavigateTab?: (tab: string) => void;
+}
+
+export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ onNavigateTab }) => {
   const {
+    conversations,
     activeConversation,
     isStreaming,
     useAstrologyContext,
@@ -33,17 +112,66 @@ export const AIAssistantScreen: React.FC = () => {
     stopGeneration,
     regenerateLastMessage,
     createNewConversation,
-    rateMessage,
-    toggleSaveMessage,
+    selectConversation,
+    deleteConversation,
+    selectedAstrologerMode,
+    setSelectedAstrologerMode,
   } = useChat();
   const { t } = useI18n();
-  const { activeProfile } = useAstrology();
+  const { activeProfile, natalChart } = useAstrology();
+  const { user } = useAuth();
+  const { openUpgradeModal } = useSubscription();
+
+  // 10-minute consultation session limit for free / non-logged-in users on AI Astrologer ONLY
+  // AFTER THAT NO ACCESS
+  const isFreeOrGuest = !user.isPremium;
+
+  const [sessionSeconds, setSessionSeconds] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('astronex_free_consultation_secs');
+      if (stored) return parseInt(stored, 10);
+    }
+    return 600; // 10 minutes = 600 seconds
+  });
+
+  const isTimerExpired = isFreeOrGuest && sessionSeconds <= 0;
+
+  useEffect(() => {
+    if (!isFreeOrGuest) return;
+    const interval = setInterval(() => {
+      setSessionSeconds((prev) => {
+        const next = Math.max(0, prev - 1);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('astronex_free_consultation_secs', next.toString());
+        }
+        return next;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isFreeOrGuest]);
+
+  const formatTimer = (secs: number) => {
+    const mins = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${mins.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
 
   const [inputVal, setInputVal] = useState('');
-  const [showHistory, setShowHistory] = useState(false);
+  const [showHistorySidebar, setShowHistorySidebar] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
   const [attachmentName, setAttachmentName] = useState<string | null>(null);
-  const [highThinking, setHighThinking] = useState(true);
+
+  // Active Niche Astrologer Mode synced with chat context
+  // Free users are restricted to 'vedic-master' ONLY; others trigger upgrade popup
+  const activeModeId = selectedAstrologerMode || 'vedic-master';
+  const setActiveModeId = (modeId: string) => {
+    if (isFreeOrGuest && modeId !== 'vedic-master') {
+      openUpgradeModal('Unlock Specialized Niche Astrologers');
+      return;
+    }
+    setSelectedAstrologerMode(modeId);
+  };
+  const activeMode = ASTROLOGER_MODES.find((m) => m.id === activeModeId) || ASTROLOGER_MODES[0];
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -55,8 +183,13 @@ export const AIAssistantScreen: React.FC = () => {
 
   const handleSend = () => {
     if (!inputVal.trim() || isStreaming) return;
-    const toSend = attachmentName ? `[Attached: ${attachmentName}] ${inputVal}` : inputVal;
-    sendMessage(toSend);
+
+    let payload = inputVal.trim();
+    if (attachmentName) {
+      payload = `[Attached File: ${attachmentName}] ${payload}`;
+    }
+
+    sendMessage(payload);
     setInputVal('');
     setAttachmentName(null);
     if (textareaRef.current) {
@@ -72,372 +205,489 @@ export const AIAssistantScreen: React.FC = () => {
   };
 
   const toggleVoiceRecording = () => {
-    if (!isRecording) {
-      setIsRecording(true);
-      setTimeout(() => {
-        setInputVal((prev) => (prev ? prev + ' ' : '') + 'What does my 10th house indicate about my career path?');
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      alert('Voice recognition is not supported in this browser.');
+      return;
+    }
+    if (isRecording) {
+      setIsRecording(false);
+      return;
+    }
+    try {
+      const SpeechRecognition =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-IN';
+
+      recognition.onstart = () => setIsRecording(true);
+      recognition.onend = () => setIsRecording(false);
+      recognition.onerror = () => setIsRecording(false);
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setInputVal((prev) => (prev ? prev + ' ' + transcript : transcript));
         setIsRecording(false);
-      }, 2200);
-    } else {
+      };
+
+      recognition.start();
+    } catch {
       setIsRecording(false);
     }
   };
 
-  const handleAttachment = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setAttachmentName(file.name);
-    }
-  };
-
-  const isWelcomeState = activeConversation.messages.length <= 1;
-
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
+        display: 'grid',
+        gridTemplateColumns: showHistorySidebar ? '260px minmax(0, 1fr)' : '0px minmax(0, 1fr)',
+        gap: showHistorySidebar ? '16px' : '0px',
         height: 'calc(100vh - 145px)',
         position: 'relative',
-        maxWidth: '860px',
-        margin: '0 auto',
         width: '100%',
+        maxWidth: '1240px',
+        margin: '0 auto',
+        transition: 'grid-template-columns 200ms ease, gap 200ms ease',
       }}
     >
-      <ChatHistoryDrawer isOpen={showHistory} onClose={() => setShowHistory(false)} />
-
-      {/* 1. Header Toolbar */}
+      {/* ================= 1. LEFT: CONSULTATION HISTORY SIDEBAR ================= */}
       <div
         style={{
-          display: 'flex',
+          display: showHistorySidebar ? 'flex' : 'none',
           flexDirection: 'column',
-          gap: '10px',
-          padding: '0 0 12px 0',
-          borderBottom: '1px solid var(--border-subtle)',
-          flexShrink: 0,
+          backgroundColor: '#101722',
+          borderRadius: '16px',
+          border: '1px solid #41454D',
+          overflow: 'hidden',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.35)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <button
-              onClick={() => setShowHistory(true)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-full)',
-                padding: '6px 12px',
-                color: 'var(--text-secondary)',
-                fontSize: '12px',
-                cursor: 'pointer',
-              }}
-            >
-              <History size={14} />
-              <span>History</span>
-            </button>
-
-            <button
-              onClick={createNewConversation}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                background: 'none',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-full)',
-                padding: '6px 12px',
-                color: 'var(--text-muted)',
-                fontSize: '12px',
-                cursor: 'pointer',
-              }}
-            >
-              <Plus size={14} />
-              <span>New Session</span>
-            </button>
-
-            {/* Deep Reasoning Toggle */}
-            <button
-              onClick={() => setHighThinking(!highThinking)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                background: highThinking ? 'rgba(250, 204, 21, 0.16)' : 'rgba(255, 255, 255, 0.05)',
-                border: highThinking ? '1px solid rgba(250, 204, 21, 0.4)' : '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-full)',
-                padding: '6px 12px',
-                color: highThinking ? '#FACC15' : 'var(--text-muted)',
-                fontSize: '11.5px',
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              <Brain size={13} />
-              <span>Deep Reasoning {highThinking ? 'ON' : 'OFF'}</span>
-            </button>
-          </div>
-
-          {/* Location & Ephemeris Indicators */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#10B981' }}>
-              <Globe size={12} />
-              <span>Grounded Intelligence</span>
-            </span>
-            <span>•</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#38BDF8' }}>
-              <MapPin size={12} />
-              <span>{activeProfile.birthPlace || 'Google Maps Registered'}</span>
-            </span>
-          </div>
-        </div>
-
-        {/* Dynamic Astrology Context Badge with Toggle */}
-        <AstrologyContextBadge
-          useContext={useAstrologyContext}
-          onToggle={toggleAstrologyContext}
-        />
-      </div>
-
-      {/* 2. Scrollable Messages Area */}
-      <div
-        style={{
-          flex: 1,
-          overflowY: 'auto',
-          padding: '16px 4px',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        {/* Welcome Empty State */}
-        {isWelcomeState && (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              textAlign: 'center',
-              margin: 'auto 0 24px',
-              padding: '0 16px',
-            }}
-          >
-            <div style={{ marginBottom: '16px' }}>
-              <GlowingOrb size={64} state={isStreaming ? 'thinking' : 'idle'} />
-            </div>
-
-            <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#FFFFFF', marginBottom: '6px' }}>
-              Chat with Expert Astrologers
-            </h3>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', maxWidth: '440px', lineHeight: 1.5, marginBottom: '24px' }}>
-              Deep astrological reasoning engine synthesizing your birth chart placements, active Mahadashas, and live planetary ephemeris.
-            </p>
-
-            {/* Suggested Prompts */}
-            <div style={{ width: '100%', maxWidth: '580px' }}>
-              <QuickPromptChips onSelectPrompt={(p) => sendMessage(p)} />
-            </div>
-          </div>
-        )}
-
-        {/* Conversation Message List */}
-        {activeConversation.messages.map((msg, index) => (
-          <ChatMessage
-            key={msg.id}
-            message={msg}
-            isLast={index === activeConversation.messages.length - 1}
-            onRegenerate={regenerateLastMessage}
-            onRate={(feedback) => rateMessage(msg.id, feedback)}
-            onToggleSave={() => toggleSaveMessage(msg.id)}
-          />
-        ))}
-
-        {/* Thinking Indicator */}
-        {isStreaming && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', color: '#FACC15', fontSize: '12.5px' }}>
-            <Sparkles size={15} className="ai-orb-thinking" />
-            <span>Consulting chart & Google verified ephemeris...</span>
-          </div>
-        )}
-
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* 3. Stop Generation Button (if streaming) */}
-      {isStreaming && (
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
-          <button
-            onClick={stopGeneration}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              background: 'rgba(14, 14, 20, 0.95)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-full)',
-              padding: '6px 14px',
-              color: 'var(--text-secondary)',
-              fontSize: '12px',
-              cursor: 'pointer',
-              boxShadow: '0 4px 14px rgba(0,0,0,0.5)',
-            }}
-          >
-            <Square size={12} fill="var(--theme-orange)" color="var(--theme-orange)" />
-            <span>Stop Response</span>
-          </button>
-        </div>
-      )}
-
-      {/* 4. Active Attachment Pill */}
-      {attachmentName && (
+        {/* Sidebar Header */}
         <div
           style={{
+            padding: '16px',
+            borderBottom: '1px solid #41454D',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '6px 12px',
-            backgroundColor: 'rgba(255, 255, 255, 0.06)',
-            borderRadius: 'var(--radius-sm)',
-            fontSize: '11px',
-            color: '#FACC15',
-            marginBottom: '6px',
           }}
         >
-          <span>Attached: {attachmentName}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <History size={16} color="#D5D7DA" />
+            <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
+              History
+            </h3>
+          </div>
           <button
-            onClick={() => setAttachmentName(null)}
-            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+            type="button"
+            onClick={() => setShowHistorySidebar(false)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#A6A9AF',
+              cursor: 'pointer',
+              padding: '4px',
+            }}
+            title="Collapse History Panel"
           >
-            ✕
+            <ChevronLeft size={16} />
           </button>
         </div>
-      )}
 
-      {/* 5. Voice Listening Wave */}
-      {isRecording && (
+        {/* New Session Button */}
+        <div style={{ padding: '12px 16px' }}>
+          <button
+            type="button"
+            onClick={createNewConversation}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              padding: '9px 14px',
+              borderRadius: '8px',
+              backgroundColor: '#101722',
+              border: '1px solid #41454D',
+              color: '#E2E8F0',
+              fontSize: '12.5px',
+              fontWeight: 650,
+              cursor: 'pointer',
+              transition: 'background 0.14s ease',
+            }}
+          >
+            <Plus size={15} color="#11A8EB" />
+            <span>New Consultation</span>
+          </button>
+        </div>
+
+        {/* Saved Sessions List */}
         <div
           style={{
+            flex: 1,
+            overflowY: 'auto',
+            padding: '0 12px 12px',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            padding: '8px',
-            backgroundColor: 'rgba(255, 106, 0, 0.2)',
-            borderRadius: 'var(--radius-md)',
-            color: '#FF8C33',
-            fontSize: '12px',
-            marginBottom: '6px',
+            flexDirection: 'column',
+            gap: '4px',
           }}
         >
-          <Mic size={15} />
-          <span>Listening to your cosmic question...</span>
-        </div>
-      )}
+          {conversations.map((conv) => {
+            const isSelected = conv.id === activeConversation.id;
+            return (
+              <div
+                key={conv.id}
+                onClick={() => selectConversation(conv.id)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '9px 12px',
+                  borderRadius: '8px',
+                  backgroundColor: isSelected ? '#1A1E2B' : 'transparent',
+                  border: isSelected ? '1px solid #2B3247' : '1px solid transparent',
+                  cursor: 'pointer',
+                }}
+              >
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: '12.5px',
+                      fontWeight: isSelected ? 650 : 500,
+                      color: isSelected ? '#FFFFFF' : '#A6A9AF',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {conv.title || 'Astrology Consultation'}
+                  </div>
+                  <div style={{ fontSize: '10px', color: '#64748B', marginTop: '2px' }}>
+                    {conv.messages.length} messages
+                  </div>
+                </div>
 
-      {/* 6. Input Control Container */}
+                {conversations.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteConversation(conv.id);
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#64748B',
+                      cursor: 'pointer',
+                      padding: '4px',
+                    }}
+                    title="Delete Conversation"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ================= 2. MAIN: ASTROLOGER CHAT WINDOW ================= */}
       <div
         style={{
           display: 'flex',
-          alignItems: 'flex-end',
-          gap: '8px',
-          backgroundColor: 'rgba(255, 255, 255, 0.05)',
-          border: '1px solid var(--border-subtle)',
-          borderRadius: 'var(--radius-xl)',
-          padding: '8px 12px',
-          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.45)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
+          flexDirection: 'column',
+          backgroundColor: '#050608',
+          borderRadius: '16px',
+          border: '1px solid #41454D',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.35)',
+          overflow: 'hidden',
+          minWidth: 0,
         }}
       >
-        {/* Attachment Upload */}
-        <label
+        {/* Top Header */}
+        <div
           style={{
+            padding: '12px 18px',
+            borderBottom: '1px solid #41454D',
+            backgroundColor: '#101722',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '34px',
-            height: '34px',
-            borderRadius: '50%',
-            cursor: 'pointer',
-            color: 'var(--text-muted)',
-            transition: 'color 160ms ease',
+            flexDirection: 'column',
+            gap: '10px',
+            flexShrink: 0,
           }}
-          title="Attach chart image or PDF"
         >
-          <Paperclip size={18} />
-          <input
-            type="file"
-            accept="image/*,.pdf,.txt"
-            onChange={handleAttachment}
-            style={{ display: 'none' }}
-          />
-        </label>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              {!showHistorySidebar && (
+                <button
+                  type="button"
+                  onClick={() => setShowHistorySidebar(true)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '6px 10px',
+                    borderRadius: '6px',
+                    backgroundColor: '#101722',
+                    border: '1px solid #41454D',
+                    color: '#D5D7DA',
+                    fontSize: '11.5px',
+                    cursor: 'pointer',
+                  }}
+                  title="Show Consultation History"
+                >
+                  <History size={13} color="#D5D7DA" />
+                  <span>History</span>
+                </button>
+              )}
 
-        {/* Text Area */}
-        <textarea
-          ref={textareaRef}
-          value={inputVal}
-          onChange={(e) => setInputVal(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Ask about your Dasha, transits, career, relationships, or gemstones..."
-          rows={1}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '8px',
+                    backgroundColor: '#101722',
+                    border: '1px solid #41454D',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {activeMode.icon}
+                </div>
+                <div>
+                  <h2 style={{ fontSize: '15px', fontWeight: 700, color: '#FFFFFF', margin: 0 }}>
+                    {activeMode.name}
+                  </h2>
+                  <p style={{ fontSize: '11px', color: '#A6A9AF', margin: 0 }}>
+                    {activeMode.title}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Timer */}
+            {isFreeOrGuest && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '5px 12px',
+                  borderRadius: '8px',
+                  backgroundColor: isTimerExpired ? 'rgba(239, 68, 68, 0.15)' : '#101722',
+                  border: isTimerExpired ? '1px solid #EF4444' : '1px solid #41454D',
+                  color: isTimerExpired ? '#EF4444' : '#E2E8F0',
+                  fontSize: '11.5px',
+                  fontWeight: 700,
+                  fontFamily: 'monospace',
+                }}
+                title="10 Minutes consultation session limit ONLY AFTER THAT NO ACCESS"
+              >
+                <Clock size={12} />
+                <span>{isTimerExpired ? 'EXPIRED (00:00)' : formatTimer(sessionSeconds)}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Mode Selector Strip */}
+          <div
+            style={{
+              display: 'flex',
+              gap: '6px',
+              overflowX: 'auto',
+              scrollbarWidth: 'none',
+              paddingBottom: '2px',
+            }}
+          >
+            {ASTROLOGER_MODES.map((mode) => {
+              const isSelected = mode.id === activeModeId;
+              const isLockedForUser = isFreeOrGuest && mode.id !== 'vedic-master';
+
+              return (
+                <button
+                  key={mode.id}
+                  type="button"
+                  onClick={() => setActiveModeId(mode.id)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    backgroundColor: isSelected ? '#1C202C' : '#25282E',
+                    border: isSelected ? '1px solid #11A8EB' : '1px solid #41454D',
+                    color: isSelected ? '#FFFFFF' : '#A6A9AF',
+                    fontSize: '12px',
+                    fontWeight: isSelected ? 650 : 500,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    opacity: isLockedForUser ? 0.75 : 1,
+                  }}
+                  title={isLockedForUser ? 'Locked for free users. Click to unlock with Premium.' : mode.title}
+                >
+                  {isLockedForUser ? <Lock size={13} color="#FBBF24" /> : mode.icon}
+                  <span>{mode.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Free Timer Notice Bar */}
+        {isFreeOrGuest && (
+          <div
+            style={{
+              padding: '8px 16px',
+              backgroundColor: isTimerExpired ? '#161215' : '#25282E',
+              borderBottom: '1px solid #41454D',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: '11.5px',
+              color: isTimerExpired ? '#FCA5A5' : '#D5D7DA',
+            }}
+          >
+            <span>
+              {isTimerExpired
+                ? '10 Minutes consultation session limit reached. ONLY AFTER THAT NO ACCESS. Upgrade to Premium to continue consulting.'
+                : `10 Minutes consultation session limit ONLY AFTER THAT NO ACCESS (${formatTimer(sessionSeconds)} remaining).`}
+            </span>
+            <button
+              type="button"
+              onClick={() => openUpgradeModal('AI Astrologer 10-Minute Consultation Limit')}
+              style={{
+                backgroundColor: '#11A8EB',
+                border: 'none',
+                borderRadius: '4px',
+                padding: '4px 12px',
+                color: '#FFFFFF',
+                fontSize: '11px',
+                fontWeight: 650,
+                cursor: 'pointer',
+              }}
+            >
+              Upgrade
+            </button>
+          </div>
+        )}
+
+        {/* Chat Messages */}
+        <div
           style={{
             flex: 1,
-            background: 'none',
-            border: 'none',
-            outline: 'none',
-            color: '#FFFFFF',
-            fontSize: '13.5px',
-            lineHeight: 1.5,
-            resize: 'none',
-            maxHeight: '120px',
-            padding: '6px 4px',
-          }}
-        />
-
-        {/* Mic Voice */}
-        <button
-          type="button"
-          onClick={toggleVoiceRecording}
-          style={{
+            overflowY: 'auto',
+            padding: '20px',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '34px',
-            height: '34px',
-            borderRadius: '50%',
-            background: isRecording ? 'rgba(255, 106, 0, 0.3)' : 'none',
-            border: 'none',
-            color: isRecording ? 'var(--theme-orange)' : 'var(--text-muted)',
-            cursor: 'pointer',
-          }}
-          title={isRecording ? 'Stop voice recording' : 'Speak inquiry'}
-        >
-          {isRecording ? <MicOff size={18} /> : <Mic size={18} />}
-        </button>
-
-        {/* Send */}
-        <button
-          type="button"
-          onClick={handleSend}
-          disabled={!inputVal.trim() || isStreaming}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            background: inputVal.trim() && !isStreaming ? 'linear-gradient(135deg, #FF6A00 0%, #D95300 100%)' : 'rgba(255, 255, 255, 0.08)',
-            border: 'none',
-            color: inputVal.trim() && !isStreaming ? '#FFFFFF' : 'var(--text-dim)',
-            cursor: inputVal.trim() && !isStreaming ? 'pointer' : 'not-allowed',
-            boxShadow: inputVal.trim() && !isStreaming ? '0 2px 10px rgba(255, 106, 0, 0.4)' : 'none',
-            transition: 'all 160ms ease',
+            flexDirection: 'column',
+            gap: '16px',
+            backgroundColor: '#050608',
           }}
         >
-          <Send size={15} />
-        </button>
+          {activeConversation.messages.map((message) => (
+            <ChatMessage
+              key={message.id}
+              message={message}
+              isStreaming={isStreaming && message.id === activeConversation.messages[activeConversation.messages.length - 1]?.id}
+              onRegenerate={regenerateLastMessage}
+            />
+          ))}
+
+          {isStreaming && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#A6A9AF', fontSize: '12px' }}>
+              <Clock size={13} className="animate-spin" color="#11A8EB" />
+              <span>Analyzing planetary configurations...</span>
+            </div>
+          )}
+
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Input Bar */}
+        <div
+          style={{
+            padding: '14px 18px',
+            borderTop: '1px solid #41454D',
+            backgroundColor: '#101722',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              backgroundColor: '#25282E',
+              border: '1px solid #41454D',
+              borderRadius: '20px',
+              padding: '5px 12px',
+            }}
+          >
+            <textarea
+              ref={textareaRef}
+              value={inputVal}
+              onChange={(e) => setInputVal(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={`Ask ${activeMode.name} regarding your horoscope, career, marriage or yogas...`}
+              rows={1}
+              disabled={isStreaming || isTimerExpired}
+              style={{
+                flex: 1,
+                background: 'none',
+                border: 'none',
+                outline: 'none',
+                color: '#FFFFFF',
+                fontSize: '13px',
+                lineHeight: 1.5,
+                resize: 'none',
+                maxHeight: '120px',
+                padding: '6px 4px',
+              }}
+            />
+
+            <button
+              type="button"
+              onClick={toggleVoiceRecording}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                background: isRecording ? '#41454D' : 'none',
+                border: 'none',
+                color: isRecording ? '#11A8EB' : '#A6A9AF',
+                cursor: 'pointer',
+                flexShrink: 0,
+              }}
+            >
+              {isRecording ? <MicOff size={16} /> : <Mic size={16} />}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSend}
+              disabled={!inputVal.trim() || isStreaming || isTimerExpired}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '34px',
+                height: '34px',
+                borderRadius: '50%',
+                background: inputVal.trim() && !isStreaming ? '#11A8EB' : '#1C1F2B',
+                border: 'none',
+                color: inputVal.trim() && !isStreaming ? '#FFFFFF' : '#64748B',
+                cursor: inputVal.trim() && !isStreaming ? 'pointer' : 'not-allowed',
+                flexShrink: 0,
+              }}
+            >
+              <Send size={14} />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,0 +1,43 @@
+# AstroNex SQL Connect Schema
+
+type User @table {
+  id: String! @col(name: "user_id")
+  email: String!
+  name: String!
+  phone: String
+  birthDate: String!
+  birthTime: String!
+  birthPlace: String!
+  latitude: Float
+  longitude: Float
+  timezone: String
+  gender: String
+  astrologySystem: String! @default(value: "vedic")
+  houseSystem: String! @default(value: "placidus")
+  zodiacSystem: String! @default(value: "sidereal")
+  planTier: String! @default(value: "free")
+  isPremium: Boolean! @default(value: false)
+  avatarUrl: String
+  createdAt: Timestamp! @default(expr: "request.time")
+  lastLoginAt: Timestamp! @default(expr: "request.time")
+}
+
+type ConsultationSession @table {
+  id: UUID! @default(expr: "uuidV4()")
+  user: User!
+  specialistId: String!
+  specialistName: String!
+  startedAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+}
+
+type ConsultationMessage @table {
+  id: UUID! @default(expr: "uuidV4()")
+  session: ConsultationSession!
+  role: String! # 'user' | 'assistant'
+  content: String!
+  thinking: String
+  groundingQuery: String
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+

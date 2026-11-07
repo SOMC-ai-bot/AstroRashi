@@ -38,144 +38,92 @@ export const Badge: React.FC<BadgeProps> = ({
   const baseStyle: React.CSSProperties = {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: '6px',
-    borderRadius: 'var(--radius-full)',
-    fontWeight: 700,
-    letterSpacing: '0.03em',
+    gap: '5px',
+    borderRadius: '4px',
+    fontWeight: 650,
+    letterSpacing: '0.02em',
     fontFamily: 'var(--font-sans)',
     whiteSpace: 'nowrap',
     userSelect: 'none',
-    transition: 'all 0.18s ease',
+    transition: 'all 0.16s ease',
   };
 
-  const sizeStyles: Record<string, React.CSSProperties> = {
-    sm: {
-      padding: '4px 10px',
-      fontSize: '11px',
-    },
-    md: {
-      padding: '6px 14px',
-      fontSize: '12.5px',
-    },
-  };
+  const sizeStyle: React.CSSProperties =
+    size === 'sm'
+      ? { padding: '2px 8px', fontSize: '11px', lineHeight: '16px' }
+      : { padding: '4px 12px', fontSize: '12.5px', lineHeight: '18px' };
 
-  const variantStyles: Record<BadgeVariant, { container: React.CSSProperties; dotColor: string }> = {
+  // Matte Dark Theme Palette (#11A8EB blue, #25282E card, #101722 surface, #41454D border)
+  const variantStyles: Record<BadgeVariant, React.CSSProperties> = {
     orange: {
-      container: {
-        background: 'rgba(255, 106, 0, 0.14)',
-        color: '#FFA04D',
-        border: '1px solid rgba(255, 106, 0, 0.4)',
-        boxShadow: '0 2px 10px rgba(255, 106, 0, 0.15)',
-      },
-      dotColor: '#FF6A00',
+      background: '#101722',
+      color: '#11A8EB',
+      border: '1px solid #11A8EB',
     },
     blue: {
-      container: {
-        background: 'rgba(37, 99, 235, 0.16)',
-        color: '#60A5FA',
-        border: '1px solid rgba(56, 189, 248, 0.4)',
-        boxShadow: '0 2px 10px rgba(37, 99, 235, 0.18)',
-      },
-      dotColor: '#38BDF8',
+      background: '#101722',
+      color: '#11A8EB',
+      border: '1px solid #11A8EB',
     },
     yellow: {
-      container: {
-        background: 'rgba(250, 204, 21, 0.14)',
-        color: '#FDE047',
-        border: '1px solid rgba(250, 204, 21, 0.4)',
-        boxShadow: '0 2px 10px rgba(250, 204, 21, 0.15)',
-      },
-      dotColor: '#FACC15',
+      background: '#101722',
+      color: '#FFFFFF',
+      border: '1px solid #41454D',
     },
     gold: {
-      container: {
-        background: 'rgba(250, 204, 21, 0.16)',
-        color: '#FACC15',
-        border: '1px solid rgba(250, 204, 21, 0.45)',
-        boxShadow: '0 2px 10px rgba(250, 204, 21, 0.2)',
-      },
-      dotColor: '#FACC15',
+      background: '#101722',
+      color: '#FFFFFF',
+      border: '1px solid #11A8EB',
     },
     green: {
-      container: {
-        background: 'rgba(16, 185, 129, 0.14)',
-        color: '#34D399',
-        border: '1px solid rgba(16, 185, 129, 0.4)',
-        boxShadow: '0 2px 10px rgba(16, 185, 129, 0.15)',
-      },
-      dotColor: '#10B981',
+      background: '#101722',
+      color: '#11A8EB',
+      border: '1px solid #41454D',
     },
     white: {
-      container: {
-        background: 'rgba(255, 255, 255, 0.12)',
-        color: '#FFFFFF',
-        border: '1px solid rgba(255, 255, 255, 0.3)',
-        boxShadow: '0 2px 10px rgba(255, 255, 255, 0.1)',
-      },
-      dotColor: '#FFFFFF',
+      background: '#25282E',
+      color: '#FFFFFF',
+      border: '1px solid #41454D',
     },
     wine: {
-      container: {
-        background: 'rgba(255, 106, 0, 0.15)',
-        color: '#FFA04D',
-        border: '1px solid rgba(255, 106, 0, 0.4)',
-        boxShadow: '0 2px 10px rgba(255, 106, 0, 0.15)',
-      },
-      dotColor: '#FF6A00',
+      background: '#101722',
+      color: '#D5D7DA',
+      border: '1px solid #41454D',
     },
     rose: {
-      container: {
-        background: 'rgba(255, 106, 0, 0.14)',
-        color: '#FF8C33',
-        border: '1px solid rgba(255, 106, 0, 0.35)',
-        boxShadow: '0 2px 10px rgba(255, 106, 0, 0.15)',
-      },
-      dotColor: '#FF7D1A',
+      background: '#101722',
+      color: '#D5D7DA',
+      border: '1px solid #41454D',
     },
     plum: {
-      container: {
-        background: 'rgba(37, 99, 235, 0.16)',
-        color: '#60A5FA',
-        border: '1px solid rgba(56, 189, 248, 0.4)',
-        boxShadow: '0 2px 10px rgba(37, 99, 235, 0.18)',
-      },
-      dotColor: '#38BDF8',
+      background: '#101722',
+      color: '#11A8EB',
+      border: '1px solid #41454D',
     },
     outline: {
-      container: {
-        background: 'transparent',
-        color: 'var(--text-secondary)',
-        border: '1px solid var(--border-subtle)',
-      },
-      dotColor: '#8E92AA',
+      background: 'transparent',
+      color: '#D5D7DA',
+      border: '1px solid #41454D',
     },
     surface: {
-      container: {
-        background: 'rgba(255, 255, 255, 0.05)',
-        color: 'var(--text-primary)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-      },
-      dotColor: '#E2E4F0',
+      background: '#25282E',
+      color: '#FFFFFF',
+      border: '1px solid #41454D',
     },
     neutral: {
-      container: {
-        background: 'rgba(255, 255, 255, 0.06)',
-        color: 'var(--text-muted)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-      },
-      dotColor: '#8E92AA',
+      background: '#101722',
+      color: '#D5D7DA',
+      border: '1px solid #41454D',
     },
   };
-
-  const currentVariant = variantStyles[variant] || variantStyles.orange;
 
   return (
     <span
       className={className}
       style={{
         ...baseStyle,
-        ...sizeStyles[size],
-        ...currentVariant.container,
+        ...sizeStyle,
+        ...(variantStyles[variant] || variantStyles.orange),
         ...style,
       }}
     >
@@ -185,8 +133,8 @@ export const Badge: React.FC<BadgeProps> = ({
             width: '6px',
             height: '6px',
             borderRadius: '50%',
-            backgroundColor: currentVariant.dotColor,
-            boxShadow: `0 0 8px ${currentVariant.dotColor}`,
+            backgroundColor: '#11A8EB',
+            display: 'inline-block',
           }}
         />
       )}

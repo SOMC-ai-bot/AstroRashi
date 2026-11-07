@@ -1,62 +1,69 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  /* Typography Tokens: Multi-Tiered Hierarchical Fonts */
+  /* Exact User-Specified Color Palette */
+  --background: #050608;
+  --surface: #101722;
+  --card: #25282E;
+
+  --primary: #11A8EB;
+  --primary-hover: #078CCB;
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #D5D7DA;
+  --text-muted: #A6A9AF;
+
+  --grey: #41454D;
+  --grey-light: #737780;
+
+  --border: #41454D;
+  --shadow: #000000;
+
+  /* Aliased System Tokens Mapped to Exact Theme */
+  --bg-primary: var(--background);
+  --bg-surface: var(--surface);
+  --bg-surface-elevated: var(--surface);
+  --bg-surface-glass: var(--surface);
+  --bg-card: var(--card);
+  --bg-card-hover: #2C3038;
+
+  --gold-primary: var(--primary);
+  --gold-light: #52C2F4;
+  --gold-vibrant: var(--primary);
+  --gold-amber: var(--primary-hover);
+  --gold-glow: transparent;
+  --gold-subtle: rgba(17, 168, 235, 0.12);
+
+  --purple-primary: var(--primary);
+  --purple-light: #52C2F4;
+  --purple-bright: var(--primary);
+  --purple-glow: transparent;
+
+  --theme-orange: var(--primary);
+  --theme-orange-light: #52C2F4;
+
+  --border-subtle: var(--border);
+  --border-card: var(--border);
+  --border-card-hover: var(--grey-light);
+  --border-focus: var(--primary);
+  --border-glow-gold: none;
+
+  /* Typography */
   --font-sans: 'Outfit', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: 'Cinzel', serif;
-  --font-editorial: 'Playfair Display', serif;
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
   --font-mono: 'JetBrains Mono', monospace;
-
-  /* Deep Mystic Midnight Celestial Void */
-  --bg-primary: #06070E;
-  --bg-surface: #0B0E1B;
-  --bg-surface-elevated: #111528;
-  --bg-surface-glass: rgba(11, 14, 27, 0.88);
-  --bg-card: rgba(14, 18, 36, 0.72);
-  --bg-card-hover: rgba(22, 28, 54, 0.88);
-
-  /* Golden Celestial & Solar Radiance */
-  --gold-primary: #F5D061;
-  --gold-light: #FDE89C;
-  --gold-vibrant: #FBBF24;
-  --gold-amber: #D97706;
-  --gold-glow: rgba(245, 208, 97, 0.45);
-  --gold-subtle: rgba(245, 208, 97, 0.12);
-
-  /* Primary Cosmic Theme: Mystic Royal Violet & Starlight */
-  --purple-primary: #8B5CF6;
-  --purple-light: #A78BFA;
-  --purple-bright: #C084FC;
-  --purple-glow: rgba(139, 92, 246, 0.45);
-
-  --theme-orange: #FF7A00;
-  --theme-orange-light: #FF9E40;
-
-  /* High-Contrast Crisp Text Palette */
-  --text-primary: #FFFFFF;
-  --text-secondary: #F1F5F9;
-  --text-muted: #CBD5E1;
-  --text-dim: #94A3B8;
-
-  /* Radiant Celestial Borders */
-  --border-subtle: rgba(245, 208, 97, 0.2);
-  --border-card: rgba(245, 208, 97, 0.28);
-  --border-card-hover: rgba(253, 232, 156, 0.65);
-  --border-focus: rgba(245, 208, 97, 0.85);
-  --border-glow-gold: 0 0 16px rgba(245, 208, 97, 0.35);
 
   /* Radii */
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  --radius-xl: 24px;
+  --radius-xl: 20px;
   --radius-full: 9999px;
 
-  /* Multi-Layer Cosmic Shadows */
-  --shadow-card: 0 16px 40px -10px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(245, 208, 97, 0.15);
-  --shadow-card-hover: 0 24px 60px -12px rgba(0, 0, 0, 0.9), 0 0 35px rgba(245, 208, 97, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  /* Matte Subtle Shadows (No glowing) */
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.6);
+  --shadow-card-hover: 0 6px 22px rgba(0, 0, 0, 0.8);
 }
 
 * {
@@ -64,67 +71,69 @@
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-html,
+html {
+  scroll-behavior: smooth;
+  background-color: var(--background);
+  color: var(--text-primary);
+}
+
 body {
   width: 100%;
   min-height: 100%;
-  background-color: var(--bg-primary);
+  background-color: var(--background);
   color: var(--text-primary);
   font-family: var(--font-sans);
   overflow-x: hidden;
   line-height: 1.6;
+  text-rendering: optimizeLegibility;
+}
+
+section, article, .glass-panel, .custom-card {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   font-weight: 700;
-  color: #FFFFFF;
+  color: var(--text-primary);
 }
 
-/* Celestial Starlight & Constellation Background Wallpaper */
+/* Matte Solid Backgrounds (No Gradients, No Glowing) */
 .cosmic-bg {
-  background-color: #06070E;
-  background-image: 
-    url('/celestial-pattern.svg'),
-    radial-gradient(ellipse 90% 60% at 50% -10%, rgba(139, 92, 246, 0.22) 0%, transparent 70%),
-    radial-gradient(circle at 10% 30%, rgba(245, 208, 97, 0.1) 0%, transparent 40%),
-    radial-gradient(circle at 90% 70%, rgba(124, 58, 237, 0.16) 0%, transparent 50%),
-    radial-gradient(circle at 50% 90%, rgba(251, 191, 36, 0.08) 0%, transparent 55%),
-    linear-gradient(180deg, #06070E 0%, #090C18 50%, #06070E 100%);
-  background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-  background-size: 800px 800px, cover, cover, cover, cover, cover;
-  background-attachment: fixed;
+  background-color: var(--background) !important;
+  background-image: none !important;
 }
 
-/* Template Exact Buttons */
+/* Matte Solid Buttons */
 .btn-mystic-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: linear-gradient(135deg, #7C3AED 0%, #8B5CF6 100%);
+  background: var(--primary);
   color: #FFFFFF;
-  border: 1px solid rgba(168, 85, 247, 0.45);
-  border-radius: 4px;
-  padding: 10px 24px;
+  border: 1px solid var(--primary);
+  border-radius: 6px;
+  padding: 10px 22px;
   font-family: var(--font-sans);
   font-size: 13.5px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  font-weight: 650;
   cursor: pointer;
-  box-shadow: 0 4px 18px rgba(124, 58, 237, 0.45);
-  transition: all 200ms ease;
+  box-shadow: none !important;
+  transition: background 160ms ease, border-color 160ms ease;
   text-decoration: none;
 }
 
 .btn-mystic-primary:hover {
-  background: linear-gradient(135deg, #8B5CF6 0%, #9333EA 100%);
-  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.65);
-  transform: translateY(-1px);
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
 }
 
 .btn-mystic-outline {
@@ -133,141 +142,101 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
   gap: 8px;
   background: transparent;
-  color: #F3EEFF;
-  border: 1px solid rgba(216, 180, 254, 0.5);
-  border-radius: 4px;
-  padding: 10px 24px;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 22px;
   font-family: var(--font-sans);
   font-size: 13.5px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  font-weight: 650;
   cursor: pointer;
-  transition: all 200ms ease;
+  transition: background 160ms ease, border-color 160ms ease;
   text-decoration: none;
 }
 
 .btn-mystic-outline:hover {
-  background: rgba(124, 58, 237, 0.2);
-  border-color: #C084FC;
+  background: var(--surface);
+  border-color: var(--primary);
   color: #FFFFFF;
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.35);
-  transform: translateY(-1px);
 }
 
-/* Glassmorphism Panels */
+/* Clean Matte Panels */
 .glass-panel {
-  background: var(--bg-card);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--border-card);
+  background: var(--card) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid var(--border) !important;
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
+  box-shadow: none !important;
 }
 
 .glass-panel-elevated {
-  background: var(--bg-surface-glass);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(168, 85, 247, 0.3);
+  background: var(--surface) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid var(--border) !important;
   border-radius: var(--radius-lg);
-  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: none !important;
 }
 
-/* Card Interactive 3D Lift */
+/* =========================================================================
+   After-Effects Type Smooth Interactive Animations & Motion System
+   ========================================================================= */
+
+/* Smooth cubic-bezier spring curves */
+:root {
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Fast responsive interaction transitions on all interactive controls */
+button, a, input, select, textarea {
+  transition: transform 140ms var(--ease-spring), background 160ms ease, border-color 160ms ease, color 160ms ease, opacity 140ms ease;
+  will-change: transform;
+}
+
+/* Spring scale click down effect (like iOS / After-Effects tactile button clicks) */
+button:active:not(:disabled), a:active {
+  transform: scale(0.965);
+}
+
+/* Screen & Tab Transition: Cinematic After-Effects style fade & subtle upward glide */
+main > * {
+  animation: afxScreenIn 260ms var(--ease-spring) both;
+  will-change: transform, opacity;
+}
+
+@keyframes afxScreenIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Card Subtle Floating Elevation on hover */
 .custom-card {
-  transition: transform var(--transition-normal), box-shadow var(--transition-normal), border-color var(--transition-normal);
+  background: var(--card);
+  border: 1px solid var(--border);
+  transition: transform 220ms var(--ease-spring), border-color 200ms ease, background 200ms ease;
+  box-shadow: none !important;
+  will-change: transform;
 }
 
 .custom-card:hover {
-  border-color: rgba(192, 132, 252, 0.45);
+  transform: translateY(-3px) scale(1.006);
+  border-color: var(--primary);
 }
 
-.card-hover:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-card-hover);
-  border-color: rgba(192, 132, 252, 0.6);
-}
-
-/* Sacred Mandala Rotating Ring Animations */
-@keyframes sacredRotateClockwise {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes sacredRotateCounter {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(-360deg); }
-}
-
-@keyframes sacredPulseCore {
-  0% { transform: scale(0.96); opacity: 0.75; filter: drop-shadow(0 0 15px #8B5CF6); }
-  50% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 35px #C084FC); }
-  100% { transform: scale(0.96); opacity: 0.75; filter: drop-shadow(0 0 15px #8B5CF6); }
-}
-
-.sacred-ring-clockwise {
-  animation: sacredRotateClockwise 80s linear infinite;
-  transform-origin: center;
-}
-
-.sacred-ring-counter {
-  animation: sacredRotateCounter 95s linear infinite;
-  transform-origin: center;
-}
-
-.sacred-core-pulse {
-  animation: sacredPulseCore 4s ease-in-out infinite;
-  transform-origin: center;
-}
-
-/* Shimmer Highlight */
-.shimmer-card {
-  position: relative;
-  overflow: hidden;
-}
-
-.shimmer-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    transparent 100%
-  );
-  animation: cardShimmer 6s infinite ease-in-out;
-  pointer-events: none;
-}
-
-@keyframes cardShimmer {
-  0% { left: -100%; }
-  35%, 100% { left: 100%; }
-}
-
-@keyframes orbBreathe {
-  0% {
-    transform: scale(0.97);
-    box-shadow: 0 0 25px rgba(124, 58, 237, 0.45), 0 0 50px rgba(168, 85, 247, 0.25);
-  }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 0 0 45px rgba(124, 58, 237, 0.8), 0 0 75px rgba(192, 132, 252, 0.5);
-  }
-  100% {
-    transform: scale(0.97);
-    box-shadow: 0 0 25px rgba(124, 58, 237, 0.45), 0 0 50px rgba(168, 85, 247, 0.25);
-  }
-}
-
+/* Modal Open: Pop and smooth scale motion */
 @keyframes modalFadeIn {
   from {
     opacity: 0;
-    transform: scale(0.97) translateY(6px);
+    transform: scale(0.96) translateY(8px);
   }
   to {
     opacity: 1;
@@ -275,30 +244,80 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* Cosmic Scrollbar */
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+/* Matte Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: var(--background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(124, 58, 237, 0.5) 0%, rgba(168, 85, 247, 0.3) 100%);
+  background: var(--grey);
   border-radius: var(--radius-full);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--purple-light);
+  background: var(--grey-light);
 }
 
 ::selection {
-  background: var(--purple-primary);
+  background: var(--primary);
   color: #FFFFFF;
 }
 
 .will-change-transform {
   will-change: transform;
+}
+
+/* Universal Tool Split Layout */
+.tool-calculator-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .tool-calculator-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* Mobile View Enhancements */
+@media (max-width: 768px) {
+  main {
+    padding-bottom: 96px !important;
+  }
+
+  .grid {
+    gap: 12px !important;
+  }
+
+  button, a {
+    word-break: break-word;
+  }
+
+  .cosmic-card {
+    padding: 14px !important;
+    background: var(--card) !important;
+    border-color: var(--border) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  main {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    padding-bottom: 100px !important;
+  }
 }

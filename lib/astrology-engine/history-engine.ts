@@ -1,4 +1,6 @@
 import { AstrologyResultObject, SavedCalculationItem, CalculationHistoryItem } from '@/types';
+import { auth, isFirebaseConfigured } from '@/lib/firebase/config';
+import { saveCalculationToFirestore } from '@/lib/firebase/firestore-service';
 
 const HISTORY_STORAGE_KEY = 'astronex_saved_calculations_v1';
 
@@ -43,6 +45,26 @@ export function saveCalculationItem(
   } catch (e) {
     console.error('Error saving calculation item:', e);
   }
+
+  // Asynchronously synchronize with Cloud Firestore if user is signed in
+  if (isFirebaseConfigured && typeof window !== 'undefined') {
+    try {
+      const currentUser = auth?.currentUser;
+      if (currentUser?.uid) {
+        saveCalculationToFirestore(
+          currentUser.uid,
+          toolId,
+          toolName,
+          resultSummary,
+          { inputSummary, profileName },
+          resultData
+        ).catch(() => {});
+      }
+    } catch {
+      // Non-blocking offline fallback
+    }
+  }
+
   return updated;
 }
 

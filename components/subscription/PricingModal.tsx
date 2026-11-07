@@ -8,8 +8,7 @@ import { BillingCycle, SubscriptionPlan } from '@/types';
 import { SUBSCRIPTION_PLANS } from '@/lib/subscription/plans';
 import { useSubscription } from '@/lib/state/subscription-context';
 import { useAuth } from '@/lib/state/auth-context';
-import { CheckoutSheet } from './CheckoutSheet';
-import { Check, Sparkles, Crown, Zap } from 'lucide-react';
+import { Check, Sparkles, Crown, Zap, Loader2 } from 'lucide-react';
 
 interface PricingModalProps {
   isOpen: boolean;
@@ -18,30 +17,40 @@ interface PricingModalProps {
 
 export const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
+  const { switchToFreePlan, subscribeToPlan } = useSubscription();
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('monthly');
-  const [selectedPlanForCheckout, setSelectedPlanForCheckout] = useState<SubscriptionPlan | null>(
-    null
-  );
+  const [isProcessingTier, setIsProcessingTier] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} maxWidth="940px">
-      <CheckoutSheet
-        isOpen={!!selectedPlanForCheckout}
-        plan={selectedPlanForCheckout}
-        billingCycle={billingCycle}
-        onClose={() => {
-          setSelectedPlanForCheckout(null);
-          onClose();
-        }}
-      />
+  const handleChoosePlan = async (plan: SubscriptionPlan) => {
+    setIsProcessingTier(plan.tier);
+    try {
+      const ok = await subscribeToPlan(plan.tier, billingCycle, 'UPI');
+      if (ok) {
+        onClose();
+      }
+    } catch (e) {
+      console.error('[Razorpay Direct Checkout Error]', e);
+    } finally {
+      setIsProcessingTier(null);
+    }
+  };
 
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="✦ AstroNex Celestial Membership Plans"
+      maxWidth="1020px"
+      size="xl"
+      allowMaximize={true}
+    >
       <div style={{ display: 'flex', flexDirection: 'column', gap: '22px', padding: '10px 4px' }}>
         {/* Header */}
-        <div style={{ textAlign: 'center' }}>
-          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--gold-primary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-            AstroNex Plans
+        <div style={{ textAlign: 'center', position: 'relative' }}>
+          <span style={{ fontSize: '11px', fontWeight: 700, color: '#F5D061', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+            ✦ Unlock All 33+ Vedic Engines & Master Consultation
           </span>
           <h2 style={{ fontSize: '26px', fontWeight: 800, color: 'var(--text-primary)', marginTop: '4px' }}>
             Choose Your Plan
@@ -97,7 +106,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose }) =
           >
             <span>Yearly</span>
             <Badge variant="gold" size="sm">
-              Save up to 20%
+              Save 44% (₹599/yr)
             </Badge>
           </button>
         </div>
@@ -112,11 +121,16 @@ export const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose }) =
           }}
         >
           {SUBSCRIPTION_PLANS.map((plan) => {
-            const isCurrent = user.planTier === plan.tier;
+            const isCurrent = (plan.tier === 'free' && !user.isPremium) || (plan.tier === 'premium' && user.isPremium);
             const price = billingCycle === 'yearly' ? plan.yearlyPrice : plan.monthlyPrice;
+            const monthlyEquivalent = plan.monthlyPrice * 12;
             const savings =
               billingCycle === 'yearly' && plan.monthlyPrice > 0
-                ? plan.monthlyPrice * 12 - plan.yearlyPrice
+                ? monthlyEquivalent - plan.yearlyPrice
+                : 0;
+            const percentageSavings =
+              billingCycle === 'yearly' && plan.monthlyPrice > 0
+                ? Math.round(((monthlyEquivalent - plan.yearlyPrice) / monthlyEquivalent) * 100)
                 : 0;
 
             const isBasic = plan.tier === 'basic';
@@ -132,12 +146,8 @@ export const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose }) =
                   justifyContent: 'space-between',
                   padding: '24px 20px',
                   borderRadius: 'var(--radius-xl)',
-                  backgroundColor: isBasic ? 'rgba(139, 47, 85, 0.22)' : 'rgba(255, 255, 255, 0.04)',
-                  border: isBasic
-                    ? '1.5px solid var(--accent-rose)'
-                    : isPremium
-                    ? '1.5px solid rgba(216, 197, 138, 0.4)'
-                    : '1px solid var(--border-subtle)',
+                  backgroundColor: isPremium ? 'rgba(249, 115, 22, 0.12)' : 'rgba(255, 255, 255, 0.04)',
+                  border: isPremium ? '2px solid #F97316' : '1px solid var(--border-subtle)',
                   boxShadow: isBasic
                     ? '0 10px 32px rgba(194, 78, 120, 0.25)'
                     : '0 8px 24px rgba(0, 0, 0, 0.3)',
@@ -160,18 +170,33 @@ export const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose }) =
                     {plan.subtitle}
                   </p>
 
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '6px' }}>
                     <span style={{ fontSize: '32px', fontWeight: 800, color: 'var(--text-primary)' }}>
                       ₹{price}
                     </span>
                     <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                       {plan.monthlyPrice === 0 ? 'forever' : billingCycle === 'yearly' ? '/year' : '/month'}
                     </span>
+                    {percentageSavings > 0 && (
+                      <span
+                        style={{
+                          background: 'rgba(16, 185, 129, 0.2)',
+                          color: '#34D399',
+                          border: '1px solid #10B981',
+                          padding: '2px 8px',
+                          borderRadius: '12px',
+                          fontSize: '11px',
+                          fontWeight: 800,
+                        }}
+                      >
+                        {percentageSavings}% OFF
+                      </span>
+                    )}
                   </div>
 
                   {savings > 0 && (
                     <div style={{ fontSize: '11.5px', color: 'var(--gold-primary)', marginBottom: '14px', fontWeight: 600 }}>
-                      Save ₹{savings} with yearly billing
+                      Save ₹{savings} ({percentageSavings}% discount) with yearly billing
                     </div>
                   )}
 
@@ -191,17 +216,31 @@ export const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose }) =
                       Current Plan
                     </Button>
                   ) : plan.tier === 'free' ? (
-                    <Button variant="ghost" size="md" disabled style={{ width: '100%', color: 'var(--text-muted)' }}>
-                      Included
+                    <Button
+                      variant="outline"
+                      size="md"
+                      onClick={() => {
+                        switchToFreePlan();
+                        onClose();
+                      }}
+                      style={{ width: '100%', borderColor: 'rgba(255, 255, 255, 0.2)' }}
+                    >
+                      Switch to Free
                     </Button>
                   ) : (
                     <Button
                       variant={isBasic ? 'primary' : 'gold'}
                       size="md"
-                      onClick={() => setSelectedPlanForCheckout(plan)}
+                      loading={isProcessingTier === plan.tier}
+                      disabled={isProcessingTier !== null}
+                      onClick={() => handleChoosePlan(plan)}
                       style={{ width: '100%' }}
                     >
-                      <span>Choose {plan.name}</span>
+                      <span>
+                        {isProcessingTier === plan.tier
+                          ? 'Opening Razorpay...'
+                          : `Choose ${plan.name} Tier`}
+                      </span>
                     </Button>
                   )}
                 </div>

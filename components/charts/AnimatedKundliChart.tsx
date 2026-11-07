@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAstrology } from '@/lib/state/astrology-context';
+import { useAuth } from '@/lib/state/auth-context';
 import { Sparkles, Eye, RotateCw, Compass, Info } from 'lucide-react';
 import { calculateNavamsaChart } from '@/lib/astrology-engine/navamsa';
 import { ZODIAC_SIGNS } from '@/lib/astrology-engine/planetary';
@@ -56,6 +57,7 @@ interface AnimatedKundliChartProps {
 
 export const AnimatedKundliChart: React.FC<AnimatedKundliChartProps> = ({ onAskAI }) => {
   const { natalChart, activeProfile } = useAstrology();
+  const { user } = useAuth();
   const [chartMode, setChartMode] = useState<'d1' | 'd9'>('d1');
   const [hoveredHouse, setHoveredHouse] = useState<number | null>(null);
   const [isDrawingAnimated, setIsDrawingAnimated] = useState(false);
@@ -157,7 +159,7 @@ export const AnimatedKundliChart: React.FC<AnimatedKundliChartProps> = ({ onAskA
                 textTransform: 'uppercase',
               }}
             >
-              ✦ Vedic Kundli Drawing • {activeProfile.name}
+              ✦ Vedic Kundli Drawing • {user?.name || activeProfile?.name || 'Cosmic Seeker'}
             </span>
             <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 700 }}>
               Live Ephemeris

@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/lib/state/auth-context';
 import { useSubscription } from '@/lib/state/subscription-context';
 import { SUBSCRIPTION_PLANS } from '@/lib/subscription/plans';
-import { CheckoutSheet } from './CheckoutSheet';
 import { ManageSubscriptionModal } from './ManageSubscriptionModal';
 import {
   Crown,
@@ -20,6 +19,7 @@ import {
   Calendar,
   AlertCircle,
   Clock,
+  Loader2,
 } from 'lucide-react';
 
 interface SubscriptionScreenProps {
@@ -33,43 +33,47 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({ onOpenPr
     userSubscription,
     billingHistory,
     cancelSubscription,
+    switchToFreePlan,
     restorePurchases,
+    subscribeToPlan,
   } = useSubscription();
 
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('yearly');
-  const [selectedPlanForCheckout, setSelectedPlanForCheckout] = useState<any>(null);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+  const [isProcessingTier, setIsProcessingTier] = useState<string | null>(null);
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [successBanner, setSuccessBanner] = useState<string | null>(null);
 
-  const handleSelectPlan = (plan: any) => {
-    setSelectedPlanForCheckout(plan);
-    setIsCheckoutOpen(true);
-  };
+  const handleSelectPlan = async (plan: any) => {
+    if (plan.tier === 'free' || plan.monthlyPrice === 0) {
+      switchToFreePlan();
+      setSuccessBanner('Switched to Free Tier successfully. No payment needed!');
+      setTimeout(() => setSuccessBanner(null), 5000);
+      return;
+    }
 
-  const handleCheckoutSuccess = () => {
-    setIsCheckoutOpen(false);
-    setSuccessBanner('Congratulations! Your Pro Astrological Membership is now active.');
-    setTimeout(() => setSuccessBanner(null), 6000);
+    setIsProcessingTier(plan.tier);
+    try {
+      // Directly open Razorpay payment gateway
+      const success = await subscribeToPlan(plan.tier, billingCycle, 'UPI');
+      if (success) {
+        setSuccessBanner(`Congratulations! Your ${plan.name} Celestial Membership is now active.`);
+        setTimeout(() => setSuccessBanner(null), 6000);
+      }
+    } catch (err: any) {
+      console.error('[Razorpay Direct Checkout Error]', err);
+    } finally {
+      setIsProcessingTier(null);
+    }
   };
 
   const handleCancelSub = () => {
-    cancelSubscription();
-    setSuccessBanner('Your subscription has been cancelled. You will retain access until the end of your billing cycle.');
+    switchToFreePlan();
+    setSuccessBanner('Your subscription has been switched to the Free Tier. No recurring payment.');
     setTimeout(() => setSuccessBanner(null), 6000);
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', paddingBottom: '90px' }}>
-      {/* Checkout Sheet */}
-      <CheckoutSheet
-        isOpen={isCheckoutOpen}
-        plan={selectedPlanForCheckout}
-        billingCycle={billingCycle}
-        onClose={() => setIsCheckoutOpen(false)}
-        onSuccess={handleCheckoutSuccess}
-      />
-
       <ManageSubscriptionModal
         isOpen={isManageModalOpen}
         onClose={() => setIsManageModalOpen(false)}
@@ -175,55 +179,66 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({ onOpenPr
       </div>
 
       {/* 2. Billing Cycle Toggle */}
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '14px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
         <div
           style={{
-            display: 'flex',
-            background: 'rgba(255, 255, 255, 0.05)',
-            padding: '4px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            background: 'rgba(15, 12, 28, 0.95)',
+            padding: '6px',
             borderRadius: 'var(--radius-full)',
-            border: '1px solid rgba(168, 85, 247, 0.25)',
+            border: '1.5px solid rgba(245, 158, 11, 0.35)',
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)',
           }}
         >
           <button
+            type="button"
             onClick={() => setBillingCycle('monthly')}
             style={{
-              padding: '8px 20px',
+              padding: '10px 24px',
               borderRadius: 'var(--radius-full)',
               border: 'none',
-              background: billingCycle === 'monthly' ? '#C084FC' : 'transparent',
-              color: billingCycle === 'monthly' ? '#000000' : '#FFFFFF',
-              fontSize: '12.5px',
+              background: billingCycle === 'monthly' ? 'linear-gradient(135deg, #FF6A00 0%, #FF8533 100%)' : 'transparent',
+              color: '#FFFFFF',
+              fontSize: '13px',
               fontWeight: 800,
               cursor: 'pointer',
-              transition: 'all 0.15s ease',
+              transition: 'all 0.2s ease',
+              boxShadow: billingCycle === 'monthly' ? '0 2px 10px rgba(255, 106, 0, 0.4)' : 'none',
             }}
           >
             Monthly Billing
           </button>
-          <button
+            <button
+            type="button"
             onClick={() => setBillingCycle('yearly')}
             style={{
-              padding: '8px 20px',
+              padding: '10px 24px',
               borderRadius: 'var(--radius-full)',
               border: 'none',
-              background: billingCycle === 'yearly' ? 'linear-gradient(135deg, #FF6A00 0%, #FF8533 100%)' : 'transparent',
+              background: billingCycle === 'yearly' ? 'linear-gradient(135deg, #10B981 0%, #059669 100%)' : 'transparent',
               color: '#FFFFFF',
-              fontSize: '12.5px',
+              fontSize: '13px',
               fontWeight: 800,
               cursor: 'pointer',
-              transition: 'all 0.15s ease',
+              transition: 'all 0.2s ease',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
+              boxShadow: billingCycle === 'yearly' ? '0 2px 12px rgba(16, 185, 129, 0.4)' : 'none',
             }}
           >
-            <span>Annual (Save 40%)</span>
-            <span style={{ fontSize: '10px', background: 'rgba(0,0,0,0.3)', padding: '2px 6px', borderRadius: '4px' }}>
-              POPULAR
+            <span>Yearly (Save Up To 44%)</span>
+            <span style={{ fontSize: '10px', background: 'rgba(0,0,0,0.3)', padding: '2px 8px', borderRadius: '10px', fontWeight: 900 }}>
+              BEST VALUE
             </span>
           </button>
         </div>
+        <span style={{ fontSize: '11.5px', color: '#CBD5E1' }}>
+          {billingCycle === 'yearly'
+            ? 'Yearly billing: Premium ₹599/yr (Save 44%)'
+            : 'Monthly billing: Premium ₹89/mo (Flexible cancel anytime)'}
+        </span>
       </div>
 
       {/* 3. Subscription Plans Comparison Cards */}
@@ -231,6 +246,12 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({ onOpenPr
         {SUBSCRIPTION_PLANS.map((plan) => {
           const isCurrent = (plan.tier === 'free' && !user.isPremium) || (plan.tier !== 'free' && user.isPremium);
           const price = billingCycle === 'yearly' ? plan.yearlyPrice : plan.monthlyPrice;
+          const monthlyEquivalent = plan.monthlyPrice * 12;
+          const yearlySavings = billingCycle === 'yearly' && plan.monthlyPrice > 0 ? monthlyEquivalent - plan.yearlyPrice : 0;
+          const percentageSavings =
+            billingCycle === 'yearly' && plan.monthlyPrice > 0
+              ? Math.round(((monthlyEquivalent - plan.yearlyPrice) / monthlyEquivalent) * 100)
+              : 0;
 
           return (
             <Card
@@ -281,14 +302,35 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({ onOpenPr
                 </div>
 
                 <div style={{ marginBottom: '18px' }}>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
                     <span style={{ fontSize: '32px', fontWeight: 900, color: '#FFFFFF' }}>
                       ₹{price}
                     </span>
                     <span style={{ fontSize: '13px', color: '#A79BBF' }}>
                       /{billingCycle === 'yearly' ? 'year' : 'month'}
                     </span>
+                    {percentageSavings > 0 && (
+                      <span
+                        style={{
+                          background: 'rgba(16, 185, 129, 0.2)',
+                          color: '#34D399',
+                          border: '1px solid #10B981',
+                          padding: '2px 8px',
+                          borderRadius: '12px',
+                          fontSize: '11px',
+                          fontWeight: 800,
+                          marginLeft: '4px',
+                        }}
+                      >
+                        {percentageSavings}% OFF
+                      </span>
+                    )}
                   </div>
+                  {yearlySavings > 0 && (
+                    <div style={{ fontSize: '11.5px', color: '#FBBF24', marginTop: '4px', fontWeight: 700 }}>
+                      ✦ Save ₹{yearlySavings} ({percentageSavings}% discount) compared to monthly
+                    </div>
+                  )}
                   <p style={{ fontSize: '12.5px', color: '#DDD6FE', marginTop: '6px', lineHeight: 1.45 }}>
                     {plan.subtitle}
                   </p>
@@ -315,9 +357,17 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({ onOpenPr
                   <Button
                     variant={plan.isPopular ? 'primary' : 'glass'}
                     fullWidth
+                    loading={isProcessingTier === plan.tier}
+                    disabled={isProcessingTier !== null}
                     onClick={() => handleSelectPlan(plan)}
                   >
-                    <span>{plan.tier === 'free' ? 'Switch to Free' : 'Upgrade & Activate Now'}</span>
+                    <span>
+                      {plan.tier === 'free'
+                        ? 'Switch to Free'
+                        : isProcessingTier === plan.tier
+                        ? 'Opening Razorpay Gateway...'
+                        : 'Upgrade & Activate Now'}
+                    </span>
                   </Button>
                 )}
               </div>

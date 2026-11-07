@@ -46,18 +46,18 @@ export const NorthIndianChart: React.FC<NorthIndianChartProps> = ({
     number,
     { labelX: number; labelY: number; planetX: number; planetY: number }
   > = {
-    1: { labelX: 200, labelY: 130, planetX: 200, planetY: 155 }, // Top diamond
-    2: { labelX: 110, labelY: 65, planetX: 110, planetY: 85 }, // Top-left upper triangle
-    3: { labelX: 65, labelY: 110, planetX: 65, planetY: 130 }, // Top-left lower triangle
-    4: { labelX: 130, labelY: 200, planetX: 130, planetY: 225 }, // Left diamond
-    5: { labelX: 65, labelY: 290, planetX: 65, planetY: 310 }, // Bottom-left upper triangle
-    6: { labelX: 110, labelY: 335, planetX: 110, planetY: 355 }, // Bottom-left lower triangle
-    7: { labelX: 200, labelY: 270, planetX: 200, planetY: 295 }, // Bottom diamond
-    8: { labelX: 290, labelY: 335, planetX: 290, planetY: 355 }, // Bottom-right lower triangle
-    9: { labelX: 335, labelY: 290, planetX: 335, planetY: 310 }, // Bottom-right upper triangle
-    10: { labelX: 270, labelY: 200, planetX: 270, planetY: 225 }, // Right diamond
-    11: { labelX: 335, labelY: 110, planetX: 335, planetY: 130 }, // Top-right lower triangle
-    12: { labelX: 290, labelY: 65, planetX: 290, planetY: 85 }, // Top-right upper triangle
+    1: { labelX: 200, labelY: 55, planetX: 200, planetY: 115 }, // Top diamond
+    2: { labelX: 105, labelY: 35, planetX: 105, planetY: 72 }, // Top-left upper triangle
+    3: { labelX: 35, labelY: 105, planetX: 70, planetY: 140 }, // Top-left lower triangle
+    4: { labelX: 55, labelY: 200, planetX: 120, planetY: 200 }, // Left diamond
+    5: { labelX: 35, labelY: 295, planetX: 70, planetY: 260 }, // Bottom-left upper triangle
+    6: { labelX: 105, labelY: 365, planetX: 105, planetY: 328 }, // Bottom-left lower triangle
+    7: { labelX: 200, labelY: 345, planetX: 200, planetY: 285 }, // Bottom diamond
+    8: { labelX: 295, labelY: 365, planetX: 295, planetY: 328 }, // Bottom-right lower triangle
+    9: { labelX: 365, labelY: 295, planetX: 330, planetY: 260 }, // Bottom-right upper triangle
+    10: { labelX: 345, labelY: 200, planetX: 280, planetY: 200 }, // Right diamond
+    11: { labelX: 365, labelY: 105, planetX: 330, planetY: 140 }, // Top-right lower triangle
+    12: { labelX: 295, labelY: 35, planetX: 295, planetY: 72 }, // Top-right upper triangle
   };
 
   return (
@@ -103,6 +103,9 @@ export const NorthIndianChart: React.FC<NorthIndianChartProps> = ({
           const coords = houseCoordinates[h.houseNumber];
           if (!coords) return null;
 
+          const totalPlanetHeight = (h.planets.length - 1) * 14;
+          const startY = coords.planetY - totalPlanetHeight / 2;
+
           return (
             <g
               key={h.houseNumber}
@@ -117,40 +120,32 @@ export const NorthIndianChart: React.FC<NorthIndianChartProps> = ({
                 dominantBaseline="central"
                 fill="var(--gold-primary)"
                 fontSize="12"
-                fontWeight="700"
-                opacity="0.85"
+                fontWeight="800"
+                opacity="0.9"
               >
                 {h.signNumber}
               </text>
 
-              {/* Occupant Planets */}
-              {h.planets.length > 0 && (
+              {/* Occupant Planets with proper spacing */}
+              {h.planets.map((p, idx) => (
                 <text
+                  key={p.name}
                   x={coords.planetX}
-                  y={coords.planetY}
+                  y={startY + idx * 14}
                   textAnchor="middle"
                   dominantBaseline="central"
-                  fill="#FFFFFF"
-                  fontSize="11"
-                  fontWeight="600"
+                  fill={p.isRetrograde ? '#FB7185' : '#FFFFFF'}
+                  fontSize="10.5"
+                  fontWeight="700"
+                  style={{ cursor: 'pointer' }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onSelectPlacement) onSelectPlacement(p);
+                  }}
                 >
-                  {h.planets.map((p, idx) => (
-                    <tspan
-                      key={p.name}
-                      x={coords.planetX}
-                      dy={idx === 0 ? 0 : 13}
-                      fill={p.isRetrograde ? 'var(--accent-rose-light)' : '#FFFFFF'}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (onSelectPlacement) onSelectPlacement(p);
-                      }}
-                    >
-                      {p.name.slice(0, 2)}
-                      {p.isRetrograde ? '®' : ''} {p.degree}°
-                    </tspan>
-                  ))}
+                  {p.name.slice(0, 2)}{p.isRetrograde ? '®' : ''} {p.degree}°
                 </text>
-              )}
+              ))}
             </g>
           );
         })}

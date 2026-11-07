@@ -1,0 +1,47 @@
+# AstroNex SQL Connect Queries
+
+query GetUser($id: String!) @auth(level: USER) {
+  user(id: $id) {
+    id
+    email
+    name
+    phone
+    birthDate
+    birthTime
+    birthPlace
+    latitude
+    longitude
+    timezone
+    gender
+    astrologySystem
+    houseSystem
+    zodiacSystem
+    planTier
+    isPremium
+    avatarUrl
+    createdAt
+    lastLoginAt
+  }
+}
+
+query ListUserSessions($userId: String!) @auth(level: USER) {
+  consultationSessions(where: { userId: { eq: $userId } }, orderBy: [{ updatedAt: DESC }]) {
+    id
+    specialistId
+    specialistName
+    startedAt
+    updatedAt
+  }
+}
+
+query GetSessionMessages($sessionId: UUID!) @auth(level: USER) {
+  consultationMessages(where: { sessionId: { eq: $sessionId } }, orderBy: [{ createdAt: ASC }]) {
+    id
+    role
+    content
+    thinking
+    groundingQuery
+    createdAt
+  }
+}
+

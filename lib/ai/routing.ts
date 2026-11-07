@@ -169,3 +169,22 @@ export function classifyIntent(query: string, useAstrologyContext = true): AIInt
 
   return 'GENERAL_CHAT';
 }
+
+export async function generateAstrologyResponse(
+  query: string,
+  context?: {
+    userName?: string;
+    birthDate?: string;
+    birthTime?: string;
+    birthPlace?: string;
+    chart?: any;
+  }
+): Promise<string> {
+  const { geminiAI } = await import('./gemini-intelligence');
+  const result = await geminiAI.generateAstrologicalCounsel({
+    prompt: query,
+    natalChart: context?.chart,
+  });
+  return result.content;
+}
+

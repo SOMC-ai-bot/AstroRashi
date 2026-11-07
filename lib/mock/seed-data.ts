@@ -26,6 +26,27 @@ export const INITIAL_USER: UserProfile = {
   createdAt: '2024-01-15T10:00:00Z',
 };
 
+export const INITIAL_GUEST_USER: UserProfile = {
+  id: '',
+  name: 'Guest Traveler',
+  email: '',
+  avatarUrl: undefined,
+  birthDate: '',
+  birthTime: '',
+  birthPlace: '',
+  latitude: 28.6139,
+  longitude: 77.209,
+  timezone: 'Asia/Kolkata',
+  gender: undefined,
+  astrologySystem: 'vedic',
+  zodiacSystem: 'sidereal',
+  houseSystem: 'whole-sign',
+  preferredLanguage: 'en',
+  isPremium: false,
+  planTier: 'free',
+  createdAt: new Date().toISOString(),
+};
+
 export const SAMPLE_COMMUNITY_POSTS: CommunityPost[] = [
   {
     id: 'post_1',

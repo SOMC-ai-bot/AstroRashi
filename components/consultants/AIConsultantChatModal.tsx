@@ -305,6 +305,36 @@ export const AIConsultantChatModal: React.FC = () => {
           </div>
         </div>
 
+        
+        {isExpired && (
+          <div
+            style={{
+              padding: '12px 20px',
+              backgroundColor: 'rgba(239, 68, 68, 0.15)',
+              borderBottom: '1px solid rgba(239, 68, 68, 0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '12px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#F87171', fontSize: '13px', fontWeight: 600 }}>
+              <Lock size={16} />
+              <span>Free 20-minute consultation has ended. Unlock unlimited access with Premium!</span>
+            </div>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => {
+                setOpenSpecialistModal(false);
+                openUpgradeModal('Unlimited Astrologer Consultations');
+              }}
+            >
+              Upgrade to Premium (₹89)
+            </Button>
+          </div>
+        )}
+
         {/* 2. Google Grounding Info Bar */}
         <div
           style={{

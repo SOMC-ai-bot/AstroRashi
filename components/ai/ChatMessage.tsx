@@ -21,6 +21,7 @@ import {
 interface ChatMessageProps {
   message: AIMessage;
   isLast?: boolean;
+  isStreaming?: boolean;
   onRegenerate?: () => void;
   onRate?: (feedback: 'like' | 'dislike') => void;
   onToggleSave?: () => void;

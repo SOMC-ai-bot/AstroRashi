@@ -82,33 +82,32 @@ export const LearnHub: React.FC = () => {
   <div>
     <h2>📖 Deep-Dive Study Notes & Chapter Breakdown</h2>
     ${article.content
-      .map(
-        (p) => `
+        .map(
+          (p) => `
       <div class="note-card">
         <p>${p.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br/>')}</p>
       </div>
     `
-      )
-      .join('')}
+        )
+        .join('')}
   </div>
-  ${
-    article.faqs && article.faqs.length > 0
-      ? `
+  ${article.faqs && article.faqs.length > 0
+        ? `
   <div>
     <h2>❓ Frequently Asked Questions & Classical Clarifications</h2>
     ${article.faqs
-      .map(
-        (f) => `
+          .map(
+            (f) => `
       <div class="faq-box">
         <strong>Q: ${f.question}</strong>
         <p style="margin-top: 6px; color: #CBD5E1;">A: ${f.answer}</p>
       </div>
     `
-      )
-      .join('')}
+          )
+          .join('')}
   </div>`
-      : ''
-  }
+        : ''
+      }
   <div class="outro-box">
     <h3>🎯 Executive Outro & Practical Synthesis</h3>
     <p>Understanding these cosmic archetypes empowers you to perceive your psychological blueprints with conscious, spiritual agency. For chart-specific verification, consult our AstroNex specialists.</p>

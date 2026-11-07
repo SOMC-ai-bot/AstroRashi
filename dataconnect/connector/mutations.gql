@@ -1,0 +1,76 @@
+# AstroNex SQL Connect Mutations
+
+mutation UpsertUser(
+  $id: String!
+  $email: String!
+  $name: String!
+  $phone: String
+  $birthDate: String!
+  $birthTime: String!
+  $birthPlace: String!
+  $latitude: Float
+  $longitude: Float
+  $timezone: String
+  $gender: String
+  $astrologySystem: String
+  $houseSystem: String
+  $zodiacSystem: String
+  $planTier: String
+  $isPremium: Boolean
+  $avatarUrl: String
+) @auth(level: USER) {
+  user_upsert(
+    data: {
+      id: $id
+      email: $email
+      name: $name
+      phone: $phone
+      birthDate: $birthDate
+      birthTime: $birthTime
+      birthPlace: $birthPlace
+      latitude: $latitude
+      longitude: $longitude
+      timezone: $timezone
+      gender: $gender
+      astrologySystem: $astrologySystem
+      houseSystem: $houseSystem
+      zodiacSystem: $zodiacSystem
+      planTier: $planTier
+      isPremium: $isPremium
+      avatarUrl: $avatarUrl
+    }
+  )
+}
+
+mutation CreateConsultationSession(
+  $userId: String!
+  $specialistId: String!
+  $specialistName: String!
+) @auth(level: USER) {
+  consultationSession_insert(
+    data: {
+      userId: $userId
+      specialistId: $specialistId
+      specialistName: $specialistName
+    }
+  )
+}
+
+mutation AddConsultationMessage(
+  $sessionId: UUID!
+  $role: String!
+  $content: String!
+  $thinking: String
+  $groundingQuery: String
+) @auth(level: USER) {
+  consultationMessage_insert(
+    data: {
+      sessionId: $sessionId
+      role: $role
+      content: $content
+      thinking: $thinking
+      groundingQuery: $groundingQuery
+    }
+  )
+}
+

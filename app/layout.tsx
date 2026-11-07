@@ -7,6 +7,7 @@ import { AstrologyProvider } from '@/lib/state/astrology-context';
 import { ChatProvider } from '@/lib/state/chat-context';
 import { ConsultantProvider } from '@/lib/state/consultant-context';
 import { CommunityProvider } from '@/lib/state/community-context';
+import { CookieConsentBanner } from '@/components/company/CookieConsentBanner';
 
 export const viewport = {
   width: 'device-width',
@@ -17,9 +18,9 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'AstroNex — Cosmic Intelligence & Self-Discovery',
+  title: 'AstroRashi — Modern Vedic Astrology & Cosmic Intelligence',
   description:
-    'AstroNex is a premium AI-powered personal assistant, authentic astronomical natal chart platform, astrologer consultation marketplace, and cosmic community.',
+    'AstroRashi is an ultra-modern AI-powered Vedic astrology platform, authentic Lagna chart suite, Kundli matching engine, and Panchang calendar.',
   keywords: [
     'astrology',
     'natal chart',
@@ -48,7 +49,10 @@ export default function RootLayout({
               <AstrologyProvider>
                 <ChatProvider>
                   <ConsultantProvider>
-                    <CommunityProvider>{children}</CommunityProvider>
+                    <CommunityProvider>
+                    {children}
+                    <CookieConsentBanner />
+                  </CommunityProvider>
                   </ConsultantProvider>
                 </ChatProvider>
               </AstrologyProvider>

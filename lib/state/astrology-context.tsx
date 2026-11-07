@@ -34,7 +34,9 @@ interface AstrologyContextType {
   // Multi-profile state & actions
   activeProfile: UserFamilyProfile;
   familyProfiles: UserFamilyProfile[];
+  profiles: UserFamilyProfile[];
   switchActiveProfile: (profileId: string) => void;
+  setActiveProfile: (profile: UserFamilyProfile | string) => void;
   saveProfile: (profile: UserFamilyProfile) => void;
   deleteProfile: (profileId: string) => void;
 }
@@ -42,28 +44,35 @@ interface AstrologyContextType {
 const AstrologyContext = createContext<AstrologyContextType | null>(null);
 
 export function AstrologyProvider({ children }: { children: React.ReactNode }) {
-  const { user, setAstrologySettings } = useAuth();
+  const { user, setAstrologySettings, updateUserProfile } = useAuth();
   const [selectedPlacement, setSelectedPlacement] = useState<PlanetPosition | null>(null);
 
   // Multi-profile state
   const [familyProfiles, setFamilyProfiles] = useState<UserFamilyProfile[]>([INITIAL_DEFAULT_PROFILE]);
   const [activeProfileId, setActiveProfileId] = useState<string>(INITIAL_DEFAULT_PROFILE.id);
 
-  // Load profiles on mount
+  // Load profiles on mount and whenever active user changes
   useEffect(() => {
-    const list = getSavedFamilyProfiles();
+    const list = getSavedFamilyProfiles(user.id, user);
     setFamilyProfiles(list);
     const def = list.find((p) => p.isDefault) || list[0];
-    if (def) setActiveProfileId(def.id);
-  }, []);
+    if (def) {
+      setActiveProfileId((prev) => {
+        if (!prev || prev === 'profile_primary_me' || prev.startsWith('profile_primary_')) {
+          return def.id;
+        }
+        return prev;
+      });
+    }
+  }, [user.id, user.name, user.birthDate, user.birthTime, user.birthPlace, user.latitude, user.longitude, user.gender, user.avatarUrl]);
 
   const activeProfile = useMemo(() => {
     return familyProfiles.find((p) => p.id === activeProfileId) || familyProfiles[0] || INITIAL_DEFAULT_PROFILE;
   }, [familyProfiles, activeProfileId]);
 
-  const system = activeProfile.astrologySystem || user.astrologySystem || 'vedic';
-  const zodiac = system === 'vedic' ? 'sidereal' : activeProfile.zodiacSystem || user.zodiacSystem || 'tropical';
-  const houseSystem = system === 'vedic' ? 'whole-sign' : activeProfile.houseSystem || user.houseSystem || 'placidus';
+  const [system, setSystemState] = useState<AstrologySystem>('vedic');
+  const zodiac: ZodiacSystem = system === 'vedic' ? 'sidereal' : 'tropical';
+  const houseSystem: HouseSystem = system === 'vedic' ? 'whole-sign' : 'placidus';
 
   const natalChart = useMemo(() => {
     return generateFullNatalChart(
@@ -94,8 +103,9 @@ export function AstrologyProvider({ children }: { children: React.ReactNode }) {
   }, [natalChart]);
 
   const setSystem = (newSystem: AstrologySystem) => {
+    setSystemState(newSystem);
     const newZodiac: ZodiacSystem = newSystem === 'vedic' ? 'sidereal' : 'tropical';
-    const newHouseSystem: HouseSystem = newSystem === 'vedic' ? 'whole-sign' : user.houseSystem;
+    const newHouseSystem: HouseSystem = newSystem === 'vedic' ? 'whole-sign' : 'placidus';
     setAstrologySettings(newSystem, newZodiac, newHouseSystem);
   };
 
@@ -107,19 +117,40 @@ export function AstrologyProvider({ children }: { children: React.ReactNode }) {
     const found = familyProfiles.find((p) => p.id === profileId);
     if (found) {
       setActiveProfileId(profileId);
+      // Synchronize active profile with user profile so personal details and avatar lock together per profile
+      // Note: We don't overwrite email and phone with stale closures
+      updateUserProfile({
+        name: found.name,
+        birthDate: found.birthDate,
+        birthTime: found.birthTime,
+        birthPlace: found.birthPlace,
+        latitude: found.latitude,
+        longitude: found.longitude,
+        timezone: found.timezone,
+        gender: found.gender,
+        avatarUrl: found.avatarUrl,
+      });
     }
   };
 
   const handleSaveProfile = (profile: UserFamilyProfile) => {
-    const updated = saveFamilyProfile(profile);
+    const updated = saveFamilyProfile(profile, user.id);
     setFamilyProfiles(updated);
   };
 
   const handleDeleteProfile = (profileId: string) => {
-    const updated = deleteFamilyProfile(profileId);
+    const updated = deleteFamilyProfile(profileId, user.id);
     setFamilyProfiles(updated);
     if (activeProfileId === profileId) {
       setActiveProfileId(updated[0]?.id || INITIAL_DEFAULT_PROFILE.id);
+    }
+  };
+
+  const setActiveProfile = (profile: UserFamilyProfile | string) => {
+    if (typeof profile === 'string') {
+      switchActiveProfile(profile);
+    } else if (profile && profile.id) {
+      switchActiveProfile(profile.id);
     }
   };
 
@@ -137,7 +168,9 @@ export function AstrologyProvider({ children }: { children: React.ReactNode }) {
         setHouseSystem,
         activeProfile,
         familyProfiles,
+        profiles: familyProfiles,
         switchActiveProfile,
+        setActiveProfile,
         saveProfile: handleSaveProfile,
         deleteProfile: handleDeleteProfile,
       }}

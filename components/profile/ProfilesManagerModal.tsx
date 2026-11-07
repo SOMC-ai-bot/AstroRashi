@@ -403,10 +403,15 @@ export const ProfilesManagerModal: React.FC<ProfilesManagerModalProps> = ({ isOp
                           <Edit2 size={14} />
                         </button>
 
-                        {familyProfiles.length > 1 && !p.isDefault && (
+                        {familyProfiles.length > 1 && (
                           <button
-                            onClick={() => deleteProfile(p.id)}
-                            style={{ background: 'none', border: 'none', color: 'var(--accent-rose-light)', cursor: 'pointer', padding: '6px' }}
+                            onClick={() => {
+                              if (confirm(`Are you sure you want to delete profile "${p.name}"?`)) {
+                                deleteProfile(p.id);
+                              }
+                            }}
+                            title="Delete profile"
+                            style={{ background: 'none', border: 'none', color: '#EF4444', cursor: 'pointer', padding: '6px' }}
                           >
                             <Trash2 size={14} />
                           </button>

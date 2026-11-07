@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AstroNex</string>
+    <string name="title_activity_main">AstroNex</string>
+    <string name="package_name">com.astronex.app</string>
+    <string name="custom_url_scheme">com.astronex.app</string>
+</resources>

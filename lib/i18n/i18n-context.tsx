@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { LanguageCode } from '@/types';
 import { TRANSLATIONS, TranslationDictionary } from './dictionary';
+import { runWebsiteAutoTranslate } from './auto-translator';
 
 interface I18nContextType {
   language: LanguageCode;
@@ -18,8 +19,10 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const saved = localStorage.getItem('astronex_language') as LanguageCode;
-      if (saved && TRANSLATIONS[saved]) {
+      if (saved) {
         setLanguageState(saved);
+        // Automatically trigger live translation
+        runWebsiteAutoTranslate(saved);
       }
     } catch (e) {
       console.error(e);
@@ -33,6 +36,8 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {
       console.error(e);
     }
+    // Automatically translate full website DOM tree using dictionaries and Google Translate fallback
+    runWebsiteAutoTranslate(lang);
   };
 
   const t = TRANSLATIONS[language] || TRANSLATIONS.en;

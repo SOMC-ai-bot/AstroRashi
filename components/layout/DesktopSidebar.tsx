@@ -6,6 +6,8 @@ import { useAuth } from '@/lib/state/auth-context';
 import { useAstrology } from '@/lib/state/astrology-context';
 import { useI18n } from '@/lib/i18n/i18n-context';
 import {
+  Home,
+  LayoutDashboard,
   Compass,
   PieChart,
   Bot,
@@ -31,7 +33,7 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
   onTabChange,
   onOpenPremium,
 }) => {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { natalChart, activeProfile } = useAstrology();
   const { t } = useI18n();
 
@@ -40,20 +42,25 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
   const asc = natalChart.ascendant;
 
   const mainNavItems: { tab: NavTab; label: string; icon: React.ReactNode; badge?: string }[] = [
-    { tab: 'discover', label: t.nav.discover, icon: <Compass size={18} /> },
-    { tab: 'charts', label: t.nav.charts, icon: <PieChart size={18} /> },
+    { tab: 'home', label: 'Home', icon: <Home size={18} /> },
+    {
+      tab: 'dashboard',
+      label: 'My Dashboard',
+      icon: <LayoutDashboard size={18} />,
+      badge: isAuthenticated ? 'Active' : undefined,
+    },
+    { tab: 'matching', label: 'Kundli Matching', icon: <PieChart size={18} /> },
     { tab: 'tools', label: 'All Calculators (33+)', icon: <Calculator size={18} />, badge: '33+' },
-    { tab: 'reports', label: 'Certified Reports', icon: <FileText size={18} />, badge: '10' },
-    { tab: 'learn', label: 'Learn Astrology', icon: <BookOpen size={18} /> },
+    // Certified Reports is conditionally added only when isAuthenticated
   ];
 
   const expertNavItems: { tab: NavTab; label: string; icon: React.ReactNode; badge?: string }[] = [
     { tab: 'consultants', label: 'Expert Astrologers', icon: <Sparkles size={18} />, badge: 'Verified' },
-    { tab: 'ai', label: 'Chat with Expert Astrologers', icon: <Bot size={18} /> },
+    { tab: 'ai', label: 'AstroRashi AI Chat', icon: <Bot size={18} /> },
   ];
 
   const secondaryNavItems: { tab: NavTab; label: string; icon: React.ReactNode; badge?: string }[] = [
-    { tab: 'subscription', label: 'Subscription & Plans', icon: <Crown size={18} />, badge: user.isPremium ? 'PRO' : 'Upgrade' },
+    { tab: 'subscription', label: isAuthenticated ? 'My Plans' : 'Subscriptions', icon: <Crown size={18} />, badge: user.isPremium ? 'PRO' : 'Upgrade' },
     { tab: 'profile', label: 'My Profiles & Settings', icon: <User size={18} /> },
   ];
 
@@ -82,7 +89,7 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
       <div>
         {/* Brand Header */}
         <div
-          onClick={() => onTabChange('discover')}
+          onClick={() => onTabChange(isAuthenticated ? 'dashboard' : 'home')}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -149,7 +156,7 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             {mainNavItems.map((item) => {
-              const isActive = activeTab === item.tab;
+              const isActive = activeTab === item.tab || (item.tab === 'home' && activeTab === 'discover');
               return (
                 <button
                   key={item.tab}
