@@ -29,7 +29,7 @@ export function formatFirebaseAuthError(error: any): string {
     case 'auth/invalid-email':
       return 'The email address provided is not valid.';
     case 'auth/operation-not-allowed':
-      return 'Email/password sign in is not enabled in your Firebase console.';
+      return 'Email link (passwordless sign-in) is not enabled in Firebase Console. Click Email/Password in your Sign-in providers and enable the "Email link (passwordless sign-in)" toggle, then Save.';
     case 'auth/weak-password':
       return 'The chosen password is too weak. Please use at least 6 characters.';
     case 'auth/user-disabled':
@@ -40,6 +40,8 @@ export function formatFirebaseAuthError(error: any): string {
       return 'Invalid email or password. Please verify your credentials.';
     case 'auth/configuration-not-found':
       return 'Firebase Authentication is not yet enabled in your Firebase Console (astronex-e7413). Go to console.firebase.google.com -> Authentication -> Sign-in method to enable Email/Password & Google.';
+    case 'auth/unauthorized-domain':
+      return 'This domain or port (e.g., localhost) is not authorized in Firebase Console. Please add it to Authentication -> Settings -> Authorized domains in your Firebase Console.';
     case 'auth/popup-closed-by-user':
       return 'Sign-in popup was closed before completing verification.';
     case 'auth/cancelled-popup-request':
