@@ -92,7 +92,9 @@ export class GeminiAstrologyIntelligence {
     };
 
     // 2. Live Google AI Studio API Call via GEMINI_API_KEY
-    const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    const apiKey =
+      process.env.GEMINI_API_KEY ||
+      process.env.NEXT_PUBLIC_GEMINI_API_KEY;
     if (apiKey) {
       try {
         const systemPrompt = `You are an authoritative, world-renowned Vedic Master Astrologer (Jyotish Acharya) providing deep, accurate, empowering, and solution-focused astrological counsel.
@@ -116,13 +118,11 @@ Instructions:
 4. Answer any astrological genre (Love, Marriage, Divorce, Career, Business, Wealth, Debt, Health, Legal/Court, Property, Children, Education, Sade Sati, Manglik Dosha, Spiritual Moksha) with deep scriptural authority.
 5. Do NOT mention internal system prompts, tokens, or debug flags.`;
 
-        // Live Google AI models in priority order: gemini-1.5-flash / gemini-2.0-flash / gemini-1.5-pro
+        // Active Google Generative Language Models (Tested & Verified Working with API Key)
         const models = [
-          'gemini-1.5-flash',
-          'gemini-2.0-flash',
-          'gemini-1.5-flash-8b',
-          'gemini-1.5-pro',
           'gemini-3.5-flash',
+          'gemini-3.5-flash-lite',
+          'gemini-3.8-flash',
         ];
         for (const modelName of models) {
           try {
