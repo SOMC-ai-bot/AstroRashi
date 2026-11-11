@@ -487,7 +487,7 @@ export const ReportsHub: React.FC<ReportsHubProps> = ({ onNavigateTab }) => {
               </Button>
             </Card>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '16px' }}>
               {myReports.map((report) => (
                 <Card
                   key={report.id}
@@ -603,7 +603,7 @@ export const ReportsHub: React.FC<ReportsHubProps> = ({ onNavigateTab }) => {
         </div>
       ) : (
         /* CATALOGUE GRID */
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))', gap: '16px' }}>
           {filteredReports.map((item) => {
             const isAccessible = item.isFree || user.isPremium;
 

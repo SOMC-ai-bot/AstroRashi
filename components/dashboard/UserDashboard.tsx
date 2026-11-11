@@ -119,7 +119,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1.65fr) minmax(320px, 1fr)',
+          gridTemplateColumns: 'minmax(0, 1.65fr) minmax(0, 1fr)',
           gap: '24px',
           alignItems: 'start',
           width: '100%',
@@ -272,7 +272,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '14px' }}>
               {[
                 {
                   id: 'vedic-master',
@@ -694,7 +694,7 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
             )}
 
             {/* All Remaining Reports from Astrological Reports Catalogue */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px' }} className="reports-subgrid">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '12px' }} className="reports-subgrid">
               {REPORT_CATALOGUE.slice(1).map((rep) => (
                 <div
                   key={rep.type}
@@ -878,10 +878,12 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
       <style jsx>{`
         @media (max-width: 900px) {
           .dashboard-main-grid {
-            grid-template-columns: 1fr !important;
+            grid-template-columns: 100% !important;
+            min-width: 0 !important;
+            width: 100% !important;
           }
           .reports-subgrid {
-            grid-template-columns: repeat(2, 1fr) !important;
+            grid-template-columns: 1fr !important;
           }
         }
         @media (max-width: 600px) {

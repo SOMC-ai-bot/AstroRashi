@@ -589,7 +589,7 @@ export const PanchangCalendarScreen: React.FC<PanchangCalendarScreenProps> = ({
                 }}
               >
                 {/* Day Header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '2px' }}>
                   <span
                     style={{
                       fontSize: '13px',
@@ -600,7 +600,7 @@ export const PanchangCalendarScreen: React.FC<PanchangCalendarScreenProps> = ({
                     {cell.dayNumber}
                   </span>
                   {cell.timing && (
-                    <span style={{ fontSize: '10px', color: '#64748B', fontFamily: 'monospace' }}>
+                    <span className="panchang-cell-time" style={{ fontSize: '10px', color: '#64748B', fontFamily: 'monospace' }}>
                       {cell.timing}
                     </span>
                   )}
@@ -744,15 +744,18 @@ export const PanchangCalendarScreen: React.FC<PanchangCalendarScreenProps> = ({
             gap: 4px !important;
           }
           .panchang-calendar-grid :global(> div) {
-            min-height: 58px !important;
-            padding: 4px 4px !important;
+            min-height: 54px !important;
+            padding: 4px 3px !important;
             border-radius: 8px !important;
+          }
+          .panchang-calendar-grid :global(.panchang-cell-time) {
+            display: none !important;
           }
           .panchang-calendar-grid :global(.panchang-cell-tithi),
           .panchang-calendar-grid :global(.panchang-cell-nakshatra),
           .panchang-calendar-grid :global(.panchang-cell-tag) {
             font-size: 8px !important;
-            line-height: 1.1 !important;
+            line-height: 1.15 !important;
           }
         }
       `}</style>
