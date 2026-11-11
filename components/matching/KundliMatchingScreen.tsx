@@ -56,61 +56,31 @@ export const KundliMatchingScreen: React.FC<KundliMatchingScreenProps> = ({
   const [deleteConfirmA, setDeleteConfirmA] = useState(false);
   const [deleteConfirmB, setDeleteConfirmB] = useState(false);
 
-  // Partner 1 (Groom) Form State - Initialized safely & persisted
-  const [selectedAId, setSelectedAId] = useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('astronex_kundli_groom_id');
-      if (saved) return saved;
-    }
-    return baseGroomProfiles[0]?.id || activeProfile?.id || '';
-  });
+  // Partner 1 (Groom) Form State - Initialized empty for user to enter
+  const [selectedAId, setSelectedAId] = useState<string>('');
 
-  const [partnerA, setPartnerA] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('astronex_kundli_groom_input');
-        if (saved) return JSON.parse(saved);
-      } catch (e) {}
-    }
-    const def = baseGroomProfiles[0] || activeProfile;
-    return {
-      name: def?.name || '',
-      gender: 'male' as const,
-      birthDate: def?.birthDate || '',
-      birthTime: def?.birthTime || '',
-      birthPlace: def?.birthPlace || '',
-      latitude: def?.latitude || 28.6139,
-      longitude: def?.longitude || 77.2090,
-    };
-  });
+  const [partnerA, setPartnerA] = useState(() => ({
+    name: '',
+    gender: 'male' as const,
+    birthDate: '',
+    birthTime: '',
+    birthPlace: '',
+    latitude: 28.6139,
+    longitude: 77.2090,
+  }));
 
-  // Partner 2 (Bride) Form State - Initialized safely & persisted
-  const [selectedBId, setSelectedBId] = useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('astronex_kundli_bride_id');
-      if (saved) return saved;
-    }
-    return baseBrideProfiles[0]?.id || '';
-  });
+  // Partner 2 (Bride) Form State - Initialized empty for user to enter
+  const [selectedBId, setSelectedBId] = useState<string>('');
 
-  const [partnerB, setPartnerB] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('astronex_kundli_bride_input');
-        if (saved) return JSON.parse(saved);
-      } catch (e) {}
-    }
-    const def = baseBrideProfiles[0];
-    return {
-      name: def?.name || '',
-      gender: 'female' as const,
-      birthDate: def?.birthDate || '',
-      birthTime: def?.birthTime || '',
-      birthPlace: def?.birthPlace || '',
-      latitude: def?.latitude || 25.3176,
-      longitude: def?.longitude || 82.9739,
-    };
-  });
+  const [partnerB, setPartnerB] = useState(() => ({
+    name: '',
+    gender: 'female' as const,
+    birthDate: '',
+    birthTime: '',
+    birthPlace: '',
+    latitude: 25.3176,
+    longitude: 82.9739,
+  }));
 
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
@@ -318,17 +288,20 @@ export const KundliMatchingScreen: React.FC<KundliMatchingScreenProps> = ({
   const moonLonA = moonA ? signs.indexOf(moonA.sign) * 30 + (moonA.degree || 15) : 45;
   const moonLonB = moonB ? signs.indexOf(moonB.sign) * 30 + (moonB.degree || 15) : 135;
 
-  // Calculate Ashtakoot Guna Milan
+  // Calculate Ashtakoot Guna Milan ONLY when both partners have valid names and birth dates
   const matchResult = useMemo(() => {
+    if (!partnerA.name.trim() || !partnerA.birthDate || !partnerB.name.trim() || !partnerB.birthDate) {
+      return null;
+    }
     return calculateAshtakootMatching(
       moonLonA,
       moonLonB,
-      partnerA.name || 'Partner 1',
-      partnerB.name || 'Partner 2',
+      partnerA.name,
+      partnerB.name,
       isManglikA,
       isManglikB
     );
-  }, [moonLonA, moonLonB, partnerA.name, partnerB.name, isManglikA, isManglikB]);
+  }, [moonLonA, moonLonB, partnerA.name, partnerA.birthDate, partnerB.name, partnerB.birthDate, isManglikA, isManglikB]);
 
   const handleDownloadReport = () => {
     if (!matchResult) return;
@@ -611,7 +584,7 @@ export const KundliMatchingScreen: React.FC<KundliMatchingScreenProps> = ({
                 cursor: 'pointer',
               }}
             >
-              <option value="custom">✍️ Custom Manual Entry (Direct Edit)</option>
+              <option value="">Select a saved profile (optional)</option>
               {groomProfiles.map((p) => (
                 <option key={p.id} value={p.id}>
                   👤 {p.name} {p.birthDate ? `(${p.birthDate})` : ''} {p.birthPlace ? `- ${p.birthPlace}` : ''}
@@ -861,7 +834,7 @@ export const KundliMatchingScreen: React.FC<KundliMatchingScreenProps> = ({
                 cursor: 'pointer',
               }}
             >
-              <option value="custom">✍️ Custom Manual Entry (Direct Edit)</option>
+              <option value="">Select a saved profile (optional)</option>
               {brideProfiles.map((p) => (
                 <option key={p.id} value={p.id}>
                   👤 {p.name} {p.birthDate ? `(${p.birthDate})` : ''} {p.birthPlace ? `- ${p.birthPlace}` : ''}
@@ -980,6 +953,44 @@ export const KundliMatchingScreen: React.FC<KundliMatchingScreenProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Empty State before details are entered */}
+      {!matchResult && (
+        <div
+          style={{
+            backgroundColor: '#131418',
+            borderRadius: '20px',
+            border: '1.5px dashed rgba(255, 255, 255, 0.12)',
+            padding: '40px 24px',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '12px',
+          }}
+        >
+          <div
+            style={{
+              width: '54px',
+              height: '54px',
+              borderRadius: '50%',
+              backgroundColor: 'rgba(255, 106, 0, 0.1)',
+              border: '1px solid rgba(255, 106, 0, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Heart size={26} color="#FF6A00" />
+          </div>
+          <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#FFFFFF', margin: 0 }}>
+            Enter Groom & Bride Details to Match Kundlis
+          </h3>
+          <p style={{ fontSize: '13px', color: '#94A3B8', margin: 0, maxWidth: '440px', lineHeight: 1.5 }}>
+            Fill in the names, dates of birth, birth times, and birthplaces for both partners above to generate the authentic 36-Guna Ashtakoot compatibility analysis.
+          </p>
+        </div>
+      )}
 
       {/* Main Results Dashboard */}
       {matchResult && (

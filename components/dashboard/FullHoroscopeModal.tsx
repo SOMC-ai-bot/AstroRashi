@@ -38,7 +38,20 @@ export const FullHoroscopeModal: React.FC<FullHoroscopeModalProps> = ({
 
   return (
     <div
-      style={{ position: 'fixed', inset: 0, zIndex: 9999, backgroundColor: '#070913', display: 'flex', flexDirection: 'column', width: '100vw', height: '100vh', overflowY: 'auto' }}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 9999,
+        backgroundColor: 'rgba(5, 6, 8, 0.92)',
+        backdropFilter: 'blur(16px)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px',
+        overflowY: 'auto',
+        boxSizing: 'border-box',
+      }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -46,7 +59,8 @@ export const FullHoroscopeModal: React.FC<FullHoroscopeModalProps> = ({
       <div
         style={{
           width: '100%',
-          maxWidth: '100%', minHeight: '100vh',
+          maxWidth: '1040px',
+          maxHeight: '92vh',
           backgroundColor: '#0F1015',
           border: '1.5px solid rgba(249, 115, 22, 0.35)',
           borderRadius: '20px',

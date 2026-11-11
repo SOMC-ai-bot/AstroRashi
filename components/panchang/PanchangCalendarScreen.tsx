@@ -486,6 +486,7 @@ export const PanchangCalendarScreen: React.FC<PanchangCalendarScreenProps> = ({
 
         {/* 7 Days of Week Header */}
         <div
+          className="panchang-weekdays-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(7, 1fr)',
@@ -512,6 +513,7 @@ export const PanchangCalendarScreen: React.FC<PanchangCalendarScreenProps> = ({
 
         {/* Calendar Cells Grid */}
         <div
+          className="panchang-calendar-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(7, 1fr)',
@@ -606,10 +608,10 @@ export const PanchangCalendarScreen: React.FC<PanchangCalendarScreenProps> = ({
 
                 {/* Tithi & Nakshatra */}
                 <div style={{ margin: '4px 0' }}>
-                  <div style={{ fontSize: '10.5px', color: '#E2E8F0', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <div className="panchang-cell-tithi" style={{ fontSize: '10.5px', color: '#E2E8F0', fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {cell.tithi}
                   </div>
-                  <div style={{ fontSize: '9.5px', color: '#94A3B8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <div className="panchang-cell-nakshatra" style={{ fontSize: '9.5px', color: '#94A3B8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {cell.nakshatra}
                   </div>
                 </div>
@@ -617,6 +619,7 @@ export const PanchangCalendarScreen: React.FC<PanchangCalendarScreenProps> = ({
                 {/* Festival / Event Badge */}
                 {cell.tag && (
                   <div
+                    className="panchang-cell-tag"
                     style={{
                       fontSize: '9px',
                       fontWeight: 700,
@@ -734,6 +737,25 @@ export const PanchangCalendarScreen: React.FC<PanchangCalendarScreenProps> = ({
           </div>
         </div>
       )}
+
+      <style jsx>{`
+        @media (max-width: 640px) {
+          .panchang-calendar-grid {
+            gap: 4px !important;
+          }
+          .panchang-calendar-grid :global(> div) {
+            min-height: 58px !important;
+            padding: 4px 4px !important;
+            border-radius: 8px !important;
+          }
+          .panchang-calendar-grid :global(.panchang-cell-tithi),
+          .panchang-calendar-grid :global(.panchang-cell-nakshatra),
+          .panchang-calendar-grid :global(.panchang-cell-tag) {
+            font-size: 8px !important;
+            line-height: 1.1 !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

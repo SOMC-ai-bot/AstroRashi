@@ -657,26 +657,6 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ onNavigate
 
             <button
               type="button"
-              onClick={toggleVoiceRecording}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '32px',
-                height: '32px',
-                borderRadius: '50%',
-                background: isRecording ? '#41454D' : 'none',
-                border: 'none',
-                color: isRecording ? '#11A8EB' : '#A6A9AF',
-                cursor: 'pointer',
-                flexShrink: 0,
-              }}
-            >
-              {isRecording ? <MicOff size={16} /> : <Mic size={16} />}
-            </button>
-
-            <button
-              type="button"
               onClick={handleSend}
               disabled={!inputVal.trim() || isStreaming || isTimerExpired}
               style={{

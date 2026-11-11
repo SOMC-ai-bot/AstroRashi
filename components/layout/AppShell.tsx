@@ -146,6 +146,7 @@ export const AppShell: React.FC = () => {
               onNavigateTab={(tab) => handleTabChange(tab as NavTab)}
               onAskAI={handleAskAI}
               onOpenCoinsModal={() => setIsPricingOpen(true)}
+              onOpenPricing={() => setIsPricingOpen(true)}
               onAddProfile={() => handleTabChange('profile')}
             />
           )}

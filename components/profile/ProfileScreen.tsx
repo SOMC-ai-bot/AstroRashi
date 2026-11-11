@@ -36,15 +36,6 @@ interface ProfileScreenProps {
   onOpenAuth?: () => void;
 }
 
-const COSMIC_AVATARS = [
-  { id: 'mystic', name: 'Mystic Sage', url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200' },
-  { id: 'celestial', name: 'Celestial Empress', url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200' },
-  { id: 'stargazer', name: 'Stargazer Explorer', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200' },
-  { id: 'solar', name: 'Solar Adept', url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200' },
-  { id: 'lunar', name: 'Lunar Priestess', url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200' },
-  { id: 'rishi', name: 'Vedic Scholar', url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200' },
-];
-
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   onOpenPremium,
   onOpenManageSubscription,
@@ -80,7 +71,6 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     if (user.timezone) setTimezone(user.timezone);
   }, [user.name, user.email, user.phone, user.gender, user.birthDate, user.birthTime, user.birthPlace, user.latitude, user.longitude, user.timezone]);
   const [savedSuccess, setSavedSuccess] = useState(false);
-  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -105,11 +95,6 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       }
     };
     reader.readAsDataURL(file);
-  };
-
-  const handleSelectAvatar = (url: string) => {
-    updateUserProfile({ avatarUrl: url });
-    setShowAvatarPicker(false);
   };
 
   const handleSave = (e: React.FormEvent) => {
@@ -278,27 +263,6 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
               <button
                 type="button"
-                onClick={() => setShowAvatarPicker(!showAvatarPicker)}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'var(--gold-primary)',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '6px 12px',
-                }}
-              >
-                <Sparkles size={13} />
-                <span>Cosmic Avatars</span>
-              </button>
-
-              <button
-                type="button"
                 onClick={onOpenPremium}
                 style={{
                   background: 'none',
@@ -318,51 +282,6 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             </div>
           </div>
         </div>
-
-        {/* Avatar Preset Customization Drawer */}
-        {showAvatarPicker && (
-          <div
-            style={{
-              marginTop: '18px',
-              paddingTop: '16px',
-              borderTop: '1px solid var(--border-subtle)',
-            }}
-          >
-            <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginBottom: '12px', fontWeight: 600 }}>
-              Choose a Cosmic Persona:
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: '10px' }}>
-              {COSMIC_AVATARS.map((av) => (
-                <button
-                  key={av.id}
-                  type="button"
-                  onClick={() => handleSelectAvatar(av.url)}
-                  style={{
-                    background: user.avatarUrl === av.url ? 'rgba(255, 106, 0, 0.2)' : 'rgba(255, 255, 255, 0.04)',
-                    border: user.avatarUrl === av.url ? '2px solid var(--theme-orange-primary)' : '1px solid var(--border-subtle)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '8px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '6px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={av.url}
-                    alt={av.name}
-                    style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover' }}
-                  />
-                  <span style={{ fontSize: '11px', color: '#FFFFFF', textAlign: 'center', fontWeight: 500 }}>
-                    {av.name}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </Card>
 
       {/* 3. Edit Birth Details Form */}

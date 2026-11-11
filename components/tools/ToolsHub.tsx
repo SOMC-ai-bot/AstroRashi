@@ -1373,7 +1373,7 @@ export const ToolsHub: React.FC<ToolsHubProps> = ({ onAskAI, onNavigateTab }) =>
     }
     setActiveToolId(toolId);
     setModalInitialTab(initialTab);
-    executeCalculation(toolId);
+    setActiveResult(null); // Clear previous results so calculation is fresh
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }

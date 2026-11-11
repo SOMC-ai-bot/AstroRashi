@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/lib/state/auth-context';
 import { useChat } from '@/lib/state/chat-context';
+import { useSubscription } from '@/lib/state/subscription-context';
 import { REPORT_CATALOGUE } from '@/components/reports/ReportsHub';
 import { useAstrology } from '@/lib/state/astrology-context';
 import { useI18n } from '@/lib/i18n/i18n-context';
@@ -38,6 +39,7 @@ interface UserDashboardProps {
   onAskAI: (prompt: string) => void;
   onSelectReport?: (reportType: ReportType) => void;
   onOpenCoinsModal?: () => void;
+  onOpenPricing?: () => void;
   onAddProfile?: () => void;
 }
 
@@ -61,12 +63,14 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
   onAskAI,
   onSelectReport,
   onOpenCoinsModal,
+  onOpenPricing,
   onAddProfile,
 }) => {
   const { user } = useAuth();
   const { natalChart, activeProfile, profiles = [], setActiveProfile } = useAstrology();
   const { t } = useI18n();
   const { setSelectedAstrologerMode } = useChat();
+  const { openUpgradeModal } = useSubscription();
 
   const [promptText, setPromptText] = useState('');
   const [selectedHoroscopeSign, setSelectedHoroscopeSign] = useState('scorpio');
@@ -319,6 +323,15 @@ export const UserDashboard: React.FC<UserDashboardProps> = ({
                 <div
                   key={engine.id}
                   onClick={() => {
+                    const isFreeOrGuest = !user?.isPremium && user?.planTier !== 'premium';
+                    if (isFreeOrGuest && engine.id !== 'vedic-master') {
+                      if (onOpenPricing) {
+                        onOpenPricing();
+                      } else {
+                        openUpgradeModal('Unlock Specialized Niche Astrologers');
+                      }
+                      return;
+                    }
                     setSelectedAstrologerMode(engine.id);
                     onNavigateTab('ai');
                   }}

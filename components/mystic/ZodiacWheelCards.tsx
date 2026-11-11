@@ -492,7 +492,7 @@ The ultimate destination of Pisces is pure self-realization: navigating earthly 
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box' }}>
       {/* 1. Header Information */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
         <div>
@@ -514,6 +514,8 @@ The ultimate destination of Pisces is pure self-realization: navigating earthly 
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
           gap: '12px',
+          width: '100%',
+          maxWidth: '100%',
         }}
       >
         {signs.map((sign) => {
