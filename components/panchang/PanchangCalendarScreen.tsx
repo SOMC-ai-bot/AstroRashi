@@ -27,6 +27,7 @@ interface CalendarDay {
   nakshatra: string;
   timing: string;
   tag?: string;
+  tagType?: 'Festival' | 'Special Yogas' | 'Astrological';
   tagColor?: string;
   isCurrentMonth: boolean;
   isToday: boolean;
@@ -172,23 +173,29 @@ export const PanchangCalendarScreen: React.FC<PanchangCalendarScreenProps> = ({
 
       // Generic tag logic if no specific festival
       let tag = fest?.name;
+      let tagType: 'Festival' | 'Special Yogas' | 'Astrological' = (fest?.tag as any) || 'Festival';
       let tagColor = fest?.tagColor;
 
       if (!tag) {
         if (tithiName.toLowerCase().includes('ekadashi')) {
-          tag = 'Ekadashi';
+          tag = 'Ekadashi Vrat';
+          tagType = 'Festival';
           tagColor = '#EF4444';
         } else if (tithiName.toLowerCase().includes('purnima')) {
-          tag = 'Purnima';
+          tag = 'Purnima Yoga';
+          tagType = 'Special Yogas';
           tagColor = '#3B82F6';
         } else if (tithiName.toLowerCase().includes('amavasya')) {
-          tag = 'Amavasya';
+          tag = 'Amavasya Tithi';
+          tagType = 'Special Yogas';
           tagColor = '#64748B';
         } else if (day % 7 === 2) {
-          tag = 'Shadbala';
+          tag = 'Amrit Siddhi Yoga';
+          tagType = 'Special Yogas';
           tagColor = '#A855F7';
         } else if (day % 7 === 4) {
-          tag = 'Kundli Matching';
+          tag = 'Sarvartha Siddhi';
+          tagType = 'Special Yogas';
           tagColor = '#F59E0B';
         }
       }
@@ -217,6 +224,7 @@ export const PanchangCalendarScreen: React.FC<PanchangCalendarScreenProps> = ({
         nakshatra: nakshatraName,
         timing: timingStr,
         tag,
+        tagType,
         tagColor,
         isCurrentMonth: true,
         isToday,
@@ -542,8 +550,8 @@ export const PanchangCalendarScreen: React.FC<PanchangCalendarScreenProps> = ({
             const isSelected = selectedDay?.dayNumber === cell.dayNumber && selectedDay?.date.getMonth() === cell.date.getMonth();
             const shouldHighlight =
               activeCategory === 'All' ||
-              (activeCategory === 'Festivals' && cell.tag === 'Festival') ||
-              (activeCategory === 'Special Yogas' && cell.tag === 'Special Yogas');
+              (activeCategory === 'Festivals' && (cell.tagType === 'Festival' || cell.tag === 'Festival')) ||
+              (activeCategory === 'Special Yogas' && (cell.tagType === 'Special Yogas' || cell.tag === 'Special Yogas'));
 
             return (
               <div

@@ -122,7 +122,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ onNavigate
   const { user } = useAuth();
   const { openUpgradeModal } = useSubscription();
 
-  // 10-minute consultation session limit for free / non-logged-in users on AI Astrologer ONLY
+  // 15-minute consultation session limit for free / non-logged-in users on AI Astrologer ONLY
   // AFTER THAT NO ACCESS
   const isFreeOrGuest = !user.isPremium;
 
@@ -131,7 +131,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ onNavigate
       const stored = localStorage.getItem('astronex_free_consultation_secs');
       if (stored) return parseInt(stored, 10);
     }
-    return 600; // 10 minutes = 600 seconds
+    return 900; // 15 minutes = 900 seconds
   });
 
   const isTimerExpired = isFreeOrGuest && sessionSeconds <= 0;
@@ -493,7 +493,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ onNavigate
                   fontWeight: 700,
                   fontFamily: 'monospace',
                 }}
-                title="10 Minutes consultation session limit ONLY AFTER THAT NO ACCESS"
+                title="15 Minutes consultation session limit ONLY AFTER THAT NO ACCESS"
               >
                 <Clock size={12} />
                 <span>{isTimerExpired ? 'EXPIRED (00:00)' : formatTimer(sessionSeconds)}</span>
@@ -561,8 +561,8 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ onNavigate
           >
             <span>
               {isTimerExpired
-                ? '10 Minutes consultation session limit reached. ONLY AFTER THAT NO ACCESS. Upgrade to Premium to continue consulting.'
-                : `10 Minutes consultation session limit ONLY AFTER THAT NO ACCESS (${formatTimer(sessionSeconds)} remaining).`}
+                ? '15 Minutes consultation session limit reached. ONLY AFTER THAT NO ACCESS. Upgrade to Premium to continue consulting.'
+                : `15 Minutes consultation session limit ONLY AFTER THAT NO ACCESS (${formatTimer(sessionSeconds)} remaining).`}
             </span>
             <button
               type="button"

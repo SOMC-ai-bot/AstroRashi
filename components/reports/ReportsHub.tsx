@@ -368,7 +368,7 @@ export const ReportsHub: React.FC<ReportsHubProps> = ({ onNavigateTab }) => {
                 Full Astrological Dossiers are a Premium Feature
               </strong>
               <span style={{ fontSize: '12px', color: '#CBD5E1' }}>
-                10 Minutes consultation session limit ONLY AFTER THAT NO ACCESS. Upgrade to Premium to generate &amp; download all 10 certified PDF reports.
+                15 Minutes consultation session limit ONLY AFTER THAT NO ACCESS. Upgrade to Premium to generate &amp; download all 10 certified PDF reports.
               </span>
             </div>
             <button
@@ -421,7 +421,7 @@ export const ReportsHub: React.FC<ReportsHubProps> = ({ onNavigateTab }) => {
                 <Lock size={22} color="#F59E0B" style={{ flexShrink: 0 }} />
                 <div>
                   <strong style={{ color: '#FDE68A', fontSize: '14px', display: 'block' }}>
-                    10 Minutes consultation session limit ONLY AFTER THAT NO ACCESS
+                    15 Minutes consultation session limit ONLY AFTER THAT NO ACCESS
                   </strong>
                   <span style={{ fontSize: '12px', color: '#CBD5E1' }}>
                     Stored dossiers &amp; printable PDF booklets are locked for free users. Upgrade to Premium for unrestricted full report downloads.

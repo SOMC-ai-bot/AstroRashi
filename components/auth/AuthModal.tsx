@@ -219,6 +219,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           transition: background .2s, color .2s;
         }
         .ar-close-btn:hover { background: rgba(255,255,255,.18); color: #fff; }
+        @media (max-width: 680px) {
+          .auth-horizontal-card {
+            flex-direction: column !important;
+            max-height: 94vh !important;
+            overflow-y: auto !important;
+          }
+          .auth-left-cosmic {
+            min-height: 140px !important;
+            padding: 20px 20px 16px !important;
+            flex: none !important;
+          }
+          .auth-right-form {
+            padding: 24px 20px !important;
+          }
+        }
       `}</style>
 
       {/* Backdrop */}
@@ -227,22 +242,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       {/* Modal wrapper */}
       <div style={{ position:'fixed', inset:0, zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', padding:'16px', pointerEvents:'none' }}>
         <div style={{
-          display:'flex', width:'100%', maxWidth:'780px', minHeight:'480px', maxHeight:'95vh',
+          display:'flex', flexDirection:'row', width:'100%', maxWidth:'820px', minHeight:'460px', maxHeight:'90vh',
           borderRadius:'24px', overflow:'hidden',
           boxShadow:'0 32px 80px rgba(0,0,0,.75), 0 0 0 1px rgba(167,139,250,.22)',
           pointerEvents:'all',
+          boxSizing:'border-box',
           opacity: visible ? 1 : 0,
           animation: visible ? 'ar-fadein .42s cubic-bezier(.34,1.56,.64,1) forwards' : 'none',
-        }}>
+        }} className="auth-horizontal-card">
 
           {/* ══ LEFT — Cosmic Panel ══ */}
           <div style={{
-            flex:'0 0 46%', minWidth:'240px', position:'relative',
+            flex:'0 0 44%', minWidth:'220px', position:'relative',
             background:'linear-gradient(155deg,#1c0540 0%,#0f0b28 28%,#2d2862 55%,#1a0a40 80%,#100720 100%)',
             display:'flex', flexDirection:'column', justifyContent:'flex-end',
-            padding:'38px 34px', overflow:'hidden',
+            padding:'34px 28px', overflow:'hidden', boxSizing:'border-box',
             animation: visible ? 'ar-left .5s .1s ease both' : 'none',
-          }}>
+          }} className="auth-left-cosmic">
             <StarField />
 
             {/* Large blue planet */}
@@ -276,9 +292,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           <div style={{
             flex:1, background:'linear-gradient(180deg,#130c2e 0%,#0c0b1e 100%)',
             display:'flex', flexDirection:'column', justifyContent:'center',
-            padding:'44px 40px', position:'relative',
+            padding:'40px 36px', position:'relative', boxSizing:'border-box',
             animation: visible ? 'ar-right .5s .15s ease both' : 'none',
-          }}>
+          }} className="auth-right-form">
             <button className="ar-close-btn" onClick={onClose} style={{ position:'absolute', top:'16px', right:'16px' }}>
               <X size={15} />
             </button>

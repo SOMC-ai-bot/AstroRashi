@@ -391,7 +391,7 @@ export const UniversalToolModal: React.FC<UniversalToolModalProps> = ({
                     }
                     size="sm"
                   >
-                    Verdict: {result.interpretation.quality}
+                    Verdict: {result.interpretation.quality === 'Good' ? 'Auspicious' : result.interpretation.quality === 'Avoid' ? 'Challenging' : 'Neutral'}
                   </Badge>
                 )}
               </div>
@@ -460,6 +460,7 @@ export const UniversalToolModal: React.FC<UniversalToolModalProps> = ({
                 </div>
               )}
 
+              {/* Classical Shastric Context */}
               {result.interpretation.traditionalContext && (
                 <div
                   style={{
@@ -478,6 +479,37 @@ export const UniversalToolModal: React.FC<UniversalToolModalProps> = ({
                   </p>
                 </div>
               )}
+
+              {/* Comprehensive Remedial & Behavioral Infographic Breakdown */}
+              <div
+                style={{
+                  marginTop: '14px',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                  gap: '10px',
+                }}
+              >
+                <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '10px', padding: '12px 14px' }}>
+                  <span style={{ fontSize: '11px', color: '#F5D061', fontWeight: 800, textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
+                    ⚡ Planetary Balance Factor
+                  </span>
+                  <p style={{ fontSize: '12px', color: '#E2E8F0', margin: 0, lineHeight: 1.45 }}>
+                    Evaluated across Lagna coordinates ({result.input?.city || 'Local Horizon'}) with high-precision sidereal degrees.
+                  </p>
+                </div>
+                <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '10px', padding: '12px 14px' }}>
+                  <span style={{ fontSize: '11px', color: '#38BDF8', fontWeight: 800, textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
+                    🎯 Astrological Directive
+                  </span>
+                  <p style={{ fontSize: '12px', color: '#E2E8F0', margin: 0, lineHeight: 1.45 }}>
+                    {result.interpretation.quality === 'Good'
+                      ? 'Harmonious configuration. Channelize high-vibrational timing for progressive ventures.'
+                      : result.interpretation.quality === 'Avoid'
+                      ? 'Intense karmic alignments detected. Implement recommended Vedic remedies and caution.'
+                      : 'Mixed astrological energies. Balance decisions through discernment and meditation.'}
+                  </p>
+                </div>
+              </div>
 
               {/* Graphical Ephemeris Precision Metrics */}
               <div

@@ -531,19 +531,24 @@ export const ToolsHub: React.FC<ToolsHubProps> = ({ onAskAI, onNavigateTab }) =>
       if (toolId === 'moon-sign') {
         const moonLon = moon?.absoluteDegree || 45.2;
         const nak = getNakshatraFromLongitude(moonLon);
+        // Moon in Scorpio (debilitated) is Avoid/Challenging, Taurus exalted is Good/Auspicious, others Neutral
+        const isDebilitated = moon?.sign === 'Scorpio';
+        const isExalted = moon?.sign === 'Taurus';
+        const moonQuality: 'Good' | 'Neutral' | 'Avoid' = isDebilitated ? 'Avoid' : isExalted ? 'Good' : 'Neutral';
+
         resObj = {
           toolId: 'moon-sign',
           toolName: 'Moon Sign Calculator',
           calculationVersion: '1.0.0',
           input: { birthDate: inputDate, birthTime: inputTime, city: selectedCity.name },
           calculatedAt: new Date().toISOString(),
-          findings: { sign: moon?.sign, degree: moon?.degree, nakshatra: nak.nakshatra.name, pada: nak.pada },
+          findings: { sign: moon?.sign, degree: moon?.degree, nakshatra: nak.nakshatra.name, pada: nak.pada, dignity: isDebilitated ? 'Neecha (Debilitated)' : isExalted ? 'Ucha (Exalted)' : 'Swakshetra / Mitrakhetra' },
           interpretation: {
-            summary: `Your Vedic Moon Sign is ${moon?.sign} (${moon?.degree}°${moon?.minute}') in ${nak.nakshatra.name} Nakshatra (Pada ${nak.pada}).`,
-            whatThisMeans: `In Vedic Jyotish, your Moon Sign (Rashi) is the sovereign ruler of your emotional memory, psychological instincts, and mental peace. Having your Moon in ${moon?.sign} anchors your thoughts in ${moon?.element} element resilience.`,
+            summary: `Your Vedic Moon Sign is ${moon?.sign} (${moon?.degree}°${moon?.minute}') in ${nak.nakshatra.name} Nakshatra (Pada ${nak.pada}). Dignity: ${isDebilitated ? 'Neecha (Debilitated - High Emotional Intensity)' : isExalted ? 'Ucha (Exalted - Supreme Mental Peace)' : 'Harmonious Balance'}.`,
+            whatThisMeans: `In Vedic Jyotish, your Moon Sign (Rashi) is the sovereign ruler of your emotional memory, psychological instincts, and mental peace. Having your Moon in ${moon?.sign} anchors your thoughts in ${moon?.element} element dynamics. ${isDebilitated ? 'Mars-ruled water sign creates deep psychological churn; regular meditation and silver accessories are advised.' : isExalted ? 'Venus-ruled earth sign bestows emotional calm and stability.' : 'Your cognitive faculties operate with adaptable analytical depth.'}`,
             howCalculated: `Calculated from your birth coordinates (${selectedCity.latitude}°, ${selectedCity.longitude}°) using sidereal celestial mechanics with Lahiri Ayanamsa (~24° offset from tropical).`,
-            traditionalContext: `Classical texts describe Moon in ${moon?.sign} as conferring intellectual devotion, artistic sensitivity, and steady loyalty to trusted companions.`,
-            quality: 'Good',
+            traditionalContext: `Classical texts describe Moon in ${moon?.sign} as conferring ${isDebilitated ? 'occult sensitivity, intense passion, and investigative perception' : isExalted ? 'artistic appreciation, steady abundance, and emotional nourishment' : 'intellectual devotion, steady loyalty, and keen adaptability'}.`,
+            quality: moonQuality,
           },
           relatedTools: [
             { id: 'nakshatra', title: 'Nakshatra Calculator' },
@@ -552,19 +557,23 @@ export const ToolsHub: React.FC<ToolsHubProps> = ({ onAskAI, onNavigateTab }) =>
           disclaimer: 'Astrological interpretations provide reflective guidance and are not fatalistic predictions.',
         };
       } else if (toolId === 'sun-sign') {
+        const isSunDebilitated = sun?.sign === 'Libra';
+        const isSunExalted = sun?.sign === 'Aries';
+        const sunQuality: 'Good' | 'Neutral' | 'Avoid' = isSunDebilitated ? 'Avoid' : isSunExalted ? 'Good' : 'Neutral';
+
         resObj = {
           toolId: 'sun-sign',
           toolName: 'Sun Sign Calculator',
           calculationVersion: '1.0.0',
           input: { birthDate: inputDate },
           calculatedAt: new Date().toISOString(),
-          findings: { vedicSidereal: sun?.sign, westernTropical: 'Virgo' },
+          findings: { vedicSidereal: sun?.sign, degree: `${sun?.degree}°`, dignity: isSunDebilitated ? 'Neecha (Debilitated in Libra)' : isSunExalted ? 'Ucha (Exalted in Aries)' : 'Neutral / Friend Rashi' },
           interpretation: {
-            summary: `Vedic Sidereal Sun: ${sun?.sign} (${sun?.degree}°) | Western Tropical Sun: Virgo`,
-            whatThisMeans: 'Your Sidereal Sun reflects your soul purpose and karmic vitality according to physical constellations, while your Western Tropical Sun reflects seasonal archetypes.',
+            summary: `Vedic Sidereal Sun: ${sun?.sign} (${sun?.degree}°) | Dignity: ${isSunDebilitated ? 'Neecha (Requires Surya Arghya & discipline)' : isSunExalted ? 'Ucha (High leadership & vitality)' : 'Balanced Atmakaraka'}`,
+            whatThisMeans: `Your Sidereal Sun reflects your soul purpose and karmic vitality according to physical constellations. In ${sun?.sign}, Surya indicates ${isSunDebilitated ? 'diplomatic sensitivity where asserting personal boundaries requires conscious effort' : isSunExalted ? 'commanding leadership, sovereign initiative, and high vital heat' : 'steady application of willpower and social duty'}.`,
             howCalculated: 'Precession of the equinoxes creates a ~24° difference between the tropical vernal point and the sidereal fixed star Chitra.',
             traditionalContext: 'In ancient Jyotish, the Sun (Surya) represents Atmakaraka (soul authority) and physical father.',
-            quality: 'Good',
+            quality: sunQuality,
           },
           relatedTools: [{ id: 'moon-sign', title: 'Moon Sign Calculator' }],
           disclaimer: 'Astrological frameworks are interpretive systems.',
@@ -1399,8 +1408,20 @@ export const ToolsHub: React.FC<ToolsHubProps> = ({ onAskAI, onNavigateTab }) =>
               <Input label="Partner 2 Name" value={inputNameB} onChange={(e) => setInputNameB(e.target.value)} />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <Input label="Partner 1 Birth Date" type="date" value={inputDate} onChange={(e) => setInputDate(e.target.value)} />
-              <Input label="Partner 2 Birth Date" type="date" value={inputDateB} onChange={(e) => setInputDateB(e.target.value)} />
+              <Input
+                label="Partner 1 Birth Date"
+                type="date"
+                value={inputDate}
+                onChange={(e) => setInputDate(e.target.value)}
+                onClear={() => setInputDate('')}
+              />
+              <Input
+                label="Partner 2 Birth Date"
+                type="date"
+                value={inputDateB}
+                onChange={(e) => setInputDateB(e.target.value)}
+                onClear={() => setInputDateB('')}
+              />
             </div>
           </>
         ) : activeToolId === 'name-numerology' || activeToolId === 'baby-name' ? (
@@ -1410,8 +1431,15 @@ export const ToolsHub: React.FC<ToolsHubProps> = ({ onAskAI, onNavigateTab }) =>
               value={inputNameA}
               onChange={(e) => setInputNameA(e.target.value)}
               placeholder="e.g. Aarav Sharma"
+              onClear={() => setInputNameA('')}
             />
-            <Input label="Birth Date" type="date" value={inputDate} onChange={(e) => setInputDate(e.target.value)} />
+            <Input
+              label="Birth Date"
+              type="date"
+              value={inputDate}
+              onChange={(e) => setInputDate(e.target.value)}
+              onClear={() => setInputDate('')}
+            />
           </div>
         ) : activeToolId === 'mobile-numerology' ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -1435,8 +1463,20 @@ export const ToolsHub: React.FC<ToolsHubProps> = ({ onAskAI, onNavigateTab }) =>
         ) : (
           <>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <Input label="Birth Date" type="date" value={inputDate} onChange={(e) => setInputDate(e.target.value)} />
-              <Input label="Birth Time" type="time" value={inputTime} onChange={(e) => setInputTime(e.target.value)} />
+              <Input
+                label="Birth Date"
+                type="date"
+                value={inputDate}
+                onChange={(e) => setInputDate(e.target.value)}
+                onClear={() => setInputDate('')}
+              />
+              <Input
+                label="Birth Time"
+                type="time"
+                value={inputTime}
+                onChange={(e) => setInputTime(e.target.value)}
+                onClear={() => setInputTime('')}
+              />
             </div>
             <LocationPicker
               selectedCity={selectedCity}

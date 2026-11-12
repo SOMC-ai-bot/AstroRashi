@@ -510,12 +510,14 @@ The ultimate destination of Pisces is pure self-realization: navigating earthly 
 
       {/* 2. Responsive 12 Signs Grid */}
       <div
+        className="zodiac-signs-grid"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 130px), 1fr))',
           gap: '12px',
           width: '100%',
           maxWidth: '100%',
+          boxSizing: 'border-box',
         }}
       >
         {signs.map((sign) => {
@@ -595,16 +597,20 @@ The ultimate destination of Pisces is pure self-realization: navigating earthly 
 
       {/* 3. Selected Sign Highlight Banner */}
       <div
+        className="zodiac-highlight-banner"
         style={{
           padding: '22px 26px',
           borderRadius: '14px',
           background: 'linear-gradient(135deg, rgba(16, 22, 44, 0.95) 0%, rgba(9, 12, 24, 0.98) 100%)',
           border: '1.5px solid rgba(245, 208, 97, 0.35)',
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
           gap: '22px',
           alignItems: 'center',
           boxShadow: '0 16px 40px rgba(0, 0, 0, 0.85)',
+          width: '100%',
+          maxWidth: '100%',
+          boxSizing: 'border-box',
         }}
       >
         <div>
@@ -646,7 +652,7 @@ The ultimate destination of Pisces is pure self-realization: navigating earthly 
           </button>
         </div>
 
-        <div style={{ borderLeft: '1px solid rgba(245, 208, 97, 0.2)', paddingLeft: '22px' }}>
+        <div className="zodiac-highlight-right" style={{ borderLeft: '1px solid rgba(245, 208, 97, 0.2)', paddingLeft: '22px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '12px', fontSize: '12.5px' }}>
             <div>
               <span style={{ color: '#94A3B8', display: 'block' }}>Element:</span>
@@ -979,6 +985,21 @@ The ultimate destination of Pisces is pure self-realization: navigating earthly 
           </div>
         </div>
       )}
+
+      <style jsx>{`
+        @media (max-width: 640px) {
+          .zodiac-highlight-banner {
+            padding: 16px !important;
+            gap: 16px !important;
+          }
+          .zodiac-highlight-right {
+            border-left: none !important;
+            padding-left: 0 !important;
+            border-top: 1px solid rgba(245, 208, 97, 0.2) !important;
+            padding-top: 14px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

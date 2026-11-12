@@ -48,8 +48,8 @@ export const FullExpertChatScreen: React.FC<FullExpertChatScreenProps> = ({
   const { natalChart, activeProfile } = useAstrology();
   const { openUpgradeModal } = useSubscription();
 
-  // Consultation Session Timer: 20 minutes = 1200 seconds
-  const TOTAL_SESSION_SECONDS = 20 * 60;
+  // Consultation Session Timer: 15 minutes = 900 seconds
+  const TOTAL_SESSION_SECONDS = 15 * 60;
   const [secondsRemaining, setSecondsRemaining] = useState<number>(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem(`astronex_expert_timer_${expert.id}_${bookingData.fullName}`);
@@ -75,7 +75,7 @@ export const FullExpertChatScreen: React.FC<FullExpertChatScreenProps> = ({
       {
         id: `ast-init-${Date.now()}`,
         role: 'assistant',
-        content: `Namaste and Pranam ${bookingData.fullName}.\n\nI am ${expert.name}, ${expert.title}. I have reviewed your consultation dossier:\n\nDate of Birth: ${bookingData.birthDate}\nTime of Birth: ${bookingData.birthTime}\nGender: ${bookingData.gender}\n${bookingData.phoneNumber ? `Contact: ${bookingData.phoneNumber}\n` : ''}\nAs an expert with ${expert.experienceYears}+ years of experience specializing in ${expert.specialties.join(', ')}, I have calculated your astrological placements.\n\nOur 20-minute dedicated consultation is active. Please ask your questions regarding career, relationship timing, or specific Vedic remedies.`,
+        content: `Namaste and Pranam ${bookingData.fullName}.\n\nI am ${expert.name}, ${expert.title}. I have reviewed your consultation dossier:\n\nDate of Birth: ${bookingData.birthDate}\nTime of Birth: ${bookingData.birthTime}\nGender: ${bookingData.gender}\n${bookingData.phoneNumber ? `Contact: ${bookingData.phoneNumber}\n` : ''}\nAs an expert with ${expert.experienceYears}+ years of experience specializing in ${expert.specialties.join(', ')}, I have calculated your astrological placements.\n\nOur 15-minute dedicated consultation is active. Please ask your questions regarding career, relationship timing, or specific Vedic remedies.`,
         timestamp: new Date().toISOString(),
       },
     ];
@@ -354,7 +354,7 @@ export const FullExpertChatScreen: React.FC<FullExpertChatScreenProps> = ({
                 fontWeight: 700,
                 fontFamily: 'monospace',
               }}
-              title="20-Minute dedicated consultation session limit"
+              title="15-Minute dedicated consultation session limit"
             >
               <Clock size={13} />
               <span>{isExpired ? 'SESSION ENDED' : formatTimer(secondsRemaining)}</span>

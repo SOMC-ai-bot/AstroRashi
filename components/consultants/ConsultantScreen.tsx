@@ -48,7 +48,9 @@ export interface ExpertAstrologer {
   iconType: 'shastri' | 'sundaram' | 'joshi' | 'devendra';
   pricingPerSession: number;
   freeWithPlan: boolean;
-  nextAvailable: string;
+  availableTimings: string;
+  availableStartHour: number; // 24-hr format
+  availableEndHour: number; // 24-hr format
   bio: string;
 }
 
@@ -65,7 +67,9 @@ export const EXPERT_ASTROLOGERS: ExpertAstrologer[] = [
     iconType: 'shastri',
     pricingPerSession: 289,
     freeWithPlan: true,
-    nextAvailable: 'Today, 4:30 PM',
+    availableTimings: '9:00 AM to 8:00 PM (Daily)',
+    availableStartHour: 9,
+    availableEndHour: 20,
     bio: 'Gold Medalist from Sampurnanand Sanskrit Vishwavidyalaya, Varanasi. Renowned across India for accurate Dasha timing and sacred Vedic remedies.',
   },
   {
@@ -80,7 +84,9 @@ export const EXPERT_ASTROLOGERS: ExpertAstrologer[] = [
     iconType: 'sundaram',
     pricingPerSession: 199,
     freeWithPlan: true,
-    nextAvailable: 'Today, 6:00 PM',
+    availableTimings: '11:00 AM to 6:00 PM (Daily)',
+    availableStartHour: 11,
+    availableEndHour: 18,
     bio: 'Pioneered Krishnamurti Paddhati (KP) sub-lord algorithms for precise marriage timing and career transition periods.',
   },
   {
@@ -95,7 +101,9 @@ export const EXPERT_ASTROLOGERS: ExpertAstrologer[] = [
     iconType: 'joshi',
     pricingPerSession: 399,
     freeWithPlan: true,
-    nextAvailable: 'Tomorrow, 11:00 AM',
+    availableTimings: '10:00 AM to 8:00 PM (Daily)',
+    availableStartHour: 10,
+    availableEndHour: 20,
     bio: 'Consultant to top corporate enterprises and high-net-worth investors across Mumbai and Ahmedabad on planetary wealth alignment.',
   },
   {
@@ -110,7 +118,9 @@ export const EXPERT_ASTROLOGERS: ExpertAstrologer[] = [
     iconType: 'devendra',
     pricingPerSession: 499,
     freeWithPlan: true,
-    nextAvailable: 'Tomorrow, 2:00 PM',
+    availableTimings: '1:00 PM to 9:00 PM (Daily)',
+    availableStartHour: 13,
+    availableEndHour: 21,
     bio: 'Specialist in resolving stubborn planetary afflictions through Vedic yantras, gemstone calibrations, and customized mantra sadhanas.',
   },
 ];
@@ -379,6 +389,11 @@ export const ConsultantScreen: React.FC<ConsultantScreenProps> = ({ onTabChange,
           const hasBooked = !!bookedSessions[expert.id];
           const isUnlocked = user.isPremium || hasBooked;
 
+          // Check real-time daily availability based on current IST hour
+          const nowIST = new Date();
+          const currentHour = nowIST.getHours();
+          const isCurrentlyActive = currentHour >= expert.availableStartHour && currentHour < expert.availableEndHour;
+
           return (
             <Card
               key={expert.id}
@@ -389,11 +404,12 @@ export const ConsultantScreen: React.FC<ConsultantScreenProps> = ({ onTabChange,
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                border: '1px solid #41454D',
+                border: isCurrentlyActive ? '1px solid #41454D' : '1px solid rgba(239, 68, 68, 0.25)',
                 backgroundColor: '#25282E',
                 borderRadius: '18px',
                 minHeight: '380px',
                 boxShadow: 'none',
+                opacity: isCurrentlyActive ? 1 : 0.85,
               }}
             >
               <div>
@@ -514,14 +530,29 @@ export const ConsultantScreen: React.FC<ConsultantScreenProps> = ({ onTabChange,
                   </div>
 
                   <div style={{ textAlign: 'right' }}>
-                    <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 650, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Clock size={11} /> Next: {expert.nextAvailable}
+                    <div style={{ fontSize: '11px', color: '#64748B' }}>Available Timings</div>
+                    <span style={{ fontSize: '11.5px', color: isCurrentlyActive ? '#10B981' : '#F59E0B', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+                      <Clock size={11} /> {expert.availableTimings}
+                    </span>
+                    <span style={{ fontSize: '10px', color: isCurrentlyActive ? '#34D399' : '#EF4444', fontWeight: 650, display: 'block', marginTop: '2px' }}>
+                      {isCurrentlyActive ? '● Available for Consultation Now' : '○ Currently Offline (Chat Locked)'}
                     </span>
                   </div>
                 </div>
 
                 {/* Primary Action Button */}
-                {hasBooked ? (
+                {!isCurrentlyActive ? (
+                  <Button
+                    variant="outline"
+                    size="md"
+                    fullWidth
+                    disabled
+                    style={{ opacity: 0.6, cursor: 'not-allowed' }}
+                    icon={<Lock size={14} />}
+                  >
+                    Chat Locked (Available {expert.availableTimings})
+                  </Button>
+                ) : hasBooked ? (
                   <Button
                     variant="orange"
                     size="md"

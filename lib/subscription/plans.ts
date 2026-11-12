@@ -10,7 +10,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     yearlyPrice: 0,
     currency: '₹',
     consultantLimit: 1,
-    consultationDurationLimitMinutes: 20,
+    consultationDurationLimitMinutes: 15,
     features: [
       'Daily Horoscope & Panchang Summary',
       'Basic Zodiac Insights & Energy',
@@ -18,7 +18,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
       'Community Discussions Access',
       'Basic Birth Chart (Sun, Moon, Rising)',
       'AstroRashi Specialist Access (1 Mode only)',
-      '20 Minutes consultation session limit ONLY AFTER THAT NO ACCESS',
+      '15 Minutes consultation session limit ONLY AFTER THAT NO ACCESS',
       'Life Insights & Cosmic Blueprint ACCESS ONLY (Birth chart PDF & Kundli match locked)',
       'Only 2 Astrology Tools accessible (Others locked)',
       'Only 2 Reports download accessible',
