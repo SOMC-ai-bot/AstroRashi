@@ -147,7 +147,7 @@ export const UpgradeSheet: React.FC<UpgradeSheetProps> = ({
               transition: 'all 0.15s ease',
             }}
           >
-            <span>Yearly (Save 44%)</span>
+            <span>Yearly (Save 30%)</span>
             <span style={{ fontSize: '9px', background: 'rgba(0,0,0,0.3)', padding: '2px 6px', borderRadius: '8px', fontWeight: 900 }}>
               BEST VALUE
             </span>
@@ -239,14 +239,14 @@ export const UpgradeSheet: React.FC<UpgradeSheetProps> = ({
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '10px' }}>
                 <span style={{ fontSize: '24px', fontWeight: 900, color: '#FFFFFF' }}>
-                  {billingCycle === 'yearly' ? '₹599' : '₹89'}
+                  {billingCycle === 'yearly' ? '₹499' : '₹59'}
                 </span>
                 <span style={{ fontSize: '11px', color: '#94A3B8' }}>
                   /{billingCycle === 'yearly' ? 'year' : 'month'}
                 </span>
                 {billingCycle === 'yearly' && (
                   <span style={{ fontSize: '10px', color: '#34D399', fontWeight: 800, marginLeft: '4px' }}>
-                    Save 44%
+                    Save 30%
                   </span>
                 )}
               </div>

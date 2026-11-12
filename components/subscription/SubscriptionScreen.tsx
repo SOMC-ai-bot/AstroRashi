@@ -228,7 +228,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({ onOpenPr
               boxShadow: billingCycle === 'yearly' ? '0 2px 12px rgba(16, 185, 129, 0.4)' : 'none',
             }}
           >
-            <span>Yearly (Save Up To 44%)</span>
+            <span>Yearly (Save Up To 30%)</span>
             <span style={{ fontSize: '10px', background: 'rgba(0,0,0,0.3)', padding: '2px 8px', borderRadius: '10px', fontWeight: 900 }}>
               BEST VALUE
             </span>
@@ -236,8 +236,8 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({ onOpenPr
         </div>
         <span style={{ fontSize: '11.5px', color: '#CBD5E1' }}>
           {billingCycle === 'yearly'
-            ? 'Yearly billing: Premium ₹599/yr (Save 44%)'
-            : 'Monthly billing: Premium ₹89/mo (Flexible cancel anytime)'}
+            ? 'Yearly billing: Premium ₹499/yr (Save 30%)'
+            : 'Monthly billing: Premium ₹59/mo (Flexible cancel anytime)'}
         </span>
       </div>
 

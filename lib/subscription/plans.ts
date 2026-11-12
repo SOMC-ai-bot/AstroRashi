@@ -34,9 +34,9 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
     id: 'plan_premium',
     tier: 'premium',
     name: 'Premium',
-    subtitle: 'Everything unlimited available features (₹89/mo or ₹599/yr)',
-    monthlyPrice: 89,
-    yearlyPrice: 599, // ₹599/year (Save ~44%)
+    subtitle: 'Everything unlimited available features (₹59/mo or ₹499/yr)',
+    monthlyPrice: 59,
+    yearlyPrice: 499, // ₹499/year (Save ~30%)
     currency: '₹',
     badge: 'Ultimate VIP',
     isPopular: true,

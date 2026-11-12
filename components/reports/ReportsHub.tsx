@@ -259,7 +259,7 @@ export const ReportsHub: React.FC<ReportsHubProps> = ({ onNavigateTab }) => {
                 onClick={() => openUpgradeModal('Full Astrological Report Bundle')}
                 icon={<Sparkles size={14} color="var(--gold-primary)" />}
               >
-                Unlock All Reports (Premium ₹89)
+                Unlock All Reports (Premium ₹59)
               </Button>
             )}
           </div>
@@ -663,7 +663,7 @@ export const ReportsHub: React.FC<ReportsHubProps> = ({ onNavigateTab }) => {
                   onClick={() => handleGenerate(item)}
                   icon={isAccessible ? <FileText size={14} /> : <Lock size={14} color="var(--gold-primary)" />}
                 >
-                  {isAccessible ? 'Generate & View Report' : 'Unlock with Premium (₹89)'}
+                  {isAccessible ? 'Generate & View Report' : 'Unlock with Premium (₹59)'}
                 </Button>
               </Card>
             );

@@ -320,7 +320,7 @@ export const AIConsultantChatModal: React.FC = () => {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#F87171', fontSize: '13px', fontWeight: 600 }}>
               <Lock size={16} />
-              <span>Free 20-minute consultation has ended. Unlock unlimited access with Premium!</span>
+              <span>Free 15-minute consultation has ended. Unlock unlimited access with Premium!</span>
             </div>
             <Button
               variant="primary"
@@ -330,7 +330,7 @@ export const AIConsultantChatModal: React.FC = () => {
                 openUpgradeModal('Unlimited Astrologer Consultations');
               }}
             >
-              Upgrade to Premium (₹89)
+              Upgrade to Premium (₹59)
             </Button>
           </div>
         )}

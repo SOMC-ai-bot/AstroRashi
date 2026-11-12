@@ -277,7 +277,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   padding: '6px 4px',
                 }}
               >
-                <span>{user.isPremium ? 'Change Subscription Plan' : 'Upgrade to Premium (₹89/mo)'}</span>
+                <span>{user.isPremium ? 'Change Subscription Plan' : 'Upgrade to Premium (₹59/mo)'}</span>
               </button>
             </div>
           </div>

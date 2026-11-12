@@ -106,7 +106,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose }) =
           >
             <span>Yearly</span>
             <Badge variant="gold" size="sm">
-              Save 44% (₹599/yr)
+              Save 30% (₹499/yr)
             </Badge>
           </button>
         </div>
